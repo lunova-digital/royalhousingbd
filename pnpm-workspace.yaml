@@ -1,0 +1,7 @@
+# Which packages' install scripts pnpm may run. sharp ships prebuilt binaries;
+# better-sqlite3 is only an optional peer of drizzle-orm and is never loaded.
+allowBuilds:
+  sharp: true
+  better-sqlite3: false
+  esbuild: false
+  unrs-resolver: false
