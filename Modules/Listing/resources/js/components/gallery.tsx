@@ -6,7 +6,7 @@ import { api, ApiError, assetUrl, upload } from '@/lib/api'
 
 import type { ListingImage } from '../types'
 
-// The listing's photo gallery: multi-upload, reorder (first is the cover), delete.
+// The listing's photo gallery: multi-upload, reorder (first is the cover), delete. Two tiles per row, sized for the form's side column.
 export function Gallery({
   listingId,
   images,
@@ -56,19 +56,19 @@ export function Gallery({
 
   return (
     <div className="grid gap-3">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3">
         {images.map((image, index) => (
-          <figure key={image.id} className="group bg-muted relative aspect-[4/3] overflow-hidden rounded-md border">
+          <figure key={image.id} className="group bg-muted relative aspect-[4/3] overflow-hidden rounded-lg border">
             <img src={assetUrl(image.thumb_path || image.path)} alt="" className="size-full object-cover" />
-            {index === 0 && <span className="bg-background/90 absolute top-2 left-2 rounded px-1.5 py-0.5 text-xs font-medium">Cover</span>}
-            <div className="bg-background/90 absolute inset-x-0 bottom-0 flex justify-between p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-              <Button type="button" variant="ghost" size="icon" aria-label="Move earlier" disabled={index === 0} onClick={() => void reorder(index, index - 1)}>
+            {index === 0 && <span className="bg-background/90 absolute top-2 left-2 rounded px-1.5 py-0.5 text-xs font-medium shadow-sm">Cover</span>}
+            <div className="bg-background/90 absolute inset-x-0 bottom-0 flex justify-between p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+              <Button type="button" variant="ghost" size="icon-sm" aria-label="Move earlier" disabled={index === 0} onClick={() => void reorder(index, index - 1)}>
                 <ChevronLeftIcon />
               </Button>
-              <Button type="button" variant="ghost" size="icon" aria-label="Delete photo" onClick={() => void remove(image)}>
+              <Button type="button" variant="ghost" size="icon-sm" aria-label="Delete photo" className="text-destructive hover:text-destructive" onClick={() => void remove(image)}>
                 <Trash2Icon />
               </Button>
-              <Button type="button" variant="ghost" size="icon" aria-label="Move later" disabled={index === images.length - 1} onClick={() => void reorder(index, index + 1)}>
+              <Button type="button" variant="ghost" size="icon-sm" aria-label="Move later" disabled={index === images.length - 1} onClick={() => void reorder(index, index + 1)}>
                 <ChevronRightIcon />
               </Button>
             </div>
@@ -78,14 +78,14 @@ export function Gallery({
           type="button"
           disabled={busy}
           onClick={() => input.current?.click()}
-          className="text-muted-foreground hover:bg-muted flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-md border border-dashed text-sm"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm transition-colors disabled:opacity-60"
         >
           <UploadIcon className="size-5" />
           {busy ? 'Uploading…' : 'Add photos'}
         </button>
       </div>
       <input ref={input} type="file" accept="image/*" multiple hidden onChange={(e) => void add(e.target.files)} />
-      <p className="text-muted-foreground text-xs">The first photo is the cover. Photos are resized and optimised on upload.</p>
+      <p className="text-muted-foreground text-xs">Hover a photo to reorder or delete it. Photos are resized and optimised on upload.</p>
       {error && <p className="text-destructive text-sm">{error}</p>}
     </div>
   )

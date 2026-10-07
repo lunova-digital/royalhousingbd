@@ -5,8 +5,9 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { Field } from '@/components/field'
 import { PageHeader } from '@/components/page-header'
 import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Switch } from '@/components/ui/switch'
@@ -97,13 +98,17 @@ export function ListingFormPage() {
 
       {message && <Alert variant={message === 'Saved.' ? 'success' : 'destructive'}>{message}</Alert>}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="grid gap-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]">
+        <div className="grid content-start gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
+              <CardDescription>What it is, where it is and what it costs.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
+              <Field id="title" label="Title" error={errors.title}>
+                <Input id="title" value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="e.g. South-facing 3-bed flat in Bashundhara" />
+              </Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field id="type" label="Type" error={errors.type}>
                   <NativeSelect id="type" value={form.type} onChange={(e) => set('type', e.target.value as ListingType)}>
@@ -118,20 +123,28 @@ export function ListingFormPage() {
                   <Input id="location" value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="e.g. Bashundhara R/A, Dhaka" />
                 </Field>
               </div>
-              <Field id="title" label="Title" error={errors.title}>
-                <Input id="title" value={form.title} onChange={(e) => set('title', e.target.value)} />
-              </Field>
-              <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
+              <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
                 <Field id="price" label="Price" error={errors.price} hint="Free text, shown as typed (e.g. ৳ 45 Lakh, ৳ 35 Lakh / katha).">
-                  <Input id="price" value={form.price} onChange={(e) => set('price', e.target.value)} disabled={form.call_for_price} />
+                  <Input id="price" value={form.price} onChange={(e) => set('price', e.target.value)} disabled={form.call_for_price} placeholder="৳ 45 Lakh" />
                 </Field>
-                <Field id="call_for_price" label="Call for Price">
-                  <div className="flex h-9 items-center">
-                    <Switch id="call_for_price" checked={form.call_for_price} onCheckedChange={(v) => set('call_for_price', v)} />
-                  </div>
-                </Field>
+                <label className="bg-muted/40 flex h-9 items-center gap-3 self-start rounded-md border px-3 text-sm sm:mt-6">
+                  <Switch id="call_for_price" checked={form.call_for_price} onCheckedChange={(v) => set('call_for_price', v)} />
+                  <span className="font-medium whitespace-nowrap">Call for price</span>
+                </label>
               </div>
+            </CardContent>
+          </Card>
 
+          <Card>
+            <CardHeader>
+              <CardTitle>Specifications</CardTitle>
+              <CardDescription>
+                {form.type === 'property' && 'Land and built-up area of the property.'}
+                {form.type === 'plot' && 'Plot size in katha or sqft.'}
+                {form.type === 'flat' && 'Size, rooms and floor of the flat.'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
               {form.type === 'property' && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="land_area" label="Land area">
@@ -143,12 +156,12 @@ export function ListingFormPage() {
                 </div>
               )}
               {form.type === 'plot' && (
-                <Field id="size" label="Size" hint="Katha or sqft.">
+                <Field id="size" label="Size" hint="Katha or sqft." className="sm:max-w-xs">
                   <Input id="size" value={form.size} onChange={(e) => set('size', e.target.value)} placeholder="e.g. 3 katha" />
                 </Field>
               )}
               {form.type === 'flat' && (
-                <div className="grid gap-4 sm:grid-cols-4">
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <Field id="size" label="Size (sqft)">
                     <Input id="size" value={form.size} onChange={(e) => set('size', e.target.value)} placeholder="e.g. 1450 sqft" />
                   </Field>
@@ -163,23 +176,38 @@ export function ListingFormPage() {
                   </Field>
                 </div>
               )}
-
-              <Field id="facilities" label="Facilities" hint="One per line.">
+              <Field id="facilities" label="Facilities" hint="One per line; shown as a checklist on the detail page.">
                 <Textarea id="facilities" rows={4} value={facilitiesText} onChange={(e) => setFacilitiesText(e.target.value)} placeholder={'Car parking\nGenerator\n24/7 security'} />
-              </Field>
-              <Field id="description" label="Description">
-                <Textarea id="description" rows={8} value={form.description} onChange={(e) => set('description', e.target.value)} />
-              </Field>
-              <Field id="video_url" label="YouTube video" error={errors.video_url} hint="Paste a YouTube link; it is embedded on the detail page.">
-                <Input id="video_url" value={form.video_url} onChange={(e) => set('video_url', e.target.value)} placeholder="https://www.youtube.com/watch?v=…" />
               </Field>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
+              <CardTitle>Description &amp; video</CardTitle>
+              <CardDescription>The long text and optional YouTube embed on the detail page.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <Field id="description" label="Description">
+                <Textarea id="description" rows={10} value={form.description} onChange={(e) => set('description', e.target.value)} />
+              </Field>
+              <Field id="video_url" label="YouTube video" error={errors.video_url} hint="Paste a YouTube link; it is embedded on the detail page.">
+                <Input id="video_url" value={form.video_url} onChange={(e) => set('video_url', e.target.value)} placeholder="https://www.youtube.com/watch?v=…" />
+              </Field>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid content-start gap-6 lg:sticky lg:top-6 lg:self-start">
+          <Card>
+            <CardHeader>
               <CardTitle>Photos</CardTitle>
-              <CardDescription>{isNew ? 'Create the listing first, then add photos here.' : 'Gallery shown on the detail page.'}</CardDescription>
+              <CardDescription>{isNew ? 'Create the listing first, then add photos here.' : 'Gallery shown on the detail page. The first photo is the cover.'}</CardDescription>
+              {!isNew && listing && (
+                <CardAction>
+                  <Badge variant="secondary">{listing.images?.length ?? 0} {listing.images?.length === 1 ? 'photo' : 'photos'}</Badge>
+                </CardAction>
+              )}
             </CardHeader>
             {!isNew && listing && (
               <CardContent>
@@ -187,15 +215,13 @@ export function ListingFormPage() {
               </CardContent>
             )}
           </Card>
-        </div>
 
-        <div className="grid content-start gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Visibility</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <label className="flex items-center justify-between gap-4 text-sm">
+              <label className="flex items-center justify-between gap-4 rounded-md border p-3 text-sm">
                 <span>
                   <span className="font-medium">Published</span>
                   <span className="text-muted-foreground block text-xs">Visible on the website.</span>
