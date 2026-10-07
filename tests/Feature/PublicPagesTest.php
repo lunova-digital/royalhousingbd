@@ -47,8 +47,9 @@ class PublicPagesTest extends TestCase
     public function test_masterplan_pages_render_plots(): void
     {
         $this->get('/map')->assertOk()->assertSee('Royal City Phase 1')->assertSee('View Map');
-        $plot = Masterplan::query()->first()->plots->first();
-        $this->get('/map/royal-city-phase-1')
+        $masterplan = Masterplan::query()->first();
+        $plot = $masterplan->plots->first();
+        $this->get($masterplan->url())
             ->assertOk()
             ->assertSee('id="plan-data"', false)
             ->assertSee($plot->reference())

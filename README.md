@@ -65,7 +65,7 @@ app/Providers/           AppServiceProvider — login rate limiter, layout view 
 bootstrap/modules.php    the module list; its order is the wiring order
 config/laramod.php       module path/namespace and the route groups
 database/migrations/     only the framework's tables; feature tables live in their module
-database/seeders/        DatabaseSeeder (module seeders + demo), DemoSeeder (+ assets/demo-layout.svg)
+database/seeders/        DatabaseSeeder (module seeders + demo), DemoSeeder (+ assets/layouts/{nw,ne,sw,se}.svg)
 resources/js/            what admin pages share: components/ (ui = shadcn), hooks/, lib/ (api.ts, menu.ts)
 resources/views/errors/  404 / 500 inside the public layout
 mobile/                  Capacitor WebView shell (see mobile/README.md)

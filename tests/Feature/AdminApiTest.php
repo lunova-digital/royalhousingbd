@@ -31,7 +31,7 @@ class AdminApiTest extends TestCase
         $this->actingAs($this->admin)->getJson('/api/admin/dashboard')
             ->assertOk()
             ->assertJsonPath('listings.plot', 1)
-            ->assertJsonPath('maps', 1)
+            ->assertJsonPath('maps', 4)
             ->assertJsonPath('plots.available', Plot::query()->where('status', 'available')->count());
     }
 
@@ -79,7 +79,7 @@ class AdminApiTest extends TestCase
             ['svg_key' => $second, 'number' => 'Z9', 'status' => 'available'],
         ]])->assertOk()->assertJsonCount(2, 'masterplan.plots')->assertJsonPath('masterplan.plots.0.status', 'booked');
 
-        $this->assertDatabaseCount('plots', 2);
+        $this->assertSame(2, $map->plots()->count());
         $this->assertDatabaseHas('plots', ['svg_key' => $first, 'number' => 'A1']);
     }
 

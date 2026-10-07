@@ -11,7 +11,7 @@ use Modules\Masterplan\Services\MasterplanService;
 use Modules\Settings\Settings;
 
 /**
- * Sample content: one listing per type, a masterplan with a layout image and
+ * Sample content: one listing per type, four masterplans with layout images and
  * plots, ticker items, a video and contact settings. Runs only while there
  * are no listings, so it never touches real data.
  */
@@ -63,28 +63,38 @@ class DemoSeeder extends Seeder
         }
         Video::query()->create(['title' => 'Project walkthrough', 'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'sort_order' => 0]);
 
-        // A schematic SVG layout (one quarter of a real Dhaka project map) in
-        // which every <g class="plan-plot"> is a plot; details for each are
-        // filled in here the way the admin's builder would.
-        $masterplan = $masterplans->create(
-            ['name' => 'Royal City Phase 1', 'description' => 'Demo layout — replace it and the plot details in the admin.', 'published' => true],
-            file_get_contents(__DIR__.'/assets/demo-layout.svg'),
-        );
+        // Four schematic SVG layouts, one per quadrant of a real Dhaka project
+        // map, in which every <g class="plan-plot"> is a plot; details for each
+        // are filled in here the way the admin's builder would.
+        $quadrants = [
+            'nw' => 'Royal City Phase 1 — North West',
+            'ne' => 'Royal City Phase 1 — North East',
+            'sw' => 'Royal City Phase 1 — South West',
+            'se' => 'Royal City Phase 1 — South East',
+        ];
+        $first = null;
+        foreach ($quadrants as $file => $name) {
+            $masterplan = $masterplans->create(
+                ['name' => $name, 'description' => 'Demo layout — replace it and the plot details in the admin.', 'published' => true],
+                file_get_contents(__DIR__."/assets/layouts/{$file}.svg"),
+            );
+            $first ??= $masterplan;
 
-        $plots = [];
-        foreach ($masterplan->layout_keys as $i => $key) {
-            $plots[] = [
-                'svg_key' => $key,
-                'number' => 'P-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
-                'size' => ['3 katha', '5 katha', '2.5 katha'][$i % 3],
-                'price' => $i % 4 === 3 ? '' : '৳ 35 Lakh / katha',
-                'position' => 'Facing '.['north', 'east', 'south', 'west'][$i % 4],
-                'status' => ['available', 'available', 'booked', 'available', 'sold'][$i % 5],
-            ];
+            $plots = [];
+            foreach ($masterplan->layout_keys as $i => $key) {
+                $plots[] = [
+                    'svg_key' => $key,
+                    'number' => strtoupper($key),
+                    'size' => ['3 katha', '5 katha', '2.5 katha'][$i % 3],
+                    'price' => $i % 4 === 3 ? '' : '৳ 35 Lakh / katha',
+                    'position' => 'Facing '.['north', 'east', 'south', 'west'][$i % 4],
+                    'status' => ['available', 'available', 'booked', 'available', 'sold'][$i % 5],
+                ];
+            }
+            $masterplans->savePlots($masterplan, $plots);
         }
-        $masterplans->savePlots($masterplan, $plots);
 
         // The plot listing is a development on this map, so its card shows availability.
-        Listing::query()->where('type', 'plot')->update(['masterplan_id' => $masterplan->id]);
+        Listing::query()->where('type', 'plot')->update(['masterplan_id' => $first->id]);
     }
 }
