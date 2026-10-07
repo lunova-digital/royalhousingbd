@@ -1,16 +1,15 @@
-// Leaflet over a plain image (CRS.Simple): the shared core of the public
-// interactive map and the admin plot builder. Plot polygons are stored in
-// image-pixel coordinates (x right, y down); Leaflet's simple CRS has y up,
-// so every point is flipped through the image height on the way in and out.
+// Leaflet over the layout SVG (CRS.Simple): the shared core of the public
+// interactive map and the admin plot builder. The SVG is fetched, parsed and
+// placed as an svgOverlay covering its viewBox, so every
+// <g class="plan-plot"> stays a live DOM node that can be clicked and styled.
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+import './plan.css'
+
 export type PlotStatus = 'available' | 'booked' | 'sold'
 
-export interface Point {
-  x: number
-  y: number
-}
+export type PlotState = 'idle' | 'selected' | 'dimmed'
 
 export const STATUS_COLORS: Record<PlotStatus, string> = {
   available: '#22c55e',
@@ -24,22 +23,57 @@ export const STATUS_LABELS: Record<PlotStatus, string> = {
   sold: 'Sold',
 }
 
+export const PLOT_SELECTOR = 'g.plan-plot'
+
+/** Fetch a stored layout and parse it into a detached <svg> element. */
+export async function loadLayout(url: string): Promise<SVGSVGElement> {
+  const response = await fetch(url, { credentials: 'same-origin' })
+  if (!response.ok) throw new Error(`Could not load the layout (${response.status}).`)
+  return parseLayout(await response.text())
+}
+
+export function parseLayout(markup: string): SVGSVGElement {
+  const doc = new DOMParser().parseFromString(markup, 'image/svg+xml')
+  const root = doc.documentElement
+  if (root.namespaceURI !== 'http://www.w3.org/2000/svg' || root.localName !== 'svg') {
+    throw new Error('The file is not an SVG.')
+  }
+  return document.importNode(root, true) as unknown as SVGSVGElement
+}
+
+/** The key of a plot group: the server's data-plot, or the id for unsaved files. */
+export function plotKey(group: Element): string {
+  return group.getAttribute('data-plot') || group.id
+}
+
+/** The text label drawn inside a plot group, e.g. "07". */
+export function plotLabel(group: Element): string {
+  return (group.querySelector('text')?.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
+export function layoutSize(svg: SVGSVGElement): { width: number; height: number } {
+  const box = svg.viewBox.baseVal
+  if (box && box.width > 0 && box.height > 0) return { width: box.width, height: box.height }
+  return { width: svg.width.baseVal.value || 1600, height: svg.height.baseVal.value || 1000 }
+}
+
 export interface PlanMap {
   map: L.Map
+  svg: SVGSVGElement
   width: number
   height: number
-  toLatLng(p: Point): L.LatLngExpression
-  fromLatLng(ll: L.LatLng): Point
+  /** Plot groups by key, in document order. */
+  plots: Map<string, SVGGElement>
   fit(): void
   destroy(): void
 }
 
 export function createPlanMap(
   container: HTMLElement,
-  plan: { image: string; width: number; height: number },
-  options: { zoomControl?: boolean } = {},
+  svg: SVGSVGElement,
+  options: { zoomControl?: boolean; onPlotClick?: (key: string | null) => void } = {},
 ): PlanMap {
-  const { width, height } = plan
+  const { width, height } = layoutSize(svg)
   const bounds: L.LatLngBoundsExpression = [
     [0, 0],
     [height, width],
@@ -53,55 +87,66 @@ export function createPlanMap(
     zoomDelta: 0.5,
     attributionControl: false,
     zoomControl: options.zoomControl ?? true,
+    // The keyboard handler focuses the container on mousedown, which scrolls
+    // a parent pane and shifts the plot under the pointer before mouseup.
+    keyboard: false,
     maxBoundsViscosity: 0.8,
   })
 
-  L.imageOverlay(plan.image, bounds).addTo(map)
+  svg.classList.add('plan-layout')
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+  L.svgOverlay(svg, bounds, { interactive: true }).addTo(map)
   map.fitBounds(bounds)
   map.setMaxBounds(L.latLngBounds(bounds).pad(0.5))
   // Do not let the visitor zoom out past the whole layout by much.
   map.setMinZoom(map.getBoundsZoom(bounds) - 1)
 
+  const plots = new Map<string, SVGGElement>()
+  for (const group of svg.querySelectorAll<SVGGElement>(PLOT_SELECTOR)) {
+    const key = plotKey(group)
+    if (key && !plots.has(key)) plots.set(key, group)
+  }
+
+  // A click is a press and release without a drag in between; the group under
+  // the pointer (if any) is the selection.
+  let pressed: { x: number; y: number } | null = null
+  const onDown = (e: PointerEvent) => {
+    pressed = { x: e.clientX, y: e.clientY }
+  }
+  const onClick = (e: MouseEvent) => {
+    if (!options.onPlotClick) return
+    if (pressed && Math.hypot(e.clientX - pressed.x, e.clientY - pressed.y) > 6) return
+    const group = (e.target as Element | null)?.closest?.(PLOT_SELECTOR) ?? null
+    options.onPlotClick(group ? plotKey(group) : null)
+  }
+  container.addEventListener('pointerdown', onDown)
+  container.addEventListener('click', onClick)
+
   return {
     map,
+    svg,
     width,
     height,
-    toLatLng: (p) => [height - p.y, p.x],
-    fromLatLng: (ll) => ({ x: round(ll.lng), y: round(height - ll.lat) }),
+    plots,
     fit: () => map.fitBounds(bounds),
-    destroy: () => map.remove(),
+    destroy: () => {
+      container.removeEventListener('pointerdown', onDown)
+      container.removeEventListener('click', onClick)
+      map.remove()
+    },
   }
 }
 
-// Fill/stroke per status and state, matching the reference plot layer:
-// idle 0.65 fill + white 0.8 stroke, hover 0.70 + 1.5, selected 0.85 + a
-// darker 2px stroke of the same hue, dimmed when filtered out.
-const RGB: Record<PlotStatus, [number, number, number]> = {
-  available: [34, 197, 94],
-  booked: [245, 158, 11],
-  sold: [239, 68, 68],
-}
-const SELECTED_STROKE: Record<PlotStatus, string> = {
-  available: '#15803d',
-  booked: '#b45309',
-  sold: '#b91c1c',
-}
+const STATUS_CLASSES = ['is-available', 'is-booked', 'is-sold', 'is-empty']
 
-export function plotStyle(status: PlotStatus, state: 'idle' | 'hover' | 'selected' | 'dimmed' = 'idle'): L.PathOptions {
-  const [r, g, b] = RGB[status] ?? [100, 116, 139]
-  const rgba = (a: number) => `rgba(${r}, ${g}, ${b}, ${a})`
-  switch (state) {
-    case 'selected':
-      return { color: SELECTED_STROKE[status] ?? '#334155', weight: 2, lineJoin: 'round', fillColor: rgba(0.85), fillOpacity: 1, opacity: 1 }
-    case 'hover':
-      return { color: '#ffffff', weight: 1.5, lineJoin: 'round', fillColor: rgba(0.7), fillOpacity: 1, opacity: 1 }
-    case 'dimmed':
-      return { color: '#ffffff', weight: 0.8, lineJoin: 'round', fillColor: rgba(0.12), fillOpacity: 1, opacity: 0.4 }
-    default:
-      return { color: '#ffffff', weight: 0.8, lineJoin: 'round', fillColor: rgba(0.65), fillOpacity: 1, opacity: 1 }
-  }
-}
-
-function round(n: number): number {
-  return Math.round(n * 10) / 10
+/**
+ * Paint a plot group for its status (null = no details yet) and state, and
+ * stamp it with the id of its Plot row (data-plot-id) when it has one.
+ */
+export function setPlotState(group: Element, status: PlotStatus | null, state: PlotState = 'idle', plotId?: number | null): void {
+  group.classList.remove(...STATUS_CLASSES, 'is-selected', 'is-dimmed')
+  group.classList.add(status ? `is-${status}` : 'is-empty')
+  if (state !== 'idle') group.classList.add(`is-${state}`)
+  if (plotId) group.setAttribute('data-plot-id', String(plotId))
+  else if (plotId === null) group.removeAttribute('data-plot-id')
 }

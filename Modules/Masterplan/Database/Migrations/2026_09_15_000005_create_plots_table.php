@@ -11,14 +11,15 @@ return new class extends Migration
         Schema::create('plots', function (Blueprint $table) {
             $table->id();
             $table->foreignId('masterplan_id')->constrained()->cascadeOnDelete();
+            // The <g class="plan-plot"> of the layout SVG this row describes.
+            $table->string('svg_key', 100);
             $table->string('number', 50);
             $table->string('size')->default('');
             $table->string('price')->default('');
             $table->string('position')->default('');
             $table->string('status', 20)->default('available')->index();
-            // Polygon over the image, in pixel coordinates: [{x, y}, ...]
-            $table->json('polygon');
             $table->timestamps();
+            $table->unique(['masterplan_id', 'svg_key']);
         });
     }
 

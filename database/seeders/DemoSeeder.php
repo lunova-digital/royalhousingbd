@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
 use Modules\Content\Models\TickerItem;
 use Modules\Content\Models\Video;
 use Modules\Listing\Models\Listing;
@@ -64,29 +63,24 @@ class DemoSeeder extends Seeder
         }
         Video::query()->create(['title' => 'Project walkthrough', 'url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'sort_order' => 0]);
 
-        // A generated layout image (1600×1000) with 16 plots over its blocks.
-        $path = 'uploads/masterplans/demo-layout.png';
-        Storage::disk('public')->put($path, file_get_contents(__DIR__.'/assets/demo-layout.png'));
-        $masterplan = $masterplans->create(['name' => 'Royal City Phase 1', 'description' => 'Demo layout — replace the image and plots in the admin map builder.', 'published' => true]);
-        $masterplan->update(['image_path' => $path, 'image_width' => 1600, 'image_height' => 1000]);
+        // A schematic SVG layout (one quarter of a real Dhaka project map) in
+        // which every <g class="plan-plot"> is a plot; details for each are
+        // filled in here the way the admin's builder would.
+        $masterplan = $masterplans->create(
+            ['name' => 'Royal City Phase 1', 'description' => 'Demo layout — replace it and the plot details in the admin.', 'published' => true],
+            file_get_contents(__DIR__.'/assets/demo-layout.svg'),
+        );
 
         $plots = [];
-        $number = 1;
-        foreach ([[80, 80, 700, 400], [900, 80, 1520, 400], [80, 600, 700, 920], [900, 600, 1520, 920]] as [$x0, $y0, $x1, $y1]) {
-            $cellW = ($x1 - $x0) / 4;
-            for ($c = 0; $c < 4; $c++) {
-                $left = $x0 + $c * $cellW + 6;
-                $right = $x0 + ($c + 1) * $cellW - 6;
-                $plots[] = [
-                    'number' => 'A'.$number,
-                    'size' => '3 katha',
-                    'price' => '৳ 35 Lakh / katha',
-                    'position' => 'Block A, facing '.['north', 'east', 'south', 'west'][$c],
-                    'status' => ['available', 'booked', 'sold'][$number % 3],
-                    'polygon' => [['x' => $left, 'y' => $y0], ['x' => $right, 'y' => $y0], ['x' => $right, 'y' => $y1], ['x' => $left, 'y' => $y1]],
-                ];
-                $number++;
-            }
+        foreach ($masterplan->layout_keys as $i => $key) {
+            $plots[] = [
+                'svg_key' => $key,
+                'number' => 'P-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                'size' => ['3 katha', '5 katha', '2.5 katha'][$i % 3],
+                'price' => $i % 4 === 3 ? '' : '৳ 35 Lakh / katha',
+                'position' => 'Facing '.['north', 'east', 'south', 'west'][$i % 4],
+                'status' => ['available', 'available', 'booked', 'available', 'sold'][$i % 5],
+            ];
         }
         $masterplans->savePlots($masterplan, $plots);
 

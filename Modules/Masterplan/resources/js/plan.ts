@@ -1,23 +1,22 @@
 // The public interactive map (FR-MAP-002..008). Reads the plan JSON the page
-// embedded, draws each plot as a tappable polygon, and fills the side panel.
-import L from 'leaflet'
-
-import { createPlanMap, plotStyle, STATUS_LABELS, type PlotStatus, type Point } from './plan-map'
+// embedded, loads the SVG layout, paints each detailed plot by status, and
+// fills the side panel when one is tapped.
+import { createPlanMap, loadLayout, setPlotState, STATUS_LABELS, type PlotStatus } from './plan-map'
 
 interface PlanPlot {
   id: number
+  key: string
   number: string
   size: string
   price: string
   position: string
   status: PlotStatus
-  polygon: Point[]
   whatsapp: string
   ref: string
 }
 
 interface Plan {
-  image: string
+  layout: string
   width: number
   height: number
   plots: PlanPlot[]
@@ -27,7 +26,28 @@ const container = document.getElementById('plan-map')
 const dataEl = document.getElementById('plan-data')
 if (container && dataEl) {
   const plan = JSON.parse(dataEl.textContent ?? '{}') as Plan
-  const plotMap = createPlanMap(container, plan, { zoomControl: false })
+  void loadLayout(plan.layout)
+    .then((svg) => mount(container, svg, plan))
+    .catch((err: unknown) => {
+      container.innerHTML = `<p class="p-8 text-center text-sm text-muted-fg">${err instanceof Error ? err.message : 'Could not load the layout.'}</p>`
+    })
+}
+
+function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
+  svg.classList.add('plan-public')
+  const byKey = new Map(plan.plots.map((p) => [p.key, p]))
+  let selected: PlanPlot | null = null
+  // Legend items toggle statuses on and off (FR-MAP-007).
+  const shown = new Set<PlotStatus>(['available', 'booked', 'sold'])
+
+  const plotMap = createPlanMap(container, svg, {
+    zoomControl: false,
+    onPlotClick: (key) => {
+      const plot = key ? byKey.get(key) : undefined
+      if (plot) select(plot)
+      else if (key === null) deselect()
+    },
+  })
 
   const panel = {
     empty: document.querySelector<HTMLElement>('[data-plot-empty]'),
@@ -47,20 +67,21 @@ if (container && dataEl) {
     sold: 'border-brand/20 bg-brand-50 text-brand',
   }
 
-  let selected: PlanPlot | null = null
-  // Legend items toggle statuses on and off (FR-MAP-007).
-  const shown = new Set<PlotStatus>(['available', 'booked', 'sold'])
-  const layers = new Map<number, L.Polygon>()
-
-  const stateOf = (plot: PlanPlot, hover = false) => {
-    if (!shown.has(plot.status)) return 'dimmed'
-    if (selected?.id === plot.id) return 'selected'
-    return hover ? 'hover' : 'idle'
-  }
-
   const restyle = () => {
-    for (const plot of plan.plots) {
-      layers.get(plot.id)?.setStyle(plotStyle(plot.status, stateOf(plot)))
+    for (const [key, group] of plotMap.plots) {
+      const plot = byKey.get(key)
+      if (!plot) {
+        setPlotState(group, null, 'idle', null)
+        continue
+      }
+      const state = !shown.has(plot.status) ? 'dimmed' : selected?.id === plot.id ? 'selected' : 'idle'
+      setPlotState(group, plot.status, state, plot.id)
+      // Every plot names itself on hover, like a printed layout.
+      if (!group.querySelector(':scope > title')) {
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
+        title.textContent = `Plot ${plot.number} · ${STATUS_LABELS[plot.status]}`
+        group.prepend(title)
+      }
     }
   }
 
@@ -94,15 +115,7 @@ if (container && dataEl) {
   document.querySelector('[data-plot-close]')?.addEventListener('click', deselect)
   if (panel.position) panel.position.dataset.default = panel.position.textContent ?? ''
 
-  for (const plot of plan.plots) {
-    const polygon = L.polygon(plot.polygon.map(plotMap.toLatLng), plotStyle(plot.status)).addTo(plotMap.map)
-    // Every plot shows its number, like a printed layout.
-    polygon.bindTooltip(plot.number, { direction: 'center', permanent: true, className: 'plan-label', opacity: 1 })
-    polygon.on('click', () => select(plot))
-    polygon.on('mouseover', () => polygon.setStyle(plotStyle(plot.status, stateOf(plot, true))))
-    polygon.on('mouseout', () => polygon.setStyle(plotStyle(plot.status, stateOf(plot))))
-    layers.set(plot.id, polygon)
-  }
+  restyle()
 
   // Zoom controls: −, percentage, +, reset (FR-MAP-006).
   const level = document.querySelector<HTMLElement>('[data-plan-zoom-level]')

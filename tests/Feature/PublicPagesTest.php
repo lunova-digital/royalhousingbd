@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Masterplan\Models\Masterplan;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
@@ -44,11 +45,14 @@ class PublicPagesTest extends TestCase
     public function test_masterplan_pages_render_plots(): void
     {
         $this->get('/map')->assertOk()->assertSee('Royal City Phase 1')->assertSee('View Map');
+        $plot = Masterplan::query()->first()->plots->first();
         $this->get('/map/royal-city-phase-1')
             ->assertOk()
             ->assertSee('id="plan-data"', false)
-            ->assertSee('MAP-1/PLOT-A1')
-            ->assertSee('"status":"available"', false);
+            ->assertSee($plot->reference())
+            ->assertSee('"key":"'.$plot->svg_key.'"', false)
+            ->assertSee('"status":"available"', false)
+            ->assertSee('.svg', false);
     }
 
     public function test_linked_listing_shows_plot_availability(): void

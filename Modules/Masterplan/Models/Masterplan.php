@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Feature 2: an interactive project layout (FR-MAP-*). A masterplan is an
- * image; its plots are polygons drawn over it in image-pixel coordinates.
+ * SVG (image_path) in which every `<g class="plan-plot">` is a plot;
+ * layout_keys lists those groups' keys and a Plot row holds the details the
+ * admin filled in for one of them.
  */
 class Masterplan extends Model
 {
@@ -16,7 +18,7 @@ class Masterplan extends Model
 
     protected function casts(): array
     {
-        return ['published' => 'boolean', 'image_width' => 'integer', 'image_height' => 'integer'];
+        return ['published' => 'boolean', 'image_width' => 'integer', 'image_height' => 'integer', 'layout_keys' => 'array'];
     }
 
     public function plots(): HasMany

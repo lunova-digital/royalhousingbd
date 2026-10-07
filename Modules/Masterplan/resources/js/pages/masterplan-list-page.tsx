@@ -38,7 +38,7 @@ export function MasterplanListPage() {
     <div className="grid gap-6">
       <PageHeader
         title="Masterplans"
-        description="Interactive project layouts. Upload the image, then place plots in the builder."
+        description="Interactive project layouts: an SVG where every plot is a group, with details filled in per plot."
         actions={
           <Button nativeButton={false} render={<Link to="/masterplans/new" />}><PlusIcon /> New masterplan</Button>
         }
@@ -75,10 +75,10 @@ export function MasterplanListPage() {
                     </TableCell>
                     <TableCell className="font-medium">
                       <Link to={`/masterplans/${m.id}`} className="hover:underline">{m.name}</Link>
-                      {!m.image_path && <span className="text-muted-foreground block text-xs">No image uploaded yet</span>}
+                      <span className="text-muted-foreground block text-xs">{m.layout_keys?.length ?? 0} plots in layout</span>
                     </TableCell>
                     <TableCell className="text-sm">
-                      {m.plots?.length ?? 0} total · <span className="text-emerald-700">{c.available} available</span> · {c.booked} booked · {c.sold} sold
+                      {m.plots?.length ?? 0} detailed · <span className="text-emerald-700">{c.available} available</span> · {c.booked} booked · {c.sold} sold
                     </TableCell>
                     <TableCell>{m.published ? <Badge variant="success">Published</Badge> : <Badge variant="secondary">Draft</Badge>}</TableCell>
                     <TableCell className="text-right">
@@ -86,14 +86,14 @@ export function MasterplanListPage() {
                         {m.published && (
                           <Button variant="ghost" size="icon" nativeButton={false} render={<a href={`/map/${m.slug}`} target="_blank" rel="noreferrer" aria-label="View on site" />}><ExternalLinkIcon /></Button>
                         )}
-                        <Button variant="outline" size="sm" disabled={!m.image_path} nativeButton={false} render={<Link to={`/masterplans/${m.id}/plots`} />}><MapIcon /> Builder</Button>
+                        <Button variant="outline" size="sm" nativeButton={false} render={<Link to={`/masterplans/${m.id}/plots`} />}><MapIcon /> Builder</Button>
                         <Button variant="ghost" size="icon" nativeButton={false} render={<Link to={`/masterplans/${m.id}`} aria-label="Edit" />}><PencilIcon /></Button>
                         <ConfirmButton
                           variant="ghost"
                           size="icon"
                           aria-label="Delete"
                           title={`Delete "${m.name}"?`}
-                          description="The map, its image and all its plots are removed. This cannot be undone."
+                          description="The map, its layout and all its plot details are removed. This cannot be undone."
                           onConfirm={() => remove(m.id)}
                         >
                           <Trash2Icon />

@@ -73,7 +73,7 @@
       {{ Modules::vite('masterplan', 'resources/js/plan.ts') }}
     @endpush
   @else
-    <p class="card p-16 text-center text-muted-fg">The layout image for this project has not been uploaded yet.</p>
+    <p class="card p-16 text-center text-muted-fg">The layout for this project has not been uploaded yet.</p>
   @endif
 </section>
 @endsection

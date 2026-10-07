@@ -1,0 +1,71 @@
+/* The layout SVG inside the Leaflet overlay pane. Plot state is expressed as
+   classes on each <g class="plan-plot">; the fills win over the file's own
+   presentation attributes and inline styles. Text labels are never recoloured. */
+.leaflet-pane > svg.plan-layout {
+  overflow: visible;
+}
+
+.leaflet-pane > svg.plan-layout path,
+.leaflet-pane > svg.plan-layout .plan-plot :not(text, tspan) {
+  pointer-events: visiblePainted;
+}
+
+.plan-layout .plan-plot text,
+.plan-layout .plan-plot tspan {
+  pointer-events: none;
+  user-select: none;
+}
+
+.plan-layout .plan-plot {
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.plan-layout .plan-plot :is(path, polygon, rect, circle, ellipse, polyline) {
+  transition: fill 0.15s, stroke 0.15s, filter 0.15s;
+}
+
+.plan-layout .plan-plot.is-available :is(path, polygon, rect, circle, ellipse, polyline) {
+  fill: #22c55e !important;
+}
+
+.plan-layout .plan-plot.is-booked :is(path, polygon, rect, circle, ellipse, polyline) {
+  fill: #f59e0b !important;
+}
+
+.plan-layout .plan-plot.is-sold :is(path, polygon, rect, circle, ellipse, polyline) {
+  fill: #ef4444 !important;
+}
+
+/* A group with no details yet: faded; the builder still lets you pick it. */
+.plan-layout .plan-plot.is-empty :is(path, polygon, rect, circle, ellipse, polyline) {
+  fill: #e5e7eb !important;
+  stroke: #9ca3af !important;
+  stroke-dasharray: 4 3;
+}
+
+.plan-layout.plan-public .plan-plot.is-empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.plan-layout.plan-public .plan-plot.is-empty :is(path, polygon, rect, circle, ellipse, polyline) {
+  fill: #f3f4f6 !important;
+  stroke: #d1d5db !important;
+  stroke-dasharray: none;
+}
+
+.plan-layout .plan-plot:not(.is-dimmed):hover :is(path, polygon, rect, circle, ellipse, polyline) {
+  filter: brightness(1.08) saturate(1.1);
+}
+
+.plan-layout .plan-plot.is-selected :is(path, polygon, rect, circle, ellipse, polyline) {
+  stroke: #111827 !important;
+  stroke-width: 3px !important;
+  stroke-dasharray: none;
+  filter: brightness(1.05);
+}
+
+.plan-layout .plan-plot.is-dimmed {
+  opacity: 0.25;
+}

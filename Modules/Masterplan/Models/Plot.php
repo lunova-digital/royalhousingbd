@@ -5,16 +5,12 @@ namespace Modules\Masterplan\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/** The details of one `<g class="plan-plot">` of a masterplan's SVG, matched by svg_key. */
 class Plot extends Model
 {
     public const STATUSES = ['available', 'booked', 'sold'];
 
     protected $guarded = [];
-
-    protected function casts(): array
-    {
-        return ['polygon' => 'array'];
-    }
 
     public function masterplan(): BelongsTo
     {

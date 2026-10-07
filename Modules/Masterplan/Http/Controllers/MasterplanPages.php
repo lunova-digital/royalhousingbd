@@ -27,20 +27,20 @@ class MasterplanPages
         $masterplan = Masterplan::query()->with('plots')->published()->where('slug', $slug)->first() ?? abort(404);
         $settings = Site::settings();
 
-        // What the map script consumes: each plot's details plus a ready-made
-        // WhatsApp link (FR-MAP-004, FR-MAP-008).
+        // What the map script consumes: each detailed plot, keyed to its SVG
+        // group, plus a ready-made WhatsApp link (FR-MAP-004, FR-MAP-008).
         $plots = $masterplan->plots->map(function (Plot $plot) use ($masterplan, $settings) {
             $message = sprintf('Hello, I\'m interested in Plot %s on %s (Ref: %s). %s%s',
                 $plot->number, $masterplan->name, $plot->reference(), Site::baseUrl(), $masterplan->url());
 
             return [
                 'id' => $plot->id,
+                'key' => $plot->svg_key,
                 'number' => $plot->number,
                 'size' => $plot->size,
                 'price' => $plot->price,
                 'position' => $plot->position,
                 'status' => $plot->status,
-                'polygon' => $plot->polygon,
                 'ref' => $plot->reference(),
                 'whatsapp' => Site::whatsapp($settings, $message),
             ];
@@ -55,7 +55,7 @@ class MasterplanPages
             'masterplan' => $masterplan,
             'counts' => $masterplan->statusCounts(),
             'plan' => [
-                'image' => $masterplan->image_path ? Storage::disk('public')->url($masterplan->image_path) : '',
+                'layout' => $masterplan->image_path ? Storage::disk('public')->url($masterplan->image_path) : '',
                 'width' => $masterplan->image_width,
                 'height' => $masterplan->image_height,
                 'plots' => $plots,

@@ -24,9 +24,10 @@ class MasterplanController
         return response()->json(['masterplan' => $masterplan->load('plots')]);
     }
 
+    /** Multipart: the SVG layout as `layout` plus name, description, published. */
     public function store(MasterplanRequest $request): JsonResponse
     {
-        return response()->json(['masterplan' => $this->masterplans->create($request->attributesForModel())], 201);
+        return response()->json(['masterplan' => $this->masterplans->create($request->attributesForModel(), $request->layoutSvg())], 201);
     }
 
     public function update(MasterplanRequest $request, Masterplan $masterplan): JsonResponse
@@ -41,11 +42,12 @@ class MasterplanController
         return response()->json(['message' => 'Deleted.']);
     }
 
-    public function setImage(Request $request, Masterplan $masterplan): JsonResponse
+    public function setLayout(Request $request, Masterplan $masterplan): JsonResponse
     {
-        $request->validate(['file' => ['required', 'file', 'max:30720']]);
+        $request->validate(['layout' => ['required', 'file', 'max:10240']]);
+        $svg = (string) file_get_contents($request->file('layout')->getRealPath());
 
-        return response()->json(['masterplan' => $this->masterplans->setImage($masterplan, $request->file('file'))]);
+        return response()->json(['masterplan' => $this->masterplans->setLayout($masterplan, $svg)]);
     }
 
     public function savePlots(PlotsRequest $request, Masterplan $masterplan): JsonResponse

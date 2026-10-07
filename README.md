@@ -49,7 +49,7 @@ Modules/<Name>/          one feature each; StudlyCase dirs hold classes, lowerca
   Auth/                  AuthController — Blade login (`login` route), `logout`, password change; AdminUserSeeder
   Dashboard/             DashboardController (counts) + the widgets that fill the admin's dashboard
   Listing/               Listing (optionally linked to a Masterplan for live availability), ListingImage, ListingService, ListingRequest, ListingController (admin API), ListingPages (public)
-  Masterplan/            Masterplan, Plot, MasterplanService, MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
+  Masterplan/            Masterplan (an SVG layout), Plot (details of one `g.plan-plot`), MasterplanService, LayoutSvg (SVG validation), MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
   Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list)
   Home/                  HomeController — homepage, About, Gallery, Contact, Privacy/Terms, sitemap.xml, robots.txt
 
@@ -65,7 +65,7 @@ app/Providers/           AppServiceProvider — login rate limiter, layout view 
 bootstrap/modules.php    the module list; its order is the wiring order
 config/laramod.php       module path/namespace and the route groups
 database/migrations/     only the framework's tables; feature tables live in their module
-database/seeders/        DatabaseSeeder (module seeders + demo), DemoSeeder (+ assets/demo-layout.png)
+database/seeders/        DatabaseSeeder (module seeders + demo), DemoSeeder (+ assets/demo-layout.svg)
 resources/js/            what admin pages share: components/ (ui = shadcn), hooks/, lib/ (api.ts, menu.ts)
 resources/views/errors/  404 / 500 inside the public layout
 mobile/                  Capacitor WebView shell (see mobile/README.md)
@@ -97,9 +97,16 @@ tests/Feature/           cross-module tests: public pages + admin API
 - shadcn/ui: the admin is written against the base-ui variants of ten components
   (`php artisan admin:init` copies them into `resources/js/components/ui`). A button
   that is a link is `<Button nativeButton={false} render={<Link to="…" />}>`, not `asChild`.
-- Masterplan plots are polygons in image-pixel coordinates (x right, y down)
-  stored as JSON. `Modules/Masterplan/resources/js/plan-map.ts` is the Leaflet
-  (CRS.Simple) core shared by the public map and the admin builder.
+- A masterplan is an SVG in which every plot is a `<g class="plan-plot">`; on
+  upload each group is keyed `plot-N` by document order (written into its `id`,
+  replacing any). Adding one is three steps in the admin: upload
+  the layout, fill in the info, then click plots in the builder to enter their
+  details. `LayoutSvg` validates and normalises the upload (viewBox, a
+  `data-plot` key per group, scripts stripped); a `Plot` row holds the details
+  of one group, matched by `svg_key`, and groups without a row show greyed out.
+  `Modules/Masterplan/resources/js/plan-map.ts` places the SVG as a Leaflet
+  (CRS.Simple) overlay and paints each group by status with classes; it is the
+  core shared by the public map and the admin builder.
 
 ## Adding to a module
 
