@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { parseLayout, plotKey, PLOT_SELECTOR } from '../plan-map'
+import { parseLayout, PLOT_SELECTOR } from '../plan-map'
 
 /** What the browser learns about an SVG before it is uploaded. */
 export interface PickedLayout {
@@ -28,8 +28,9 @@ export async function inspectLayout(file: File): Promise<PickedLayout> {
     if (width > 0 && height > 0) problems.push('The SVG has no viewBox; its width and height are used instead.')
     else problems.push('The SVG needs a viewBox (or a width and height).')
   }
-  // Keys are assigned by the server on save; here only the count matters.
-  const keys = [...svg.querySelectorAll(PLOT_SELECTOR)].map((g, i) => plotKey(g) || `plot-${i + 1}`)
+  // The server keys plots plot-N by document order (any id in the file is
+  // replaced), so predict the same keys here.
+  const keys = [...svg.querySelectorAll(PLOT_SELECTOR)].map((_, i) => `plot-${i + 1}`)
   if (keys.length === 0) problems.push('No plots found. Every plot must be a <g class="plan-plot"> group.')
   if (svg.querySelector('script')) problems.push('Scripts inside the SVG are removed on upload.')
   return { file, svg, keys, width, height, problems }

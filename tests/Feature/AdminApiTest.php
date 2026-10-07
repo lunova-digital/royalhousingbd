@@ -21,6 +21,7 @@ class AdminApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Storage::fake('public');
         $this->seed(DemoSeeder::class);
         $this->admin = User::factory()->create(['email' => 'admin@example.com', 'password' => 'password']);
     }

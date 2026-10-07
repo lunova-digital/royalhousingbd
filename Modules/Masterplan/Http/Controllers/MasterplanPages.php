@@ -3,7 +3,6 @@
 namespace Modules\Masterplan\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Storage;
 use Modules\Masterplan\Models\Masterplan;
 use Modules\Masterplan\Models\Plot;
 use Modules\Site\Site;
@@ -55,7 +54,7 @@ class MasterplanPages
             'masterplan' => $masterplan,
             'counts' => $masterplan->statusCounts(),
             'plan' => [
-                'layout' => $masterplan->image_path ? Storage::disk('public')->url($masterplan->image_path) : '',
+                'layout' => Site::asset($masterplan->image_path),
                 'width' => $masterplan->image_width,
                 'height' => $masterplan->image_height,
                 'plots' => $plots,

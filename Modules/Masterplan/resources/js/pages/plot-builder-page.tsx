@@ -233,7 +233,7 @@ export function PlotBuilderPage() {
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-2 px-4 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2">
             <div className="text-muted-foreground flex items-center gap-3 text-xs">
               {STATUS_OPTIONS.map((s) => (
                 <span key={s.value} className="inline-flex items-center gap-1"><span className="size-2.5 rounded-sm" style={{ background: STATUS_COLORS[s.value] }} />{s.label}</span>

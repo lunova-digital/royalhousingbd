@@ -1,7 +1,7 @@
 @extends('site::layouts.app')
 @section('content')
 @php($label = $type ? \Modules\Listing\Models\Listing::label($type) : null)
-@php($query = fn (array $extra) => $path.'?'.http_build_query(array_filter(['q' => $filter['q'], 'location' => $filter['location']] + $extra, fn ($v) => $v !== null && $v !== '')))
+@php($query = fn (array $extra) => rtrim($path.'?'.http_build_query(array_filter(['q' => $filter['q'], 'location' => $filter['location']] + $extra, fn ($v) => $v !== null && $v !== '')), '?'))
 
 <section class="container-x pt-5">
   @include('site::partials.breadcrumb', ['items' => $label ? [['Projects', '/projects'], [$label.' listings', null]] : [['Projects', null]]])

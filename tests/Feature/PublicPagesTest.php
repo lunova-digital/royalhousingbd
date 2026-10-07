@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Modules\Masterplan\Models\Masterplan;
 use Tests\TestCase;
 
@@ -14,6 +15,7 @@ class PublicPagesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Storage::fake('public');
         $this->seed(DemoSeeder::class);
     }
 

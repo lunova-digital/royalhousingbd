@@ -2,7 +2,6 @@
 
 namespace Modules\Site;
 
-use Illuminate\Support\Facades\Storage;
 use Modules\Settings\Settings;
 use Modules\Site\Support\WhatsApp;
 
@@ -75,7 +74,8 @@ class Site
             return $path;
         }
 
-        return Storage::disk('public')->url($path);
+        // Host-relative so uploads resolve on whichever host serves the site.
+        return '/storage/'.ltrim($path, '/');
     }
 
     /** Turn a JSON list setting into rows. */
