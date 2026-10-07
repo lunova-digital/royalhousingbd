@@ -1,0 +1,207 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@source '../js';
+@source '../views';
+@source '../../Modules';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/protibimbok/laramod-admin/resources/js';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Public-site theme, measured from the reference (evaly.com.bd): light page, white
+   bordered cards, red accent, near-black hero panels and footer, Plus Jakarta Sans headings. */
+@theme {
+  --font-display: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink-950: #0b0d12; /* hero panels, dark buttons */
+  --color-ink-900: #0b121e; /* footer */
+  --color-ink-800: #1f2937;
+  --color-page: #fafafb; /* page background */
+  --color-fill: #f2f4f7; /* subtle grey fills: search bar, tiles */
+  --color-line: #e5e7eb; /* borders */
+
+  --color-fg: #0f1623;
+  --color-muted-fg: #6b7280;
+  --color-faint-fg: #9ca3af;
+
+  --color-brand: #e8002d;
+  --color-brand-600: #c2002a;
+  --color-brand-50: #fde7ec;
+  --color-success: #0f8c5a;
+  --color-success-50: #e6f5ee;
+  --color-info: #1d4ed8;
+  --color-info-50: #e8effc;
+  --color-warn: #b45309;
+  --color-warn-50: #fef3c7;
+  --color-whatsapp: #25d366;
+
+  --color-plot-available: #10b981;
+  --color-plot-booked: #f59e0b;
+  --color-plot-sold: #ef4444;
+}
+
+@layer components {
+  .font-display { font-family: var(--font-display); }
+  .container-x { @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6; }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.14em] text-brand; }
+  .accent { @apply text-brand; }
+  .card { @apply rounded-2xl border border-line bg-white; }
+  .tile { @apply rounded-xl bg-fill; }
+  .dark-panel { @apply rounded-3xl text-white; background: radial-gradient(60% 70% at 95% 0%, rgb(232 0 45 / 0.28), transparent 60%), #0b0d12; }
+  .dark-band { @apply text-white; background: radial-gradient(40% 90% at 15% 50%, rgb(232 0 45 / 0.22), transparent 60%), linear-gradient(90deg, #0b0d12, #0e1a2b); }
+  .sale-band { @apply rounded-3xl text-white; background: linear-gradient(90deg, #5a0014 0%, #2a000a 45%, #0b0d12 100%); }
+  .btn, .btn-primary, .btn-dark, .btn-light, .btn-outline, .btn-ghost, .btn-green { @apply inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors duration-200; }
+  .btn-primary { @apply bg-brand text-white hover:bg-brand-600; }
+  .btn-dark { @apply bg-ink-950 text-white hover:bg-ink-800; }
+  .btn-light { @apply bg-white text-fg shadow-sm hover:bg-fill; }
+  .btn-outline { @apply border border-line bg-white text-fg hover:bg-fill; }
+  .btn-ghost { @apply border border-white/15 text-white hover:bg-white/10; }
+  .btn-green { @apply bg-success text-white hover:bg-emerald-800; }
+  .btn-arrow { @apply inline-flex size-8 items-center justify-center rounded-full bg-brand text-white; }
+  .chip { @apply inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold; }
+  .chip-gray { @apply bg-fill text-ink-800; }
+  .chip-red { @apply bg-brand-50 text-brand; }
+  .chip-green { @apply bg-success-50 text-success; }
+  .chip-amber { @apply bg-warn-50 text-warn; }
+  .badge-sale { @apply inline-flex items-center rounded-md bg-brand px-2 py-1 text-xs font-bold text-white; }
+  .pill-tag { @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-white/90; }
+  .pill-tag-light { @apply inline-flex items-center gap-2 rounded-full border border-brand/15 bg-brand-50 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand; }
+  .pill-nav { @apply whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:text-brand; }
+  .pill-nav-active { @apply text-brand; }
+  .icon-box { @apply inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-fill text-fg; }
+  .input { @apply h-11 w-full rounded-xl border border-line bg-white px-4 text-sm text-fg outline-none placeholder:text-faint-fg focus:border-ink-950; }
+  .link-muted { @apply text-sm text-white/65 transition-colors hover:text-white; }
+  .availability-bar { @apply bg-brand; }
+  .prose-light { @apply leading-relaxed text-ink-800; }
+  .prose-light h2 { @apply mt-8 mb-3 font-display text-xl font-bold text-fg; }
+}
+
+/* FAQ accordion: the plus turns into a cross when open */
+details[open] .faq-icon { transform: rotate(45deg); }
+.faq-icon { transition: transform 0.2s; }
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+
+/* Horizontal scrollers hide their scrollbar like the reference's category row */
+.scroll-row { scrollbar-width: none; }
+.scroll-row::-webkit-scrollbar { display: none; }
+
+/* Announcement ticker (FR-HOME-003) */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-track { animation: ticker 40s linear infinite; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
+
+/* Interactive map: plot labels mimic a printed layout (9px, 800, white halo). */
+.plan-filter[aria-pressed="false"] { opacity: 0.45; }
+.plan-label { background: transparent; border: 0; color: #111; font: 800 9px/1 Inter, sans-serif; padding: 0; box-shadow: none; pointer-events: none; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 3px #fff; }
+.plan-label::before { display: none; }
+.leaflet-container { background: #f6f5ec; font-family: var(--font-body); }
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+
+    "paths": {
+      "@/*": [
+        "./resources/js/*"
+      ],
+      "@site/*": [
+        "./Modules/Site/resources/*"
+      ],
+      "@settings/*": [
+        "./Modules/Settings/resources/*"
+      ],
+      "@auth/*": [
+        "./Modules/Auth/resources/*"
+      ],
+      "@dashboard/*": [
+        "./Modules/Dashboard/resources/*"
+      ],
+      "@listing/*": [
+        "./Modules/Listing/resources/*"
+      ],
+      "@masterplan/*": [
+        "./Modules/Masterplan/resources/*"
+      ],
+      "@content/*": [
+        "./Modules/Content/resources/*"
+      ],
+      "@home/*": [
+        "./Modules/Home/resources/*"
+      ],
+      "@admin/*": [
+        "./vendor/protibimbok/laramod-admin/resources/*"
+      ]
+    }
+  },
+  "include": ["resources/js", "Modules/*/resources/js"]
+}

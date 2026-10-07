@@ -1,0 +1,25 @@
+<?php
+
+use Laramod\Admin\AdminModule;
+use Modules\Auth\AuthModule;
+use Modules\Content\ContentModule;
+use Modules\Dashboard\DashboardModule;
+use Modules\Home\HomeModule;
+use Modules\Listing\ListingModule;
+use Modules\Masterplan\MasterplanModule;
+use Modules\Media\MediaModule;
+use Modules\Settings\SettingsModule;
+use Modules\Site\SiteModule;
+
+return [
+    SiteModule::class,
+    SettingsModule::class,
+    MediaModule::class,
+    AuthModule::class,
+    DashboardModule::class,
+    ListingModule::class,
+    MasterplanModule::class,
+    ContentModule::class,
+    HomeModule::class,
+    AdminModule::class,
+];
