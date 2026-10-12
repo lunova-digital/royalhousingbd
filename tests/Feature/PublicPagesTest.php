@@ -73,6 +73,10 @@ class PublicPagesTest extends TestCase
             ->assertSee($plot->reference())
             ->assertSee('"key":"'.$plot->svg_key.'"', false)
             ->assertSee('"status":"available"', false)
+            // The WhatsApp message is composed in the browser from the selection.
+            ->assertSee('"whatsapp":{"number":"8801700000000"', false)
+            ->assertSee('"messageMany":', false)
+            ->assertSee('template data-plot-item', false)
             ->assertSee('.svg', false);
     }
 

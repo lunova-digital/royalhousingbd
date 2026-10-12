@@ -27,24 +27,19 @@ class MasterplanPages
         $settings = Site::settings();
 
         // What the map script consumes: each detailed plot, keyed to its SVG
-        // group, plus a ready-made WhatsApp link (FR-MAP-004, FR-MAP-008).
-        $plots = $masterplan->plots->map(function (Plot $plot) use ($masterplan, $settings) {
-            $message = __('masterplan::show.whatsapp_message', [
-                'number' => $plot->number, 'project' => $masterplan->name, 'ref' => $plot->reference(), 'url' => Site::baseUrl().$masterplan->url(),
-            ]);
-
-            return [
-                'id' => $plot->id,
-                'key' => $plot->svg_key,
-                'number' => $plot->number,
-                'size' => $plot->size,
-                'price' => $plot->price,
-                'position' => $plot->position,
-                'status' => $plot->status,
-                'ref' => $plot->reference(),
-                'whatsapp' => Site::whatsapp($settings, $message),
-            ];
-        });
+        // group (FR-MAP-004). The WhatsApp message is composed in the browser
+        // from the visitor's selection, so the page ships the number and the
+        // message templates rather than a link per plot (FR-MAP-008).
+        $plots = $masterplan->plots->map(fn (Plot $plot) => [
+            'id' => $plot->id,
+            'key' => $plot->svg_key,
+            'number' => $plot->number,
+            'size' => $plot->size,
+            'price' => $plot->price,
+            'position' => $plot->position,
+            'status' => $plot->status,
+            'ref' => $plot->reference(),
+        ]);
 
         return view('masterplan::show', Site::page([
             'title' => __('masterplan::show.title', ['name' => $masterplan->name]),
@@ -59,7 +54,13 @@ class MasterplanPages
                 'width' => $masterplan->image_width,
                 'height' => $masterplan->image_height,
                 'plots' => $plots,
-                // The side panel's own words, in the visitor's language.
+                'whatsapp' => [
+                    'number' => preg_replace('/\D+/', '', (string) ($settings['whatsapp_number'] ?? '')),
+                    'project' => $masterplan->name,
+                    'url' => Site::baseUrl().$masterplan->url(),
+                ],
+                // The side panel's own words, in the visitor's language. The
+                // message templates keep their :placeholders for the script.
                 'labels' => [
                     'available' => __('site::common.available'),
                     'booked' => __('site::common.booked'),
@@ -67,6 +68,11 @@ class MasterplanPages
                     'plot' => __('site::common.plot'),
                     'callForPrice' => __('site::common.call_for_price'),
                     'loadError' => __('masterplan::show.load_error'),
+                    'selected' => __('masterplan::show.n_selected'),
+                    'removePlot' => __('masterplan::show.remove_plot'),
+                    'messageOne' => __('masterplan::show.whatsapp_message'),
+                    'messageMany' => __('masterplan::show.whatsapp_message_many'),
+                    'messagePlot' => __('masterplan::show.whatsapp_message_plot'),
                 ],
             ],
         ]));

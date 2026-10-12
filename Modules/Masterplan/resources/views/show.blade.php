@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      {{-- FR-MAP-004: selected plot details; FR-MAP-008: WhatsApp with map + plot reference --}}
+      {{-- FR-MAP-004: the selected plots; FR-MAP-008: one WhatsApp message listing every selected plot --}}
       <div>
         <div data-plot-empty class="card hidden p-8 text-center lg:block">
           <span class="icon-box mx-auto size-14 rounded-2xl">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-6'])</span>
@@ -49,15 +49,26 @@
         </div>
         <div data-plot-details hidden class="card p-5 lg:sticky lg:top-4">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="font-display text-xl font-bold">{{ __('site::common.plot') }} <span data-plot-number></span></h3>
-            <button type="button" data-plot-close aria-label="{{ __('site::common.close') }}" class="inline-flex size-9 items-center justify-center rounded-full bg-fill hover:bg-line">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-4'])</button>
+            <h3 class="font-display text-xl font-bold" data-plot-count></h3>
+            <button type="button" data-plot-clear class="inline-flex h-9 items-center gap-1.5 rounded-full bg-fill px-3 text-xs font-semibold hover:bg-line">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-3.5']) {{ __('masterplan::show.clear_selection') }}</button>
           </div>
-          <div class="mt-4"><span data-plot-status class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold"></span></div>
-          <dl class="mt-4 divide-y divide-line rounded-xl border border-line text-sm">
-            <div class="flex items-center gap-3 p-3.5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => 'expand', 'class' => 'size-4'])</span><span><dt class="text-xs text-muted-fg">{{ __('masterplan::show.plot_size') }}</dt><dd class="font-semibold" data-plot-size></dd></span></div>
-            <div class="flex items-center gap-3 p-3.5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => 'tag', 'class' => 'size-4'])</span><span><dt class="text-xs text-muted-fg">{{ __('site::common.price') }}</dt><dd class="font-display text-lg font-extrabold" data-plot-price></dd></span></div>
-            <div class="flex items-center gap-3 p-3.5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4'])</span><span><dt class="text-xs text-muted-fg">{{ __('site::common.location') }}</dt><dd class="font-semibold" data-plot-position>{{ $m->name }}</dd></span></div>
-          </dl>
+          <ul data-plot-list class="mt-4 grid max-h-[45vh] gap-2.5 overflow-y-auto"></ul>
+          <template data-plot-item>
+            <li class="rounded-xl border border-line p-3.5 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <span class="font-display text-base font-bold">{{ __('site::common.plot') }} <span data-item-number></span></span>
+                <span class="flex items-center gap-2">
+                  <span data-item-status class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold"></span>
+                  <button type="button" data-item-remove class="inline-flex size-7 items-center justify-center rounded-full bg-fill hover:bg-line">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-3.5'])</button>
+                </span>
+              </div>
+              <dl class="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1.5">
+                <div><dt class="text-xs text-muted-fg">{{ __('masterplan::show.plot_size') }}</dt><dd class="font-semibold" data-item-size></dd></div>
+                <div><dt class="text-xs text-muted-fg">{{ __('site::common.price') }}</dt><dd class="font-display font-extrabold" data-item-price></dd></div>
+                <div class="col-span-2"><dt class="text-xs text-muted-fg">{{ __('site::common.location') }}</dt><dd class="font-semibold" data-item-position></dd></div>
+              </dl>
+            </li>
+          </template>
           <div class="mt-4 grid gap-2.5">
             @if ($settings['whatsapp_number'] ?? '')
               <a data-plot-whatsapp href="#" target="_blank" rel="noreferrer" class="btn-primary h-12 w-full rounded-xl text-base">{{ __('site::common.book_now') }}</a>

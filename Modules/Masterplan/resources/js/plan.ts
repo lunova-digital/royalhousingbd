@@ -1,6 +1,7 @@
 // The public interactive map (FR-MAP-002..008). Reads the plan JSON the page
 // embedded, loads the SVG layout, paints each detailed plot by status, and
-// fills the side panel when one is tapped.
+// lists the tapped plots in the side panel, where one WhatsApp message asks
+// about all of them at once.
 import { createPlanMap, loadLayout, setPlotState, STATUS_LABELS, type PlotStatus } from './plan-map'
 
 interface PlanPlot {
@@ -11,15 +12,23 @@ interface PlanPlot {
   price: string
   position: string
   status: PlotStatus
-  whatsapp: string
   ref: string
 }
 
-/** The words the panel needs, translated by the page (the public site is bilingual). */
+/**
+ * The words the panel needs, translated by the page (the public site is
+ * bilingual). The message templates keep Laravel's :placeholders, and
+ * `selected` is a "singular|plural" pair.
+ */
 interface PlanLabels extends Record<PlotStatus, string> {
   plot: string
   callForPrice: string
   loadError: string
+  selected: string
+  removePlot: string
+  messageOne: string
+  messageMany: string
+  messagePlot: string
 }
 
 interface Plan {
@@ -27,7 +36,42 @@ interface Plan {
   width: number
   height: number
   plots: PlanPlot[]
+  whatsapp?: { number: string; project: string; url: string }
   labels?: Partial<PlanLabels>
+}
+
+const DEFAULT_LABELS: PlanLabels = {
+  ...STATUS_LABELS,
+  plot: 'Plot',
+  callForPrice: 'Call for Price',
+  loadError: 'Could not load the layout.',
+  selected: ':count plot selected|:count plots selected',
+  removePlot: 'Remove plot :number',
+  messageOne: "Hello, I'm interested in Plot :number on :project (Ref: :ref). :url",
+  messageMany: "Hello, I'm interested in these plots on :project:\n:plots\n:url",
+  messagePlot: '- Plot :number (Ref: :ref)',
+}
+
+/** Fill a Laravel-style template: ":number" → values.number. */
+function fill(template: string, values: Record<string, string>): string {
+  return template.replace(/:([a-z]+)/gi, (match, key: string) => values[key] ?? match)
+}
+
+/** Pick the branch of a "singular|plural" string for a count. */
+function plural(template: string, count: number): string {
+  const [one, many] = template.split('|')
+  return fill(count === 1 || many === undefined ? one : many, { count: String(count) })
+}
+
+/** The click-to-chat link for one or more plots (FR-MAP-008). */
+export function whatsappLink(plan: Pick<Plan, 'whatsapp'>, labels: PlanLabels, plots: PlanPlot[]): string {
+  const { number = '', project = '', url = '' } = plan.whatsapp ?? {}
+  const text =
+    plots.length === 1
+      ? fill(labels.messageOne, { number: plots[0].number, ref: plots[0].ref, project, url })
+      : fill(labels.messageMany, { plots: plots.map((p) => fill(labels.messagePlot, { number: p.number, ref: p.ref })).join('\n'), project, url })
+  // Spaces are %20 (not +), which WhatsApp would show literally.
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`
 }
 
 const container = document.getElementById('plan-map')
@@ -44,32 +88,34 @@ if (container && dataEl) {
 
 function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
   svg.classList.add('plan-public')
-  const labels: PlanLabels = { ...STATUS_LABELS, plot: 'Plot', callForPrice: 'Call for Price', loadError: 'Could not load the layout.', ...plan.labels }
+  const labels: PlanLabels = { ...DEFAULT_LABELS, ...plan.labels }
   const byKey = new Map(plan.plots.map((p) => [p.key, p]))
-  let selected: PlanPlot | null = null
+  // The selection, in the order the plots were tapped.
+  const selected = new Map<number, PlanPlot>()
   // Legend items toggle statuses on and off (FR-MAP-007).
   const shown = new Set<PlotStatus>(['available', 'booked', 'sold'])
 
   const plotMap = createPlanMap(container, svg, {
     zoomControl: false,
+    // Tapping a plot adds it to the selection; tapping it again removes it.
+    // Tapping the empty map keeps the selection (the panel has a clear button).
     onPlotClick: (key) => {
       const plot = key ? byKey.get(key) : undefined
-      if (plot) select(plot)
-      else if (key === null) deselect()
+      if (plot) toggle(plot)
     },
   })
 
   const panel = {
     empty: document.querySelector<HTMLElement>('[data-plot-empty]'),
     details: document.querySelector<HTMLElement>('[data-plot-details]'),
-    number: document.querySelector<HTMLElement>('[data-plot-number]'),
-    status: document.querySelector<HTMLElement>('[data-plot-status]'),
-    size: document.querySelector<HTMLElement>('[data-plot-size]'),
-    price: document.querySelector<HTMLElement>('[data-plot-price]'),
-    position: document.querySelector<HTMLElement>('[data-plot-position]'),
+    count: document.querySelector<HTMLElement>('[data-plot-count]'),
+    list: document.querySelector<HTMLElement>('[data-plot-list]'),
+    item: document.querySelector<HTMLTemplateElement>('template[data-plot-item]'),
     ref: document.querySelector<HTMLElement>('[data-plot-ref]'),
     whatsapp: document.querySelectorAll<HTMLAnchorElement>('[data-plot-whatsapp]'),
   }
+  // The masterplan's name, shown when a plot has no position of its own.
+  const defaultPosition = plan.whatsapp?.project ?? ''
 
   const statusClass: Record<PlotStatus, string> = {
     available: 'border-success/20 bg-success-50 text-success',
@@ -84,7 +130,7 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
         setPlotState(group, null, 'idle', null)
         continue
       }
-      const state = !shown.has(plot.status) ? 'dimmed' : selected?.id === plot.id ? 'selected' : 'idle'
+      const state = !shown.has(plot.status) ? 'dimmed' : selected.has(plot.id) ? 'selected' : 'idle'
       setPlotState(group, plot.status, state, plot.id)
       // Every plot names itself on hover, like a printed layout.
       if (!group.querySelector(':scope > title')) {
@@ -95,37 +141,59 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
     }
   }
 
-  const select = (plot: PlanPlot) => {
-    selected = plot
-    restyle()
-    if (panel.empty) panel.empty.classList.add('lg:hidden')
-    if (panel.details) panel.details.hidden = false
-    if (panel.number) panel.number.textContent = plot.number
-    if (panel.status) {
-      panel.status.textContent = labels[plot.status] ?? plot.status
-      panel.status.className = `inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold ${statusClass[plot.status] ?? ''}`
+  const renderItem = (plot: PlanPlot): HTMLElement => {
+    const li = (panel.item?.content.firstElementChild as HTMLElement | null)?.cloneNode(true) as HTMLElement
+    const set = (attr: string, text: string) => {
+      const el = li.querySelector<HTMLElement>(`[${attr}]`)
+      if (el) el.textContent = text
     }
-    if (panel.size) panel.size.textContent = plot.size || '—'
-    if (panel.price) panel.price.textContent = plot.price || labels.callForPrice
-    if (panel.position) panel.position.textContent = plot.position || (panel.position.dataset.default ?? '—')
-    if (panel.ref) panel.ref.textContent = plot.ref
-    for (const link of panel.whatsapp) link.href = plot.whatsapp
-    // Below lg the panel sits under the map; bring it into view.
-    if (window.innerWidth < 1024) {
+    set('data-item-number', plot.number)
+    set('data-item-size', plot.size || '—')
+    set('data-item-price', plot.price || labels.callForPrice)
+    set('data-item-position', plot.position || defaultPosition || '—')
+    const status = li.querySelector<HTMLElement>('[data-item-status]')
+    if (status) {
+      status.textContent = labels[plot.status] ?? plot.status
+      status.classList.add(...(statusClass[plot.status] ?? '').split(' ').filter(Boolean))
+    }
+    const remove = li.querySelector<HTMLButtonElement>('[data-item-remove]')
+    if (remove) {
+      remove.setAttribute('aria-label', fill(labels.removePlot, { number: plot.number }))
+      remove.addEventListener('click', () => toggle(plot))
+    }
+    return li
+  }
+
+  const render = () => {
+    restyle()
+    const plots = [...selected.values()]
+    if (panel.details) panel.details.hidden = plots.length === 0
+    panel.empty?.classList.toggle('lg:hidden', plots.length > 0)
+    if (plots.length === 0) return
+    if (panel.count) panel.count.textContent = plural(labels.selected, plots.length)
+    if (panel.list) panel.list.replaceChildren(...plots.map(renderItem))
+    if (panel.ref) panel.ref.textContent = plots.map((p) => p.ref).join(', ')
+    const link = whatsappLink(plan, labels, plots)
+    for (const a of panel.whatsapp) a.href = link
+  }
+
+  const toggle = (plot: PlanPlot) => {
+    const added = !selected.has(plot.id)
+    if (added) selected.set(plot.id, plot)
+    else selected.delete(plot.id)
+    render()
+    // Below lg the panel sits under the map; bring a new pick into view.
+    if (added && window.innerWidth < 1024) {
       panel.details?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }
 
-  const deselect = () => {
-    selected = null
-    restyle()
-    if (panel.details) panel.details.hidden = true
-    if (panel.empty) panel.empty.classList.remove('lg:hidden')
-  }
-  document.querySelector('[data-plot-close]')?.addEventListener('click', deselect)
-  if (panel.position) panel.position.dataset.default = panel.position.textContent ?? ''
+  document.querySelector('[data-plot-clear]')?.addEventListener('click', () => {
+    selected.clear()
+    render()
+  })
 
-  restyle()
+  render()
 
   // Zoom controls: −, percentage, +, reset (FR-MAP-006).
   const level = document.querySelector<HTMLElement>('[data-plan-zoom-level]')
