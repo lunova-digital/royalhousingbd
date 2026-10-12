@@ -43,6 +43,9 @@
       "@content/*": [
         "./Modules/Content/resources/*"
       ],
+      "@consultation/*": [
+        "./Modules/Consultation/resources/*"
+      ],
       "@home/*": [
         "./Modules/Home/resources/*"
       ],

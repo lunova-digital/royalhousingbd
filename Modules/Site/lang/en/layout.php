@@ -17,6 +17,7 @@ return [
     'company' => 'Company',
     'about_us' => 'About us',
     'support' => 'Support',
+    'free_consultation' => 'Free consultation',
     'book_site_visit' => 'Book a site visit',
     'whatsapp_enquiry' => 'WhatsApp enquiry',
     'privacy_policy' => 'Privacy policy',

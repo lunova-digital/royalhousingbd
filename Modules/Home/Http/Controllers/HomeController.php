@@ -92,6 +92,7 @@ class HomeController
     {
         $base = Site::baseUrl();
         $urls = collect(Site::NAV)->map(fn ($item) => [$item['href'], now()]);
+        $urls->push(['/consultation', now()]);
         foreach (ListingType::registry() as $type) {
             $urls->push([$type->url(), now()]);
         }

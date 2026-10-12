@@ -17,6 +17,7 @@ return [
     'company' => 'কোম্পানি',
     'about_us' => 'আমাদের সম্পর্কে',
     'support' => 'সহায়তা',
+    'free_consultation' => 'ফ্রি পরামর্শ',
     'book_site_visit' => 'সাইট ভিজিট বুক করুন',
     'whatsapp_enquiry' => 'হোয়াটসঅ্যাপে জিজ্ঞাসা',
     'privacy_policy' => 'গোপনীয়তা নীতি',

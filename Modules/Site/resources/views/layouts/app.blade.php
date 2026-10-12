@@ -152,6 +152,7 @@
           <div>
             <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('site::layout.support') }}</h3>
             <ul class="mt-4 space-y-2.5">
+              <li><a href="/consultation" class="link-muted">{{ __('site::layout.free_consultation') }}</a></li>
               <li><a href="/contact" class="link-muted">{{ __('site::layout.book_site_visit') }}</a></li>
               @if ($whatsapp)<li><a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="link-muted">{{ __('site::layout.whatsapp_enquiry') }}</a></li>@endif
               <li><a href="/privacy" class="link-muted">{{ __('site::layout.privacy_policy') }}</a></li>
@@ -190,13 +191,16 @@
       </div>
     </nav>
 
-    {{-- FR-COMM-001: floating WhatsApp icon on every page --}}
-    @if ($whatsapp)
-      <a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" aria-label="{{ __('site::common.chat_on_whatsapp') }}"
-         class="fixed right-4 bottom-20 z-40 inline-flex size-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-lg shadow-black/20 transition-transform hover:scale-105 lg:right-6 lg:bottom-6">
-        @include('site::partials.whatsapp-icon')
-      </a>
-    @endif
+    {{-- Floating actions: the free consultation launcher (client's top priority) above the WhatsApp icon (FR-COMM-001) --}}
+    <div class="fixed right-4 bottom-20 z-40 flex flex-col items-end gap-3 lg:right-6 lg:bottom-6">
+      @includeIf('consultation::partials.launcher')
+      @if ($whatsapp)
+        <a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" aria-label="{{ __('site::common.chat_on_whatsapp') }}"
+           class="inline-flex size-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-lg shadow-black/20 transition-transform hover:scale-105">
+          @include('site::partials.whatsapp-icon')
+        </a>
+      @endif
+    </div>
 
     {{-- Lightbox for galleries --}}
     <div data-lightbox hidden class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4">
