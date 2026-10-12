@@ -120,6 +120,6 @@ class Listing extends Model
 
     public function priceLabel(): string
     {
-        return $this->call_for_price || trim((string) $this->price) === '' ? __('Call for Price') : $this->price;
+        return $this->call_for_price || trim((string) $this->price) === '' ? __('site::common.call_for_price') : $this->price;
     }
 }

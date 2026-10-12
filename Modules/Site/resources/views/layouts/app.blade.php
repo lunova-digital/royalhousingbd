@@ -33,18 +33,18 @@
       <div class="container-x flex h-9 items-center justify-between gap-4">
         <div class="flex min-w-0 items-center gap-4">
           @if ($settings['address'] ?? '')
-            <span class="flex min-w-0 items-center gap-1.5">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-3.5 shrink-0'])<span class="truncate">{{ __('Visit us') }} <strong class="font-semibold text-white">{{ \Illuminate\Support\Str::limit($settings['address'], 40) }}</strong></span></span>
+            <span class="flex min-w-0 items-center gap-1.5">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-3.5 shrink-0'])<span class="truncate">{{ __('site::layout.visit_us') }} <strong class="font-semibold text-white">{{ \Illuminate\Support\Str::limit($settings['address'], 40) }}</strong></span></span>
           @endif
           <span class="hidden h-3.5 w-px bg-white/15 sm:block"></span>
-          <a href="/map" class="hidden hover:text-white sm:block">{{ __('Project map') }}</a>
-          <a href="/gallery" class="hidden hover:text-white sm:block">{{ __('Gallery') }}</a>
-          <a href="/contact" class="hidden hover:text-white sm:block">{{ __('Help & contact') }}</a>
+          <a href="/map" class="hidden hover:text-white sm:block">{{ __('site::common.project_map') }}</a>
+          <a href="/gallery" class="hidden hover:text-white sm:block">{{ __('site::common.gallery') }}</a>
+          <a href="/contact" class="hidden hover:text-white sm:block">{{ __('site::layout.help_contact') }}</a>
         </div>
         <div class="flex shrink-0 items-center gap-4">
-          @if ($phone)<a href="tel:{{ $phone }}" class="flex items-center gap-1.5 hover:text-white">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-3.5'])<span class="hidden sm:inline">{{ $phone }}</span><span class="sm:hidden">{{ __('Call') }}</span></a>@endif
+          @if ($phone)<a href="tel:{{ $phone }}" class="flex items-center gap-1.5 hover:text-white">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-3.5'])<span class="hidden sm:inline">{{ $phone }}</span><span class="sm:hidden">{{ __('site::layout.call') }}</span></a>@endif
           @if ($settings['email'] ?? '')<span class="hidden h-3.5 w-px bg-white/15 md:block"></span><a href="mailto:{{ $settings['email'] }}" class="hidden hover:text-white md:block">{{ $settings['email'] }}</a>@endif
           {{-- Language toggle: `?lang=` is remembered by the SetLocale middleware --}}
-          <span class="flex items-center overflow-hidden rounded-md border border-white/15 text-[11px] font-semibold leading-none" role="group" aria-label="{{ __('Language') }}">
+          <span class="flex items-center overflow-hidden rounded-md border border-white/15 text-[11px] font-semibold leading-none" role="group" aria-label="{{ __('site::layout.language') }}">
             @foreach (\Modules\Site\Site::LOCALES as $code => $label)
               <a href="{{ \Modules\Site\Site::localeUrl($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" rel="nofollow" class="px-2 py-1 transition-colors {{ $code === $locale ? 'bg-white text-fg' : 'text-white/70 hover:text-white' }}" @if ($code === $locale) aria-current="true" @endif>{{ $label }}</a>
             @endforeach
@@ -57,37 +57,37 @@
       {{-- Brand, search, actions --}}
       <div class="container-x">
         <div class="flex h-16 items-center gap-3 lg:h-20 lg:gap-6">
-          @include('site::partials.brand', ['href' => '/', 'sub' => __('Real Estate')])
+          @include('site::partials.brand', ['href' => '/', 'sub' => __('site::layout.real_estate')])
           <form action="/projects" method="get" class="hidden flex-1 items-center overflow-hidden rounded-full bg-fill pl-2 md:flex" role="search">
             <label class="relative shrink-0 border-r border-line">
-              <span class="sr-only">{{ __('Type') }}</span>
+              <span class="sr-only">{{ __('site::common.type') }}</span>
               <select name="type" class="h-11 appearance-none bg-transparent pr-8 pl-4 text-sm font-medium text-fg outline-none">
-                <option value="">{{ __('All') }}</option>
+                <option value="">{{ __('site::common.all') }}</option>
                 @foreach ($types as $t)<option value="{{ $t['key'] }}">{{ $t['label'] }}</option>@endforeach
               </select>
               <span class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-fg">@include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5'])</span>
             </label>
-            <input type="search" name="q" placeholder="{{ __('Search plots, flats, locations…') }}" class="h-11 min-w-0 flex-1 bg-transparent px-4 text-sm text-fg outline-none placeholder:text-faint-fg" />
-            <button type="submit" class="btn-dark m-1 h-10 px-5">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-4']) {{ __('Search') }}</button>
+            <input type="search" name="q" placeholder="{{ __('site::layout.search_placeholder') }}" class="h-11 min-w-0 flex-1 bg-transparent px-4 text-sm text-fg outline-none placeholder:text-faint-fg" />
+            <button type="submit" class="btn-dark m-1 h-10 px-5">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-4']) {{ __('site::common.search') }}</button>
           </form>
           <div class="ml-auto flex items-center gap-1 sm:gap-2">
-            @if ($phone)<a href="tel:{{ $phone }}" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="{{ __('Call us') }}">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('Call') }}</span></a>@endif
-            @if ($whatsapp)<a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="WhatsApp">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('WhatsApp') }}</span></a>@endif
-            <a href="/map" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="{{ __('Project map') }}">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('Map') }}</span></a>
+            @if ($phone)<a href="tel:{{ $phone }}" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="{{ __('site::common.call_us') }}">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('site::layout.call') }}</span></a>@endif
+            @if ($whatsapp)<a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="WhatsApp">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('site::common.whatsapp') }}</span></a>@endif
+            <a href="/map" class="flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-fg hover:bg-fill sm:px-3" aria-label="{{ __('site::common.project_map') }}">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-5'])<span class="text-[11px] text-muted-fg">{{ __('site::layout.map') }}</span></a>
           </div>
         </div>
         <form action="/projects" method="get" class="mb-3 flex items-center overflow-hidden rounded-full bg-fill md:hidden" role="search">
           <span class="pl-4 text-muted-fg">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-4'])</span>
-          <input type="search" name="q" placeholder="{{ __('Search plots, flats, locations…') }}" class="h-11 min-w-0 flex-1 bg-transparent px-3 text-sm text-fg outline-none placeholder:text-faint-fg" />
-          <button type="submit" class="btn-dark m-1 h-9 px-4">{{ __('Search') }}</button>
+          <input type="search" name="q" placeholder="{{ __('site::layout.search_placeholder') }}" class="h-11 min-w-0 flex-1 bg-transparent px-3 text-sm text-fg outline-none placeholder:text-faint-fg" />
+          <button type="submit" class="btn-dark m-1 h-9 px-4">{{ __('site::common.search') }}</button>
         </form>
       </div>
 
       {{-- Category row --}}
       <div class="border-t border-line">
         <div class="container-x flex h-14 items-center gap-2">
-          <a href="/projects" class="btn-dark h-10 shrink-0 rounded-xl px-4">@include('site::partials.icon', ['name' => 'menu', 'class' => 'size-4']) {{ __('All Projects') }} @include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5 opacity-70'])</a>
-          <nav class="scroll-row flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" aria-label="{{ __('Main') }}">
+          <a href="/projects" class="btn-dark h-10 shrink-0 rounded-xl px-4">@include('site::partials.icon', ['name' => 'menu', 'class' => 'size-4']) {{ __('site::layout.all_projects_menu') }} @include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5 opacity-70'])</a>
+          <nav class="scroll-row flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" aria-label="{{ __('site::layout.main_nav') }}">
             @foreach ($nav as $item)
               @if ($item['key'] === 'map')
                 @foreach ($types as $t)<a href="{{ $t['href'] }}" class="pill-nav {{ $path === $t['href'] ? 'pill-nav-active' : '' }}">{{ $t['label'] }}</a>@endforeach
@@ -95,7 +95,7 @@
               <a href="{{ $item['href'] }}" class="pill-nav {{ $nav_active === $item['key'] && ! in_array($path, array_column($types, 'href'), true) ? 'pill-nav-active' : '' }}">{{ __($item['label']) }}</a>
             @endforeach
           </nav>
-          <span class="hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-success xl:flex">@include('site::partials.icon', ['name' => 'shield-check', 'class' => 'size-4']) {{ __('100% Verified Documents') }}</span>
+          <span class="hidden shrink-0 items-center gap-1.5 text-sm font-semibold text-success xl:flex">@include('site::partials.icon', ['name' => 'shield-check', 'class' => 'size-4']) {{ __('site::layout.verified_documents') }}</span>
         </div>
       </div>
     </header>
@@ -117,49 +117,49 @@
               @endif
               <span class="font-display text-lg font-bold">{{ $site_name }}</span>
             </a>
-            <p class="mt-5 max-w-sm text-sm leading-relaxed text-white/65">{{ $settings['about_text'] ?: __('Residential plots, flats and property development with verified documents, prime locations and site visits booked over WhatsApp.') }}</p>
-            <h3 class="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-white">{{ __('Contact us') }}</h3>
+            <p class="mt-5 max-w-sm text-sm leading-relaxed text-white/65">{{ $settings['about_text'] ?: __('site::layout.footer_blurb') }}</p>
+            <h3 class="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-white">{{ __('site::common.contact_us') }}</h3>
             <ul class="mt-3 space-y-2 text-sm text-white/65">
-              @if ($phone)<li>{{ __('Hotline') }}: <a href="tel:{{ $phone }}" class="hover:text-white">{{ $phone }}</a></li>@endif
-              @if ($settings['email'] ?? '')<li>{{ __('Email') }}: <a href="mailto:{{ $settings['email'] }}" class="hover:text-white">{{ $settings['email'] }}</a></li>@endif
-              @if ($settings['address'] ?? '')<li>{{ __('Office') }}: {{ $settings['address'] }}</li>@endif
+              @if ($phone)<li>{{ __('site::common.hotline') }}: <a href="tel:{{ $phone }}" class="hover:text-white">{{ $phone }}</a></li>@endif
+              @if ($settings['email'] ?? '')<li>{{ __('site::common.email') }}: <a href="mailto:{{ $settings['email'] }}" class="hover:text-white">{{ $settings['email'] }}</a></li>@endif
+              @if ($settings['address'] ?? '')<li>{{ __('site::common.office') }}: {{ $settings['address'] }}</li>@endif
             </ul>
             @if ($whatsapp || $phone)
-              <h3 class="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-white">{{ __('Talk to us') }}</h3>
+              <h3 class="mt-8 text-xs font-bold uppercase tracking-[0.14em] text-white">{{ __('site::layout.talk_to_us') }}</h3>
               <div class="mt-3 flex flex-wrap gap-2">
-                @if ($whatsapp)<a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2.5 rounded-xl bg-white px-3.5 py-2 text-fg">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5'])<span><span class="block text-[10px] uppercase tracking-wider text-muted-fg">{{ __('Chat on') }}</span><span class="block text-sm font-bold">{{ __('WhatsApp') }}</span></span></a>@endif
-                @if ($phone)<a href="tel:{{ $phone }}" class="inline-flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-white">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-5'])<span><span class="block text-[10px] uppercase tracking-wider text-white/50">{{ __('Call us') }}</span><span class="block text-sm font-bold">{{ __('Hotline') }}</span></span></a>@endif
+                @if ($whatsapp)<a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2.5 rounded-xl bg-white px-3.5 py-2 text-fg">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5'])<span><span class="block text-[10px] uppercase tracking-wider text-muted-fg">{{ __('site::common.chat_on') }}</span><span class="block text-sm font-bold">{{ __('site::common.whatsapp') }}</span></span></a>@endif
+                @if ($phone)<a href="tel:{{ $phone }}" class="inline-flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-2 text-white">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-5'])<span><span class="block text-[10px] uppercase tracking-wider text-white/50">{{ __('site::common.call_us') }}</span><span class="block text-sm font-bold">{{ __('site::common.hotline') }}</span></span></a>@endif
               </div>
             @endif
           </div>
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('Projects') }}</h3>
+            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('site::common.projects') }}</h3>
             <ul class="mt-4 space-y-2.5">
-              <li><a href="/projects" class="link-muted">{{ __('All projects') }}</a></li>
-              @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="link-muted">{{ __(':type listings', ['type' => $t['label']]) }}</a></li>@endforeach
-              <li><a href="/map" class="link-muted">{{ __('Interactive project map') }}</a></li>
+              <li><a href="/projects" class="link-muted">{{ __('site::common.all_projects') }}</a></li>
+              @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="link-muted">{{ __('site::common.type_listings', ['type' => $t['label']]) }}</a></li>@endforeach
+              <li><a href="/map" class="link-muted">{{ __('site::layout.interactive_project_map') }}</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('Company') }}</h3>
+            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('site::layout.company') }}</h3>
             <ul class="mt-4 space-y-2.5">
-              <li><a href="/about" class="link-muted">{{ __('About us') }}</a></li>
-              <li><a href="/about#team" class="link-muted">{{ __('Our team') }}</a></li>
-              <li><a href="/gallery" class="link-muted">{{ __('Gallery') }}</a></li>
-              <li><a href="/contact" class="link-muted">{{ __('Contact us') }}</a></li>
+              <li><a href="/about" class="link-muted">{{ __('site::layout.about_us') }}</a></li>
+              <li><a href="/about#team" class="link-muted">{{ __('site::common.our_team') }}</a></li>
+              <li><a href="/gallery" class="link-muted">{{ __('site::common.gallery') }}</a></li>
+              <li><a href="/contact" class="link-muted">{{ __('site::common.contact_us') }}</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('Support') }}</h3>
+            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('site::layout.support') }}</h3>
             <ul class="mt-4 space-y-2.5">
-              <li><a href="/contact" class="link-muted">{{ __('Book a site visit') }}</a></li>
-              @if ($whatsapp)<li><a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="link-muted">{{ __('WhatsApp enquiry') }}</a></li>@endif
-              <li><a href="/privacy" class="link-muted">{{ __('Privacy policy') }}</a></li>
-              <li><a href="/terms" class="link-muted">{{ __('Terms of service') }}</a></li>
+              <li><a href="/contact" class="link-muted">{{ __('site::layout.book_site_visit') }}</a></li>
+              @if ($whatsapp)<li><a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="link-muted">{{ __('site::layout.whatsapp_enquiry') }}</a></li>@endif
+              <li><a href="/privacy" class="link-muted">{{ __('site::layout.privacy_policy') }}</a></li>
+              <li><a href="/terms" class="link-muted">{{ __('site::layout.terms_of_service') }}</a></li>
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('Follow') }}</h3>
+            <h3 class="text-xs font-bold uppercase tracking-[0.14em]">{{ __('site::layout.follow') }}</h3>
             <div class="mt-4 flex flex-wrap gap-2">
               @foreach (['facebook_url' => 'facebook', 'instagram_url' => 'instagram', 'youtube_url' => 'youtube', 'tiktok_url' => 'tiktok'] as $key => $icon)
                 @if ($settings[$key] ?? '')
@@ -170,14 +170,14 @@
           </div>
         </div>
         <div class="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-white/55 md:flex-row md:items-center md:justify-between">
-          <p>© {{ date('Y') }} {{ $site_name }}. {{ __('All rights reserved.') }}</p>
-          <p class="flex items-center gap-3"><span>{{ __('Site visits') }}</span><span class="rounded-md bg-white px-2.5 py-1 text-xs font-bold text-fg">{{ __('By appointment · WhatsApp') }}</span></p>
+          <p>© {{ date('Y') }} {{ $site_name }}. {{ __('site::layout.all_rights_reserved') }}</p>
+          <p class="flex items-center gap-3"><span>{{ __('site::layout.site_visits') }}</span><span class="rounded-md bg-white px-2.5 py-1 text-xs font-bold text-fg">{{ __('site::layout.by_appointment') }}</span></p>
         </div>
       </div>
     </footer>
 
     {{-- Bottom tab bar on phones and tablets --}}
-    <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white lg:hidden" aria-label="{{ __('Quick navigation') }}" style="padding-bottom: env(safe-area-inset-bottom, 0px)">
+    <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white lg:hidden" aria-label="{{ __('site::layout.quick_navigation') }}" style="padding-bottom: env(safe-area-inset-bottom, 0px)">
       <div class="flex h-16 items-stretch justify-around px-1">
         @foreach (array_values(array_filter($nav, fn ($i) => $i['key'] !== 'gallery')) as $item)
           @php($active = $nav_active === $item['key'])
@@ -192,7 +192,7 @@
 
     {{-- FR-COMM-001: floating WhatsApp icon on every page --}}
     @if ($whatsapp)
-      <a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" aria-label="{{ __('Chat on WhatsApp') }}"
+      <a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" aria-label="{{ __('site::common.chat_on_whatsapp') }}"
          class="fixed right-4 bottom-20 z-40 inline-flex size-14 items-center justify-center rounded-full bg-whatsapp text-white shadow-lg shadow-black/20 transition-transform hover:scale-105 lg:right-6 lg:bottom-6">
         @include('site::partials.whatsapp-icon')
       </a>
@@ -200,7 +200,7 @@
 
     {{-- Lightbox for galleries --}}
     <div data-lightbox hidden class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4">
-      <button type="button" data-lightbox-close aria-label="{{ __('Close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
+      <button type="button" data-lightbox-close aria-label="{{ __('site::common.close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
       <img data-lightbox-img src="" alt="" class="max-h-[90svh] max-w-full rounded-2xl object-contain" />
     </div>
     @stack('scripts')

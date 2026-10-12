@@ -33,7 +33,7 @@ class HomeController
         $settings = Site::settings();
 
         return view('home::about', Site::page([
-            'title' => __('About Us'),
+            'title' => __('home::about.title'),
             'description' => $settings['about_title'],
             'nav' => 'about',
         ], [
@@ -54,25 +54,25 @@ class HomeController
         }
         foreach (Masterplan::query()->published()->orderByDesc('id')->get() as $masterplan) {
             if ($masterplan->image_path) {
-                $photos[] = ['src' => $masterplan->image_path, 'thumb' => $masterplan->image_path, 'category' => 'masterplan', 'caption' => $masterplan->name, 'location' => __('Masterplan'), 'href' => $masterplan->url()];
+                $photos[] = ['src' => $masterplan->image_path, 'thumb' => $masterplan->image_path, 'category' => 'masterplan', 'caption' => $masterplan->name, 'location' => __('home::gallery.masterplan'), 'href' => $masterplan->url()];
             }
         }
 
         return view('home::gallery', Site::page([
-            'title' => __('Gallery'),
-            'description' => __('Photos of our properties, plots, flats and project masterplans.'),
+            'title' => __('site::common.gallery'),
+            'description' => __('home::gallery.description'),
             'nav' => 'gallery',
         ], ['photos' => $photos, 'listingTypes' => ListingType::registry()->values()]));
     }
 
     public function privacy(): View
     {
-        return view('home::legal', Site::page(['title' => __('Privacy Policy')], ['page' => 'privacy', 'heading' => __('Privacy Policy'), 'body' => Site::settings()['privacy_text']]));
+        return view('home::legal', Site::page(['title' => __('home::legal.privacy_title')], ['page' => 'privacy', 'heading' => __('home::legal.privacy_title'), 'body' => Site::settings()['privacy_text']]));
     }
 
     public function terms(): View
     {
-        return view('home::legal', Site::page(['title' => __('Terms of Service')], ['page' => 'terms', 'heading' => __('Terms of Service'), 'body' => Site::settings()['terms_text']]));
+        return view('home::legal', Site::page(['title' => __('home::legal.terms_title')], ['page' => 'terms', 'heading' => __('home::legal.terms_title'), 'body' => Site::settings()['terms_text']]));
     }
 
     public function contact(): View
@@ -80,11 +80,11 @@ class HomeController
         $settings = Site::settings();
 
         return view('home::contact', Site::page([
-            'title' => __('Contact Us'),
-            'description' => __('Get in touch with :site by phone, email or WhatsApp.', ['site' => $settings['site_name']]),
+            'title' => __('home::contact.title'),
+            'description' => __('home::contact.description', ['site' => $settings['site_name']]),
             'nav' => 'contact',
         ], [
-            'whatsapp' => Site::whatsapp($settings, __("Hello, I'd like to get in touch about your listings.")),
+            'whatsapp' => Site::whatsapp($settings, __('home::contact.whatsapp_message')),
         ]));
     }
 

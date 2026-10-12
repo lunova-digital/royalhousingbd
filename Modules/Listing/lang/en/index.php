@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'our_projects' => 'Our projects',
+    'description' => 'Browse :title in Bangladesh. Contact us on WhatsApp for details and site visits.',
+    'listing_type' => 'Listing type',
+    'catalogue' => 'Catalogue',
+    'intro_type' => 'Browse :type listings from :site: verified documents, prime locations and site visits on request.',
+    'intro_all' => 'Browse every project from :site: verified documents, prime locations and site visits on request.',
+    'listing_count' => ':count listing|:count listings',
+    'browse_by_location' => 'Browse by location',
+    'option_count' => ':count option|:count options',
+    'filters' => 'Filters',
+    'clear_all' => 'Clear all',
+    'search_placeholder' => 'Project, area, feature…',
+    'apply' => 'Apply',
+    'features' => 'Features',
+    'features_hint' => 'Tick what the project must have.',
+    'all_types' => 'All types',
+    'showing' => 'Showing :shown of :total',
+    'for_query' => 'for “:q”',
+    'in_location' => 'in :location',
+    'sorted_by_newest' => 'Sorted by newest',
+    'no_match' => 'No projects match.',
+    'no_match_hint' => 'Try a different search, location or fewer features.',
+    'clear_filters' => 'Clear filters',
+    'pagination' => 'Pagination',
+];

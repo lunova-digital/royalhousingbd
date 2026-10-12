@@ -83,8 +83,11 @@ tests/Feature/           cross-module tests: public pages + admin API
   remembered in a plain `lang` cookie by `Modules\Site\Http\Middleware\SetLocale`
   (a global middleware the Site module declares), which calls `app()->setLocale()`.
   Only the chrome and static copy are translated: Blade uses `__()` / `trans_choice()`
-  with the English string as the key and each module ships `lang/bn.json` through
-  `ProvidesTranslations` (`lang/bn.json` at the root covers the error pages).
+  with short keys. Each module ships `lang/{en,bn}/<page>.php` through
+  `ProvidesTranslations`, namespaced by module (`__('listing::index.browse_by_location')`);
+  strings shared across modules live in `site::common`, and `lang/{en,bn}/errors.php`
+  at the root covers the error pages. English is the source: add a key to the `en`
+  file and its translation to `bn`.
   Admin-entered content stays as entered. For `bn` the layout also loads Noto Sans
   Bengali and `app.css` swaps the font tokens under `html:lang(bn)`.
 - Listing types and features are rows the admin manages (Content → Listing types /

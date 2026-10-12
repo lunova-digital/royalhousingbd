@@ -83,7 +83,7 @@ class Site
             'nav' => self::NAV,
             'types' => self::types(),
             'nav_active' => $meta['nav'] ?? '',
-            'whatsapp_float' => self::whatsapp($s, __("Hello, I found you on :site and I'd like to know more.", ['site' => $siteName])),
+            'whatsapp_float' => self::whatsapp($s, __('site::common.whatsapp_float_message', ['site' => $siteName])),
         ];
     }
 

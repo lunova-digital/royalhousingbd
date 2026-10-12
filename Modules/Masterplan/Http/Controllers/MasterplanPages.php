@@ -15,8 +15,8 @@ class MasterplanPages
         $masterplans = Masterplan::query()->with('plots')->published()->orderBy('id')->get();
 
         return view('masterplan::index', Site::page([
-            'title' => __('Project Map'),
-            'description' => __('Choose a project to explore its interactive masterplan with live plot availability.'),
+            'title' => __('site::common.project_map_title'),
+            'description' => __('masterplan::index.description'),
             'nav' => 'map',
         ], ['masterplans' => $masterplans]));
     }
@@ -29,7 +29,7 @@ class MasterplanPages
         // What the map script consumes: each detailed plot, keyed to its SVG
         // group, plus a ready-made WhatsApp link (FR-MAP-004, FR-MAP-008).
         $plots = $masterplan->plots->map(function (Plot $plot) use ($masterplan, $settings) {
-            $message = __('Hello, I\'m interested in Plot :number on :project (Ref: :ref). :url', [
+            $message = __('masterplan::show.whatsapp_message', [
                 'number' => $plot->number, 'project' => $masterplan->name, 'ref' => $plot->reference(), 'url' => Site::baseUrl().$masterplan->url(),
             ]);
 
@@ -47,8 +47,8 @@ class MasterplanPages
         });
 
         return view('masterplan::show', Site::page([
-            'title' => __(':name — Project Map', ['name' => $masterplan->name]),
-            'description' => __('Tap a plot on the :name masterplan to see its size, price and availability.', ['name' => $masterplan->name]),
+            'title' => __('masterplan::show.title', ['name' => $masterplan->name]),
+            'description' => __('masterplan::show.description', ['name' => $masterplan->name]),
             'image' => $masterplan->image_path,
             'nav' => 'map',
         ], [
@@ -61,12 +61,12 @@ class MasterplanPages
                 'plots' => $plots,
                 // The side panel's own words, in the visitor's language.
                 'labels' => [
-                    'available' => __('Available'),
-                    'booked' => __('Booked'),
-                    'sold' => __('Sold'),
-                    'plot' => __('Plot'),
-                    'callForPrice' => __('Call for Price'),
-                    'loadError' => __('Could not load the layout.'),
+                    'available' => __('site::common.available'),
+                    'booked' => __('site::common.booked'),
+                    'sold' => __('site::common.sold'),
+                    'plot' => __('site::common.plot'),
+                    'callForPrice' => __('site::common.call_for_price'),
+                    'loadError' => __('masterplan::show.load_error'),
                 ],
             ],
         ]));

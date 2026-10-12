@@ -37,11 +37,11 @@ class ListingPages
             'published' => true,
         ];
         $page = $this->listings->search($filter, self::PER_PAGE, (int) $request->query('page', 1));
-        $title = $typeName ? __(':type listings', ['type' => $typeName]) : __('Our projects');
+        $title = $typeName ? __('site::common.type_listings', ['type' => $typeName]) : __('listing::index.our_projects');
 
         return view('listing::index', Site::page([
             'title' => $title,
-            'description' => __('Browse :title in Bangladesh. Contact us on WhatsApp for details and site visits.', ['title' => $title]),
+            'description' => __('listing::index.description', ['title' => $title]),
             'nav' => 'projects',
         ], [
             'listings' => $page->items(),
@@ -62,13 +62,13 @@ class ListingPages
     {
         $listing = $this->listings->findPublished($type, $slug) ?? abort(404);
         $settings = Site::settings();
-        $message = __('Hello, I\'m interested in ":title" (:location, Ref: :ref). :url', [
+        $message = __('listing::show.whatsapp_message', [
             'title' => $listing->title, 'location' => $listing->location, 'ref' => $listing->reference(), 'url' => Site::baseUrl().$listing->url(),
         ]);
 
         return view('listing::show', Site::page([
             'title' => $listing->title,
-            'description' => __(':type in :location. :price.', ['type' => $listing->typeLabel(), 'location' => $listing->location, 'price' => $listing->priceLabel()]),
+            'description' => __('listing::show.description', ['type' => $listing->typeLabel(), 'location' => $listing->location, 'price' => $listing->priceLabel()]),
             'image' => $listing->cover()?->path,
             'nav' => 'projects',
         ], [
