@@ -12,7 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // The public site's language cookie is read by a global middleware
+        // (Modules\Site\Http\Middleware\SetLocale), before the web group would
+        // decrypt it, so it travels in plain text.
+        $middleware->encryptCookies(except: ['lang']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

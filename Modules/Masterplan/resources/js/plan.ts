@@ -15,11 +15,19 @@ interface PlanPlot {
   ref: string
 }
 
+/** The words the panel needs, translated by the page (the public site is bilingual). */
+interface PlanLabels extends Record<PlotStatus, string> {
+  plot: string
+  callForPrice: string
+  loadError: string
+}
+
 interface Plan {
   layout: string
   width: number
   height: number
   plots: PlanPlot[]
+  labels?: Partial<PlanLabels>
 }
 
 const container = document.getElementById('plan-map')
@@ -29,12 +37,14 @@ if (container && dataEl) {
   void loadLayout(plan.layout)
     .then((svg) => mount(container, svg, plan))
     .catch((err: unknown) => {
-      container.innerHTML = `<p class="p-8 text-center text-sm text-muted-fg">${err instanceof Error ? err.message : 'Could not load the layout.'}</p>`
+      const message = err instanceof Error ? err.message : (plan.labels?.loadError ?? 'Could not load the layout.')
+      container.innerHTML = `<p class="p-8 text-center text-sm text-muted-fg">${message}</p>`
     })
 }
 
 function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
   svg.classList.add('plan-public')
+  const labels: PlanLabels = { ...STATUS_LABELS, plot: 'Plot', callForPrice: 'Call for Price', loadError: 'Could not load the layout.', ...plan.labels }
   const byKey = new Map(plan.plots.map((p) => [p.key, p]))
   let selected: PlanPlot | null = null
   // Legend items toggle statuses on and off (FR-MAP-007).
@@ -79,7 +89,7 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
       // Every plot names itself on hover, like a printed layout.
       if (!group.querySelector(':scope > title')) {
         const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
-        title.textContent = `Plot ${plot.number} · ${STATUS_LABELS[plot.status]}`
+        title.textContent = `${labels.plot} ${plot.number} · ${labels[plot.status]}`
         group.prepend(title)
       }
     }
@@ -92,11 +102,11 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
     if (panel.details) panel.details.hidden = false
     if (panel.number) panel.number.textContent = plot.number
     if (panel.status) {
-      panel.status.textContent = STATUS_LABELS[plot.status] ?? plot.status
+      panel.status.textContent = labels[plot.status] ?? plot.status
       panel.status.className = `inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-semibold ${statusClass[plot.status] ?? ''}`
     }
     if (panel.size) panel.size.textContent = plot.size || '—'
-    if (panel.price) panel.price.textContent = plot.price || 'Call for Price'
+    if (panel.price) panel.price.textContent = plot.price || labels.callForPrice
     if (panel.position) panel.position.textContent = plot.position || (panel.position.dataset.default ?? '—')
     if (panel.ref) panel.ref.textContent = plot.ref
     for (const link of panel.whatsapp) link.href = plot.whatsapp

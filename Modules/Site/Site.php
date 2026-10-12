@@ -4,6 +4,7 @@ namespace Modules\Site;
 
 use Modules\Listing\Models\ListingType;
 use Modules\Settings\Settings;
+use Modules\Site\Http\Middleware\SetLocale;
 use Modules\Site\Support\WhatsApp;
 
 /**
@@ -12,7 +13,10 @@ use Modules\Site\Support\WhatsApp;
  */
 class Site
 {
-    /** The sitemap from SRS §3, in order. */
+    /** The public site's languages (code => the toggle's short label); English is the default. */
+    public const LOCALES = ['en' => 'EN', 'bn' => 'বাং'];
+
+    /** The sitemap from SRS §3, in order; labels are translated where rendered. */
     public const NAV = [
         ['key' => 'home', 'label' => 'Home', 'href' => '/', 'icon' => 'home'],
         ['key' => 'about', 'label' => 'About', 'href' => '/about', 'icon' => 'info'],
@@ -21,6 +25,18 @@ class Site
         ['key' => 'gallery', 'label' => 'Gallery', 'href' => '/gallery', 'icon' => 'image'],
         ['key' => 'contact', 'label' => 'Contact', 'href' => '/contact', 'icon' => 'phone'],
     ];
+
+    /** A supported locale code, or null for anything else. */
+    public static function locale(mixed $code): ?string
+    {
+        return is_string($code) && array_key_exists($code, self::LOCALES) ? $code : null;
+    }
+
+    /** The current URL with `?lang=` set, which SetLocale remembers in its cookie. */
+    public static function localeUrl(string $code): string
+    {
+        return request()->fullUrlWithQuery([SetLocale::COOKIE => $code]);
+    }
 
     /**
      * The listing type sub-navigation (Property · Plot · Flat · …), in the admin's order.
@@ -67,7 +83,7 @@ class Site
             'nav' => self::NAV,
             'types' => self::types(),
             'nav_active' => $meta['nav'] ?? '',
-            'whatsapp_float' => self::whatsapp($s, "Hello, I found you on {$siteName} and I'd like to know more."),
+            'whatsapp_float' => self::whatsapp($s, __("Hello, I found you on :site and I'd like to know more.", ['site' => $siteName])),
         ];
     }
 

@@ -122,16 +122,18 @@ for (const tabs of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
 }
 
 // Contact form → WhatsApp (SRS: no enquiry storage; all contact is WhatsApp).
+// The page passes the field labels (data-whatsapp-labels) in the visitor's language.
 const form = document.querySelector<HTMLFormElement>('[data-whatsapp-form]')
 if (form) {
+  const labels = { subject: 'Subject', name: 'Name', phone: 'Phone', email: 'Email', ...parseLabels(form.dataset.whatsappLabels) }
   form.addEventListener('submit', (event) => {
     event.preventDefault()
     const data = new FormData(form)
     const lines = [
-      `Subject: ${data.get('subject')}`,
-      `Name: ${data.get('name')}`,
-      data.get('phone') ? `Phone: ${data.get('phone')}` : '',
-      data.get('email') ? `Email: ${data.get('email')}` : '',
+      `${labels.subject}: ${data.get('subject')}`,
+      `${labels.name}: ${data.get('name')}`,
+      data.get('phone') ? `${labels.phone}: ${data.get('phone')}` : '',
+      data.get('email') ? `${labels.email}: ${data.get('email')}` : '',
       '',
       String(data.get('message') ?? ''),
     ].filter((line, i) => line !== '' || i === 4)
@@ -141,4 +143,12 @@ if (form) {
       : `mailto:?subject=${encodeURIComponent(String(data.get('subject')))}&body=${encodeURIComponent(lines.join('\n'))}`
     window.open(url, '_blank', 'noopener')
   })
+}
+
+function parseLabels(json: string | undefined): Partial<Record<'subject' | 'name' | 'phone' | 'email', string>> {
+  try {
+    return json ? (JSON.parse(json) as Partial<Record<'subject' | 'name' | 'phone' | 'email', string>>) : {}
+  } catch {
+    return {}
+  }
 }

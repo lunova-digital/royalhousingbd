@@ -15,8 +15,8 @@ class MasterplanPages
         $masterplans = Masterplan::query()->with('plots')->published()->orderBy('id')->get();
 
         return view('masterplan::index', Site::page([
-            'title' => 'Project Map',
-            'description' => 'Choose a project to explore its interactive masterplan with live plot availability.',
+            'title' => __('Project Map'),
+            'description' => __('Choose a project to explore its interactive masterplan with live plot availability.'),
             'nav' => 'map',
         ], ['masterplans' => $masterplans]));
     }
@@ -29,8 +29,9 @@ class MasterplanPages
         // What the map script consumes: each detailed plot, keyed to its SVG
         // group, plus a ready-made WhatsApp link (FR-MAP-004, FR-MAP-008).
         $plots = $masterplan->plots->map(function (Plot $plot) use ($masterplan, $settings) {
-            $message = sprintf('Hello, I\'m interested in Plot %s on %s (Ref: %s). %s%s',
-                $plot->number, $masterplan->name, $plot->reference(), Site::baseUrl(), $masterplan->url());
+            $message = __('Hello, I\'m interested in Plot :number on :project (Ref: :ref). :url', [
+                'number' => $plot->number, 'project' => $masterplan->name, 'ref' => $plot->reference(), 'url' => Site::baseUrl().$masterplan->url(),
+            ]);
 
             return [
                 'id' => $plot->id,
@@ -46,8 +47,8 @@ class MasterplanPages
         });
 
         return view('masterplan::show', Site::page([
-            'title' => $masterplan->name.' — Project Map',
-            'description' => "Tap a plot on the {$masterplan->name} masterplan to see its size, price and availability.",
+            'title' => __(':name — Project Map', ['name' => $masterplan->name]),
+            'description' => __('Tap a plot on the :name masterplan to see its size, price and availability.', ['name' => $masterplan->name]),
             'image' => $masterplan->image_path,
             'nav' => 'map',
         ], [
@@ -58,6 +59,15 @@ class MasterplanPages
                 'width' => $masterplan->image_width,
                 'height' => $masterplan->image_height,
                 'plots' => $plots,
+                // The side panel's own words, in the visitor's language.
+                'labels' => [
+                    'available' => __('Available'),
+                    'booked' => __('Booked'),
+                    'sold' => __('Sold'),
+                    'plot' => __('Plot'),
+                    'callForPrice' => __('Call for Price'),
+                    'loadError' => __('Could not load the layout.'),
+                ],
             ],
         ]));
     }

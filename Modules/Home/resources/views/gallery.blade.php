@@ -1,11 +1,11 @@
 @extends('site::layouts.app')
 @section('content')
 @php($asset = fn ($p) => \Modules\Site\Site::asset($p))
-@include('site::partials.page-hero', ['crumbs' => [['Gallery', null]], 'title' => 'Gallery', 'text' => 'Photos of our properties, plots, flats and project masterplans.'])
+@include('site::partials.page-hero', ['crumbs' => [[__('Gallery'), null]], 'title' => __('Gallery'), 'text' => __('Photos of our properties, plots, flats and project masterplans.')])
 
 <section class="container-x mt-6">
-  <div class="scroll-row flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter photos">
-    @foreach (['all' => 'All photos'] + $listingTypes->pluck('name', 'slug')->all() + ['masterplan' => 'Masterplans'] as $key => $label)
+  <div class="scroll-row flex gap-2 overflow-x-auto pb-1" role="group" aria-label="{{ __('Filter photos') }}">
+    @foreach (['all' => __('All photos')] + $listingTypes->pluck('name', 'slug')->all() + ['masterplan' => __('Masterplans')] as $key => $label)
       <button type="button" data-gallery-filter="{{ $key }}" class="gallery-filter shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors {{ $key === 'all' ? 'bg-ink-950 text-white' : 'bg-fill text-fg hover:bg-line' }}">{{ $label }}</button>
     @endforeach
   </div>
@@ -19,9 +19,9 @@
         </figure>
       @endforeach
     </div>
-    <p data-gallery-empty hidden class="card mt-5 p-16 text-center text-muted-fg">No photos in this category yet.</p>
+    <p data-gallery-empty hidden class="card mt-5 p-16 text-center text-muted-fg">{{ __('No photos in this category yet.') }}</p>
   @else
-    <p class="card mt-5 p-16 text-center text-muted-fg">No photos yet.</p>
+    <p class="card mt-5 p-16 text-center text-muted-fg">{{ __('No photos yet.') }}</p>
   @endif
 </section>
 @endsection
