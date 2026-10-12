@@ -75,6 +75,9 @@
         @if ($whatsappOn)<a href="{{ $whatsapp }}" target="_blank" rel="noreferrer" class="btn-primary h-13 rounded-xl text-base">{{ __('site::common.book_now') }}</a>@else<a href="/contact" class="btn-primary h-13 rounded-xl text-base">{{ __('site::common.book_now') }}</a>@endif
         <a href="{{ $planLive ? $plan->url() : '/map' }}" class="btn-outline size-13 rounded-xl px-0" aria-label="{{ __('site::common.project_map') }}">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-5'])</a>
       </div>
+      @if (\Modules\Consultation\Availability::enabled())
+        <button type="button" data-consult-open data-consult-listing="{{ $l->id }}" class="btn-outline mt-3 h-12 w-full rounded-xl text-sm">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-4 text-brand']) {{ __('listing::show.free_consultation') }}</button>
+      @endif
       @if ($l->hasBrochure())
         <a href="{{ $asset($l->brochure_path) }}" download="{{ $l->brochureFilename() }}" class="btn-outline mt-3 h-12 w-full rounded-xl text-sm">@include('site::partials.icon', ['name' => 'download', 'class' => 'size-4']) {{ __('listing::show.download_brochure') }} <span class="font-normal text-muted-fg">(PDF · {{ \Illuminate\Support\Number::fileSize((int) $l->brochure_size, 1) }})</span></a>
       @endif

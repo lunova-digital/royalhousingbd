@@ -17,6 +17,7 @@ return [
     'availability' => 'Availability',
     'plots_open' => ':available of :total plots open',
     'available_note' => 'Available, ready for a site visit',
+    'free_consultation' => 'Book a free consultation about this listing',
     'download_brochure' => 'Download brochure',
     'prime_location' => 'Prime location',
     'verified_papers' => 'Verified papers',

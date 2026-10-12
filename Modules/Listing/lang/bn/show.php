@@ -17,6 +17,7 @@ return [
     'availability' => 'খালি প্লট',
     'plots_open' => ':total টি প্লটের মধ্যে :available টি খালি',
     'available_note' => 'খালি আছে, সাইট ভিজিটের জন্য প্রস্তুত',
+    'free_consultation' => 'এই লিস্টিং নিয়ে ফ্রি পরামর্শ বুক করুন',
     'download_brochure' => 'ব্রোশিওর ডাউনলোড',
     'prime_location' => 'সেরা লোকেশন',
     'verified_papers' => 'যাচাইকৃত কাগজ',
