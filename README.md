@@ -52,6 +52,9 @@ Modules/<Name>/          one feature each; StudlyCase dirs hold classes, lowerca
                          ListingImage, ListingService (search: keyword + feature filters), ListingRequest, Listing/ListingType/FeatureController (admin API), ListingPages (public)
   Masterplan/            Masterplan (an SVG layout), Plot (details of one `g.plan-plot`), MasterplanService, LayoutSvg (SVG validation), MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
   Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list)
+  Consultation/          Free consultation booking: Availability (the admin's hours, from settings), Scheduler (slot calendar, double-booking guard), Consultation (a booking),
+                         ConsultationPages (public: /consultation, slot feed, booking, confirmation + .ics), ConsultationController (admin: bookings list, availability),
+                         ConsultationBooked mail, the floating launcher partial + consult.ts widget
   Home/                  HomeController — homepage, About, Gallery, Contact, Privacy/Terms, sitemap.xml, robots.txt
 
 inside a module:
@@ -95,6 +98,14 @@ tests/Feature/           cross-module tests: public pages + admin API
   (`/plot`, `/plot/{listing}`), so the Listing module is wired last (`order() = -1`) and
   registers `/{type}` as fallback routes: every static page and the admin match first,
   and an unknown slug is a 404. `Site::types()` feeds the header, footer and search.
+- Free consultations: every public page carries the Consultation module's floating launcher
+  (`consultation::partials.launcher`, included by the site layout) which opens the booking widget in a
+  `<dialog>`; `/consultation` has it inline. The widget fetches `/consultation/availability` (the next
+  days and their slots in Bangladesh time, labelled in the visitor's language) and posts to
+  `/consultation`; the slot is checked against the admin's hours (Leads → Availability, stored as
+  `consult_*` settings) and existing bookings inside a transaction. Bookings land in Leads →
+  Consultations and an email goes to the site's contact address; the visitor gets a reference,
+  an `.ics` file and a WhatsApp link. Times are stored in UTC and shown in `Asia/Dhaka`.
 - Admin: laramod-admin answers `/admin/*` (behind `auth`) and mounts the React shell.
   A module adds pages with a dashboard script: `resources/js/dashboard.tsx`, listed in
   both `viteEntries()` and `dashboardScripts()`, calls `registerModule({ id, order,

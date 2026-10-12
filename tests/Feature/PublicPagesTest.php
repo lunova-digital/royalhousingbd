@@ -21,10 +21,10 @@ class PublicPagesTest extends TestCase
 
     public function test_every_sitemap_page_renders(): void
     {
-        foreach (['/', '/about', '/projects', '/property', '/plot', '/flat', '/resort', '/five-star-hotel', '/map', '/gallery', '/contact', '/privacy', '/terms', '/robots.txt'] as $path) {
+        foreach (['/', '/about', '/projects', '/property', '/plot', '/flat', '/resort', '/five-star-hotel', '/map', '/gallery', '/contact', '/consultation', '/privacy', '/terms', '/robots.txt'] as $path) {
             $this->get($path)->assertOk();
         }
-        $this->get('/sitemap.xml')->assertOk()->assertSee('/plot/corner-plot-block-c')->assertSee('/five-star-hotel</loc>', false);
+        $this->get('/sitemap.xml')->assertOk()->assertSee('/plot/corner-plot-block-c')->assertSee('/consultation</loc>', false)->assertSee('/five-star-hotel</loc>', false);
     }
 
     public function test_listing_detail_has_whatsapp_reference(): void
