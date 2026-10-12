@@ -2,6 +2,7 @@ import { ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
+import { Combobox } from '@/components/combobox'
 import { Field } from '@/components/field'
 import { PageHeader } from '@/components/page-header'
 import { Alert } from '@/components/ui/alert'
@@ -16,7 +17,7 @@ import { api, ApiError } from '@/lib/api'
 
 import { Brochure } from '../components/brochure'
 import { Gallery } from '../components/gallery'
-import { useFeatures, useListingTypes } from '../api'
+import { useFeatures, useListingTypes, useLocations } from '../api'
 import { EMPTY_INPUT, listingUrl, toInput, type Feature, type Listing, type ListingInput } from '../types'
 
 export function ListingFormPage() {
@@ -32,6 +33,7 @@ export function ListingFormPage() {
   const [masterplans, setMasterplans] = useState<{ id: number; name: string }[]>([])
   const types = useListingTypes()
   const [features, setFeatures] = useFeatures()
+  const [locations] = useLocations()
   const [newFeature, setNewFeature] = useState('')
   const [featureError, setFeatureError] = useState<string | null>(null)
 
@@ -143,8 +145,15 @@ export function ListingFormPage() {
                     ))}
                   </NativeSelect>
                 </Field>
-                <Field id="location" label="Location" error={errors.location}>
-                  <Input id="location" value={form.location} onChange={(e) => set('location', e.target.value)} placeholder="e.g. Bashundhara R/A, Dhaka" />
+                <Field id="location" label="Location" error={errors.location_id} hint="Type to search. Missing one? Add it under Content → Locations.">
+                  <Combobox
+                    id="location"
+                    options={(locations ?? []).map((l) => ({ value: l.id, label: l.name }))}
+                    value={form.location_id}
+                    onChange={(v) => set('location_id', typeof v === 'number' ? v : null)}
+                    placeholder="Search locations…"
+                    emptyText="No location matches."
+                  />
                 </Field>
               </div>
               <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">

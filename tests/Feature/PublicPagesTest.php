@@ -39,7 +39,8 @@ class PublicPagesTest extends TestCase
     public function test_listing_grid_filters_by_location_and_search(): void
     {
         $this->get('/listings')->assertRedirect('/projects');
-        $this->get('/projects?location=Purbachal%2C+Dhaka')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
+        $this->get('/projects?location=Hasara+%28Munshiganj%29')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
+        $this->get('/plot')->assertOk()->assertSee('Narayanganj');
         $this->get('/flat?q=lake')->assertOk()->assertSee('1450 sqft flat');
         $this->get('/flat?q=nothing-matches')->assertOk()->assertSee('No projects match');
     }
@@ -50,7 +51,7 @@ class PublicPagesTest extends TestCase
         $this->get('/projects?q=gas')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
         $this->get('/projects?q=royal+city')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
         $this->get('/projects?q=five+star')->assertOk()->assertSee('Beachfront hotel')->assertDontSee('Corner plot');
-        $this->get('/projects?q=lift+uttara')->assertOk()->assertSee('1450 sqft flat')->assertDontSee('Beachfront hotel');
+        $this->get('/projects?q=lift+mirpur')->assertOk()->assertSee('1450 sqft flat')->assertDontSee('Beachfront hotel');
     }
 
     public function test_feature_filter_requires_every_ticked_feature(): void

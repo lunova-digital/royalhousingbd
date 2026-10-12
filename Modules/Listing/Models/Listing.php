@@ -50,6 +50,12 @@ class Listing extends Model
         return $this->belongsTo(ListingType::class, 'type', 'slug');
     }
 
+    /** The admin-managed Location the `location` name is copied from. */
+    public function locationRecord(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('published', true);

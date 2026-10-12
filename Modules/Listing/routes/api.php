@@ -4,6 +4,7 @@ use Illuminate\Routing\Router;
 use Modules\Listing\Http\Controllers\FeatureController;
 use Modules\Listing\Http\Controllers\ListingController;
 use Modules\Listing\Http\Controllers\ListingTypeController;
+use Modules\Listing\Http\Controllers\LocationController;
 
 /** @var Router $router */
 $router->prefix('admin')->middleware('auth')->group(function (Router $router) {
@@ -19,4 +20,5 @@ $router->prefix('admin')->middleware('auth')->group(function (Router $router) {
     $router->put('listing-types/order', [ListingTypeController::class, 'reorder']);
     $router->apiResource('listing-types', ListingTypeController::class)->except('show');
     $router->apiResource('features', FeatureController::class)->except('show');
+    $router->apiResource('locations', LocationController::class)->except('show');
 });

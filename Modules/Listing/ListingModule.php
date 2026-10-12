@@ -14,6 +14,7 @@ use Laramod\Contracts\ProvidesViews;
 use Laramod\Contracts\ProvidesViteEntries;
 use Modules\Listing\Database\Seeders\FeatureSeeder;
 use Modules\Listing\Database\Seeders\ListingTypeSeeder;
+use Modules\Listing\Database\Seeders\LocationSeeder;
 
 class ListingModule implements Module, Ordered, ProvidesApiRoutes, ProvidesDashboardScripts, ProvidesMigrations, ProvidesRoutes, ProvidesSeeders, ProvidesViews, ProvidesViteEntries
 {
@@ -50,7 +51,7 @@ class ListingModule implements Module, Ordered, ProvidesApiRoutes, ProvidesDashb
 
     public function seeders(): array
     {
-        return [ListingTypeSeeder::class, FeatureSeeder::class];
+        return [ListingTypeSeeder::class, FeatureSeeder::class, LocationSeeder::class];
     }
 
     public function views(): string

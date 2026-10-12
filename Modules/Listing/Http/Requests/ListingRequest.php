@@ -4,6 +4,7 @@ namespace Modules\Listing\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Modules\Listing\Models\Location;
 use Modules\Site\Support\YouTube;
 
 /** The admin form; the same shape creates and updates. */
@@ -14,7 +15,7 @@ class ListingRequest extends FormRequest
         return [
             'type' => ['required', 'string', Rule::exists('listing_types', 'slug')],
             'title' => ['required', 'string', 'max:200'],
-            'location' => ['required', 'string', 'max:255'],
+            'location_id' => ['required', 'integer', Rule::exists('locations', 'id')],
             'price' => ['nullable', 'string', 'max:255', Rule::requiredIf(! $this->boolean('call_for_price'))],
             'call_for_price' => ['boolean'],
             'land_area' => ['nullable', 'string', 'max:255'],
@@ -41,6 +42,8 @@ class ListingRequest extends FormRequest
         return [
             'price.required' => 'Enter a price or tick Call for Price.',
             'type.exists' => 'Choose one of the listing types.',
+            'location_id.required' => 'Choose a location.',
+            'location_id.exists' => 'Choose one of the locations.',
         ];
     }
 
@@ -48,11 +51,13 @@ class ListingRequest extends FormRequest
     public function attributesForModel(): array
     {
         $data = $this->validated();
+        $location = Location::query()->findOrFail($data['location_id']);
 
         return [
             'type' => $data['type'],
             'title' => trim($data['title']),
-            'location' => trim($data['location']),
+            'location' => $location->name,
+            'location_id' => $location->id,
             'price' => trim((string) ($data['price'] ?? '')),
             'call_for_price' => (bool) ($data['call_for_price'] ?? false),
             'land_area' => trim((string) ($data['land_area'] ?? '')),

@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Listing\Models\Feature;
 use Modules\Listing\Models\Listing;
+use Modules\Listing\Models\Location;
 use Modules\Masterplan\Models\Masterplan;
 use Modules\Masterplan\Models\Plot;
 use Tests\TestCase;
@@ -40,26 +41,27 @@ class AdminApiTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $this->postJson('/api/admin/listings', ['type' => 'flat', 'title' => '', 'location' => '', 'price' => ''])
+        $this->postJson('/api/admin/listings', ['type' => 'flat', 'title' => '', 'location_id' => null, 'price' => ''])
             ->assertStatus(422)
-            ->assertJsonValidationErrors(['title', 'location', 'price']);
+            ->assertJsonValidationErrors(['title', 'location_id', 'price']);
+        $mirpur = Location::query()->where('name', 'Mirpur')->value('id');
 
-        $this->postJson('/api/admin/listings', ['type' => 'villa', 'title' => 'x', 'location' => 'y', 'price' => '1'])
+        $this->postJson('/api/admin/listings', ['type' => 'villa', 'title' => 'x', 'location_id' => $mirpur, 'price' => '1'])
             ->assertStatus(422)->assertJsonValidationErrors(['type']);
 
         $lift = Feature::query()->where('slug', 'lift')->value('id');
         $cctv = Feature::query()->where('slug', 'cctv')->value('id');
         $created = $this->postJson('/api/admin/listings', [
-            'type' => 'flat', 'title' => 'Test flat', 'location' => 'Mirpur, Dhaka', 'call_for_price' => true,
+            'type' => 'flat', 'title' => 'Test flat', 'location_id' => $mirpur, 'call_for_price' => true,
             'size' => '1200 sqft', 'bedrooms' => 3, 'baths' => 2, 'floor' => '3rd',
             'features' => [$lift, $cctv, $lift], 'description' => 'Hi', 'published' => true,
             'video_url' => 'https://youtu.be/dQw4w9WgXcQ',
-        ])->assertCreated()->assertJsonPath('listing.slug', 'test-flat')->assertJsonPath('listing.type_label', 'Flat')->assertJsonCount(2, 'listing.features');
+        ])->assertCreated()->assertJsonPath('listing.slug', 'test-flat')->assertJsonPath('listing.type_label', 'Flat')->assertJsonPath('listing.location', 'Mirpur')->assertJsonCount(2, 'listing.features');
         $id = $created->json('listing.id');
 
         $this->get('/flat/test-flat')->assertOk()->assertSee('Call for Price')->assertSee('CCTV');
 
-        $this->putJson("/api/admin/listings/{$id}", ['type' => 'flat', 'title' => 'Renamed flat', 'location' => 'Mirpur', 'price' => '৳ 1 Crore', 'published' => false, 'features' => [$cctv]])
+        $this->putJson("/api/admin/listings/{$id}", ['type' => 'flat', 'title' => 'Renamed flat', 'location_id' => $mirpur, 'price' => '৳ 1 Crore', 'published' => false, 'features' => [$cctv]])
             ->assertOk()->assertJsonPath('listing.slug', 'renamed-flat')->assertJsonPath('listing.features.0.slug', 'cctv')->assertJsonCount(1, 'listing.features');
         $this->get('/flat/renamed-flat')->assertNotFound();
 
@@ -121,13 +123,35 @@ class AdminApiTest extends TestCase
         $this->putJson("/api/admin/listing-types/{$typeId}", ['name' => 'Commercial'])->assertOk()->assertJsonPath('type.name', 'Commercial')->assertJsonPath('type.slug', 'commercial-space');
         $this->putJson('/api/admin/listing-types/order', ['ids' => [$typeId]])->assertOk()->assertJsonPath('types.0.slug', 'commercial-space');
 
-        $listing = $this->postJson('/api/admin/listings', ['type' => 'commercial-space', 'title' => 'Shop unit', 'location' => 'Gulshan', 'price' => '৳ 2 Crore', 'published' => true])
+        $listing = $this->postJson('/api/admin/listings', ['type' => 'commercial-space', 'title' => 'Shop unit', 'location_id' => Location::query()->where('name', 'Uttara')->value('id'), 'price' => '৳ 2 Crore', 'published' => true])
             ->assertCreated()->assertJsonPath('listing.type_label', 'Commercial');
         $this->get('/commercial-space/shop-unit')->assertOk()->assertSee('Shop unit');
         $this->deleteJson("/api/admin/listing-types/{$typeId}")->assertStatus(422);
         $this->deleteJson('/api/admin/listings/'.$listing->json('listing.id'))->assertOk();
         $this->deleteJson("/api/admin/listing-types/{$typeId}")->assertOk();
         $this->get('/commercial-space')->assertNotFound();
+    }
+
+    public function test_locations_are_managed_and_renames_reach_listings(): void
+    {
+        $this->actingAs($this->admin);
+
+        $this->getJson('/api/admin/locations')->assertOk()->assertJsonPath('locations.0.name', 'Cox\'s Bazar')->assertJsonCount(8, 'locations');
+        $this->postJson('/api/admin/locations', ['name' => 'Mirpur'])->assertStatus(422)->assertJsonValidationErrors(['name']);
+        $created = $this->postJson('/api/admin/locations', ['name' => 'Gulshan'])->assertCreated()->assertJsonPath('location.slug', 'gulshan');
+        $id = $created->json('location.id');
+
+        $plot = Listing::query()->where('type', 'plot')->first();
+        $this->putJson("/api/admin/listings/{$plot->id}", ['type' => 'plot', 'title' => $plot->title, 'location_id' => $id, 'price' => $plot->price, 'published' => true])
+            ->assertOk()->assertJsonPath('listing.location', 'Gulshan');
+        $this->putJson("/api/admin/locations/{$id}", ['name' => 'Gulshan 2'])->assertOk()->assertJsonPath('location.listings_count', 1);
+        $this->assertSame('Gulshan 2', $plot->fresh()->location);
+        $this->get('/projects?location=Gulshan+2')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
+
+        $this->deleteJson("/api/admin/locations/{$id}")->assertStatus(422);
+        $this->deleteJson("/api/admin/listings/{$plot->id}")->assertOk();
+        $this->deleteJson("/api/admin/locations/{$id}")->assertOk();
+        $this->assertDatabaseMissing('locations', ['id' => $id]);
     }
 
     public function test_features_are_managed_and_detached_on_delete(): void

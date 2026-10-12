@@ -13,6 +13,13 @@ export interface Feature {
   listings_count?: number
 }
 
+export interface Location {
+  id: number
+  name: string
+  slug: string
+  listings_count?: number
+}
+
 export interface ListingImage {
   id: number
   listing_id: number
@@ -28,6 +35,7 @@ export interface Listing {
   title: string
   slug: string
   location: string
+  location_id: number | null
   price: string
   call_for_price: boolean
   land_area: string
@@ -50,13 +58,13 @@ export interface Listing {
   updated_at: string
 }
 
-// What the form sends: the listing's own columns plus the ids of its features.
-export type ListingInput = Omit<Listing, 'id' | 'slug' | 'type_label' | 'featured' | 'featured_order' | 'brochure_path' | 'brochure_size' | 'images' | 'features' | 'created_at' | 'updated_at'> & { features: number[] }
+// What the form sends: the listing's own columns (the location as its id) plus the ids of its features.
+export type ListingInput = Omit<Listing, 'id' | 'slug' | 'type_label' | 'location' | 'featured' | 'featured_order' | 'brochure_path' | 'brochure_size' | 'images' | 'features' | 'created_at' | 'updated_at'> & { features: number[] }
 
 export const EMPTY_INPUT: ListingInput = {
   type: '',
   title: '',
-  location: '',
+  location_id: null,
   price: '',
   call_for_price: false,
   land_area: '',
@@ -73,7 +81,7 @@ export const EMPTY_INPUT: ListingInput = {
 }
 
 export function toInput(listing: Listing): ListingInput {
-  const { id: _id, slug: _slug, type_label: _tl, featured: _f, featured_order: _fo, brochure_path: _bp, brochure_size: _bs, images: _i, features, created_at: _c, updated_at: _u, ...columns } = listing
+  const { id: _id, slug: _slug, type_label: _tl, location: _l, featured: _f, featured_order: _fo, brochure_path: _bp, brochure_size: _bs, images: _i, features, created_at: _c, updated_at: _u, ...columns } = listing
   return { ...columns, features: (features ?? []).map((f) => f.id) }
 }
 

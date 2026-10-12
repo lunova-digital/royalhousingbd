@@ -11,6 +11,7 @@ use Modules\Listing\Models\Feature;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingImage;
 use Modules\Listing\Models\ListingType;
+use Modules\Listing\Models\Location;
 use Modules\Media\Services\DocumentStore;
 use Modules\Media\Services\ImageStore;
 
@@ -61,12 +62,12 @@ class ListingService
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
-    /** Distinct locations of published listings, for the filter dropdown. */
+    /** Every location, with how many published listings (of the type) are in it, for the filter. */
     public function locations(?string $type = null): array
     {
-        return Listing::query()->published()
-            ->when($type, fn ($q) => $q->where('type', $type))
-            ->distinct()->orderBy('location')->pluck('location')->all();
+        return Location::query()->ordered()
+            ->withCount(['listings' => fn (Builder $q) => $q->published()->when($type, fn ($q) => $q->where('type', $type))])
+            ->get()->all();
     }
 
     /** Features used by at least one published listing (of the type), with how many, for the filter. */
