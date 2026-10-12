@@ -4,6 +4,7 @@ namespace Modules\Site\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Modules\Site\Site;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,8 +20,10 @@ class SetLocale
     public function handle(Request $request, Closure $next): Response
     {
         $chosen = Site::locale($request->query(self::COOKIE));
-        $locale = $chosen ?? Site::locale($request->cookie(self::COOKIE)) ?? config('app.locale');
+        // Not config('app.locale'): setLocale() rewrites that, so it would carry over in a long-lived process.
+        $locale = $chosen ?? Site::locale($request->cookie(self::COOKIE)) ?? array_key_first(Site::LOCALES);
         app()->setLocale($locale);
+        Date::setLocale($locale);
 
         $response = $next($request);
 

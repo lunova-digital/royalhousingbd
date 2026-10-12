@@ -52,10 +52,17 @@ class Site
 
     private static ?array $settings = null;
 
+    private static ?object $settingsFor = null;
+
     /** Site settings, read once per request. */
     public static function settings(): array
     {
-        return self::$settings ??= Settings::all();
+        if (self::$settings === null || self::$settingsFor !== app('request')) {
+            self::$settings = Settings::all();
+            self::$settingsFor = app('request');
+        }
+
+        return self::$settings;
     }
 
     /**
