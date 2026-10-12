@@ -31,7 +31,7 @@
         @php($on = $location->name === $filter['location'])
         <a href="{{ $query(['location' => $on ? '' : $location->name, 'page' => null]) }}" class="card flex items-center gap-3 p-3 text-sm font-semibold transition-colors hover:border-ink-950 {{ $on ? 'border-ink-950 ring-1 ring-ink-950' : '' }}">
           <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-fill font-display font-extrabold">{{ mb_strtoupper(mb_substr($location->name, 0, 1)) }}</span>
-          <span class="min-w-0 flex-1 truncate">{{ $location->name }}<span class="block truncate text-xs font-medium text-muted-fg">{{ $location->listings_count }} {{ \Illuminate\Support\Str::plural('project', $location->listings_count) }}</span></span>
+          <span class="min-w-0 flex-1 truncate">{{ $location->name }}<span class="block truncate text-xs font-medium text-muted-fg">{{ trans_choice(':count project|:count projects', $location->listings_count) }}</span></span>
           @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4 shrink-0 text-faint-fg'])
         </a>
       @endforeach
