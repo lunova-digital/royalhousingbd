@@ -62,6 +62,22 @@ class PublicPagesTest extends TestCase
         $this->get('/plot')->assertOk()->assertSee('name="features[]"', false)->assertSee('Boundary wall')->assertDontSee('Swimming pool');
     }
 
+    public function test_budget_range_filter_compares_the_taka_amount(): void
+    {
+        // Demo prices: duplex ৳ 4.5 Crore, corner plot ৳ 35 Lakh / katha, resort share ৳ 25 Lakh; the flat is "call for price".
+        $this->get('/projects?budget_max=5000000')->assertOk()->assertSee('Corner plot')->assertSee('Hilltop eco resort')->assertDontSee('Duplex house')->assertDontSee('1450 sqft flat')
+            ->assertSee('up to ৳ 50 Lakh');
+        $this->get('/projects?budget_min=10000000')->assertOk()->assertSee('Duplex house')->assertDontSee('Corner plot')->assertSee('from ৳ 1 Crore');
+        $this->get('/projects?budget_min=3000000&budget_max=4000000')->assertOk()->assertSee('Corner plot')->assertDontSee('Hilltop eco resort')->assertSee('৳ 30 Lakh – ৳ 40 Lakh');
+        // Swapped bounds are put in order; bounds are capped at 100 crore; junk is ignored.
+        $this->get('/projects?budget_min=4000000&budget_max=3000000')->assertOk()->assertSee('Corner plot')->assertDontSee('Hilltop eco resort');
+        $this->get('/projects?budget_max=99999999999')->assertOk()->assertSee('Duplex house')->assertSee('up to ৳ 100 Crore');
+        $this->get('/projects?budget_min=abc')->assertOk()->assertSee('1450 sqft flat')->assertSee('Sorted by newest');
+        // The selects keep their choice and the type links carry the range along.
+        $this->get('/projects?budget_max=5000000')->assertSee('value="5000000" selected', false)->assertSee('href="/plot?budget_max=5000000"', false);
+        $this->get('/projects?budget_max=5000000&lang=bn')->assertOk()->assertSee('৳ 50 লাখ পর্যন্ত')->assertSee('বাজেট');
+    }
+
     public function test_masterplan_pages_render_plots(): void
     {
         $this->get('/map')->assertOk()->assertSee('Royal City Phase 1')->assertSee('View Map');

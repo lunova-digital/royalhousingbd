@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Listing\Services\ListingService;
+use Modules\Listing\Support\Price;
 use Modules\Site\Site;
 
 /** The public listing pages: grids per type (FR-LIST-001/002) and details (FR-LIST-003/004). */
@@ -29,11 +30,17 @@ class ListingPages
 
         $features = $this->listings->filterFeatures($type);
         $wanted = array_values(array_intersect((array) $request->query('features', []), array_column($features, 'slug')));
+        [$min, $max] = [Price::bound($request->query('budget_min')), Price::bound($request->query('budget_max'))];
+        if ($min > 0 && $max > 0 && $min > $max) {
+            [$min, $max] = [$max, $min];
+        }
         $filter = [
             'type' => $type,
             'location' => (string) $request->query('location', ''),
             'q' => (string) $request->query('q', ''),
             'features' => $wanted,
+            'budget_min' => $min,
+            'budget_max' => $max,
             'published' => true,
         ];
         $page = $this->listings->search($filter, self::PER_PAGE, (int) $request->query('page', 1));
@@ -54,6 +61,7 @@ class ListingPages
             'locations' => $this->listings->locations($type),
             'features' => $features,
             'filter' => $filter,
+            'budgetSteps' => Price::STEPS,
             'path' => $all ? '/projects' : "/{$type}",
         ]));
     }

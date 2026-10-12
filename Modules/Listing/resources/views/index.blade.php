@@ -1,10 +1,12 @@
 @extends('site::layouts.app')
 @section('content')
 @php($label = $typeName)
-@php($base = ['q' => $filter['q'], 'location' => $filter['location'], 'features' => $filter['features']])
+@php($base = ['q' => $filter['q'], 'location' => $filter['location'], 'features' => $filter['features'], 'budget_min' => $filter['budget_min'] ?: null, 'budget_max' => $filter['budget_max'] ?: null])
 {{-- A link to this grid with some filters changed; features[] stay plain so the checkboxes read them back. --}}
 @php($query = fn (array $extra, ?string $to = null) => rtrim(($to ?? $path).'?'.preg_replace('/%5B\d+%5D=/', '%5B%5D=', http_build_query(array_filter($extra + $base, fn ($v) => $v !== null && $v !== '' && $v !== []))), '?'))
-@php($active = $filter['q'] !== '' || $filter['location'] !== '' || $filter['features'] !== [])
+@php($budget = $filter['budget_min'] > 0 || $filter['budget_max'] > 0)
+@php($active = $filter['q'] !== '' || $filter['location'] !== '' || $filter['features'] !== [] || $budget)
+@php($money = fn (int $amount) => \Modules\Listing\Support\Price::format($amount))
 @php($featureNames = array_column(array_filter($features, fn ($f) => in_array($f->slug, $filter['features'], true)), 'name'))
 
 <section class="container-x pt-5">
@@ -52,6 +54,22 @@
       <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('site::common.search') }}</h3>
       <label class="relative mt-3 block"><span class="sr-only">{{ __('site::common.search') }}</span><span class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-faint-fg">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-4'])</span><input type="search" name="q" value="{{ $filter['q'] }}" placeholder="{{ __('listing::index.search_placeholder') }}" class="input h-10 pl-10" /></label>
       <button type="submit" class="btn-dark mt-2 h-10 w-full">{{ __('listing::index.apply') }}</button>
+
+      {{-- Budget range: min/max in Taka, up to 100 crore; a change applies at once --}}
+      <div class="mt-5 border-t border-line pt-4">
+        <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('listing::index.budget') }}</h3>
+        <p class="mt-1 text-xs text-muted-fg">{{ __('listing::index.budget_hint') }}</p>
+        <div class="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
+          @foreach (['budget_min' => __('listing::index.budget_min'), 'budget_max' => __('listing::index.budget_max')] as $name => $label)
+            <label class="grid gap-1 text-xs font-medium text-muted-fg"><span>{{ $label }}</span>
+              <span class="relative"><select name="{{ $name }}" data-autosubmit class="input h-10 appearance-none pr-8 text-sm font-semibold text-fg">
+                <option value="">{{ __('listing::index.budget_any') }}</option>
+                @foreach ($budgetSteps as $step)<option value="{{ $step }}" @selected($filter[$name] === $step)>{{ $money($step) }}</option>@endforeach
+              </select><span class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-fg">@include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5'])</span></span>
+            </label>
+          @endforeach
+        </div>
+      </div>
 
       @if (count($features))
         <div class="mt-5 border-t border-line pt-4">
@@ -101,6 +119,7 @@
       <p class="flex flex-wrap items-center gap-1.5 text-muted-fg">
         @if ($filter['q'])<span>{!! __('listing::index.for_query', ['q' => '<strong class="font-semibold text-fg">'.e($filter['q']).'</strong>']) !!}</span>@endif
         @if ($filter['location'])<span>{!! __('listing::index.in_location', ['location' => '<strong class="font-semibold text-fg">'.e($filter['location']).'</strong>']) !!}</span>@endif
+        @if ($budget)<span class="chip chip-gray">@if ($filter['budget_min'] > 0 && $filter['budget_max'] > 0){{ __('listing::index.budget_between', ['min' => $money($filter['budget_min']), 'max' => $money($filter['budget_max'])]) }}@elseif ($filter['budget_min'] > 0){{ __('listing::index.budget_from', ['min' => $money($filter['budget_min'])]) }}@else{{ __('listing::index.budget_up_to', ['max' => $money($filter['budget_max'])]) }}@endif</span>@endif
         @foreach ($featureNames as $name)<span class="chip chip-gray">{{ $name }}</span>@endforeach
         @if (! $active){{ __('listing::index.sorted_by_newest') }} @endif
       </p>
