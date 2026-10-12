@@ -18,7 +18,7 @@ import { api, ApiError } from '@/lib/api'
 import { Brochure } from '../components/brochure'
 import { Gallery } from '../components/gallery'
 import { useFeatures, useListingTypes, useLocations } from '../api'
-import { EMPTY_INPUT, listingUrl, toInput, type Feature, type Listing, type ListingInput } from '../types'
+import { EMPTY_INPUT, formatTaka, listingUrl, toInput, type Feature, type Listing, type ListingInput } from '../types'
 
 export function ListingFormPage() {
   const { id } = useParams()
@@ -165,6 +165,17 @@ export function ListingFormPage() {
                   <span className="font-medium whitespace-nowrap">Call for price</span>
                 </label>
               </div>
+              {!form.call_for_price && (
+                <Field
+                  id="price_amount"
+                  label="Budget (৳)"
+                  error={errors.price_amount}
+                  className="sm:max-w-xs"
+                  hint={form.price_amount ? `Shows under budgets of ${formatTaka(form.price_amount)} and above in the search filter.` : 'Total price in Taka for the budget filter, e.g. 4500000. Left blank, it is read from the price text when that is a plain amount.'}
+                >
+                  <Input id="price_amount" type="number" min={0} step={1} inputMode="numeric" value={form.price_amount ?? ''} onChange={(e) => set('price_amount', e.target.value === '' ? null : Number(e.target.value))} placeholder="4500000" />
+                </Field>
+              )}
             </CardContent>
           </Card>
 

@@ -38,6 +38,7 @@ export interface Listing {
   location_id: number | null
   price: string
   call_for_price: boolean
+  price_amount: number | null
   land_area: string
   built_area: string
   size: string
@@ -67,6 +68,7 @@ export const EMPTY_INPUT: ListingInput = {
   location_id: null,
   price: '',
   call_for_price: false,
+  price_amount: null,
   land_area: '',
   built_area: '',
   size: '',
@@ -83,6 +85,14 @@ export const EMPTY_INPUT: ListingInput = {
 export function toInput(listing: Listing): ListingInput {
   const { id: _id, slug: _slug, type_label: _tl, location: _l, featured: _f, featured_order: _fo, brochure_path: _bp, brochure_size: _bs, images: _i, features, created_at: _c, updated_at: _u, ...columns } = listing
   return { ...columns, features: (features ?? []).map((f) => f.id) }
+}
+
+// "৳ 4.5 Crore" / "৳ 35 Lakh" / "৳ 85,000" for a Taka amount.
+export function formatTaka(amount: number): string {
+  const unit = (n: number, word: string) => `৳ ${Number((amount / n).toFixed(2))} ${word}`
+  if (amount >= 1e7) return unit(1e7, 'Crore')
+  if (amount >= 1e5) return unit(1e5, 'Lakh')
+  return `৳ ${amount.toLocaleString('en-IN')}`
 }
 
 export function listingUrl(l: Pick<Listing, 'type' | 'slug'>): string {

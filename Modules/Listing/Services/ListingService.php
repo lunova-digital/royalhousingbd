@@ -12,6 +12,7 @@ use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingImage;
 use Modules\Listing\Models\ListingType;
 use Modules\Listing\Models\Location;
+use Modules\Listing\Support\Price;
 use Modules\Media\Services\DocumentStore;
 use Modules\Media\Services\ImageStore;
 
@@ -22,9 +23,10 @@ class ListingService
      *
      * `q` is a keyword search: every word must match the title, location,
      * description, type name, a feature name or the linked masterplan's name.
-     * `features` are slugs the listing must all have.
+     * `features` are slugs the listing must all have. `budget_min` / `budget_max` are Taka
+     * (0 = open); setting either leaves out listings without a numeric price (call for price).
      *
-     * @param  array{type?: string, location?: string, q?: string, features?: string[], published?: bool}  $filter
+     * @param  array{type?: string, location?: string, q?: string, features?: string[], budget_min?: int, budget_max?: int, published?: bool}  $filter
      */
     public function search(array $filter, int $perPage = 12, int $page = 1): LengthAwarePaginator
     {
@@ -40,6 +42,12 @@ class ListingService
         }
         foreach ($filter['features'] ?? [] as $slug) {
             $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
+        }
+        [$min, $max] = [Price::bound($filter['budget_min'] ?? 0), Price::bound($filter['budget_max'] ?? 0)];
+        if ($min > 0 || $max > 0) {
+            $query->whereNotNull('price_amount')
+                ->when($min > 0, fn ($q) => $q->where('price_amount', '>=', $min))
+                ->when($max > 0, fn ($q) => $q->where('price_amount', '<=', $max));
         }
         foreach (preg_split('/\s+/', mb_strtolower(trim($filter['q'] ?? ''))) ?: [] as $term) {
             if ($term === '') {
@@ -88,6 +96,7 @@ class ListingService
     public function create(array $attributes, array $featureIds = []): Listing
     {
         $attributes['slug'] = $this->uniqueSlug($attributes['title']);
+        $attributes = $this->withPriceAmount($attributes);
 
         return DB::transaction(function () use ($attributes, $featureIds) {
             $listing = Listing::query()->create($attributes);
@@ -103,6 +112,7 @@ class ListingService
         if ($listing->title !== $attributes['title']) {
             $attributes['slug'] = $this->uniqueSlug($attributes['title'], $listing->id);
         }
+        $attributes = $this->withPriceAmount($attributes);
         DB::transaction(function () use ($listing, $attributes, $featureIds) {
             $listing->update($attributes);
             $listing->features()->sync($featureIds);
@@ -192,6 +202,18 @@ class ListingService
                 Listing::query()->where('id', $id)->update(['featured' => true, 'featured_order' => $i]);
             }
         });
+    }
+
+    /** The budget amount: as entered, else read from the price text; none while "call for price". */
+    private function withPriceAmount(array $attributes): array
+    {
+        if (! empty($attributes['call_for_price'])) {
+            $attributes['price_amount'] = null;
+        } elseif (empty($attributes['price_amount'])) {
+            $attributes['price_amount'] = Price::parse($attributes['price'] ?? '');
+        }
+
+        return $attributes;
     }
 
     private function uniqueSlug(string $title, ?int $selfId = null): string

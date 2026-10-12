@@ -20,6 +20,7 @@ class Listing extends Model
     {
         return [
             'call_for_price' => 'boolean',
+            'price_amount' => 'integer',
             'featured' => 'boolean',
             'published' => 'boolean',
             'bedrooms' => 'integer',
@@ -116,6 +117,12 @@ class Listing extends Model
         return $this->type === 'property'
             ? ($this->land_area ?: $this->built_area ?: $this->size)
             : ($this->size ?: $this->land_area ?: $this->built_area);
+    }
+
+    /** The price as Taka for the budget filter (null: call for price or not a plain amount). */
+    public function priceAmount(): ?int
+    {
+        return $this->price_amount;
     }
 
     public function priceLabel(): string

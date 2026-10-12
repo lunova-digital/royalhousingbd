@@ -61,8 +61,14 @@ class AdminApiTest extends TestCase
 
         $this->get('/flat/test-flat')->assertOk()->assertSee('Call for Price')->assertSee('CCTV');
 
+        // The budget amount is read from the price text unless entered; "call for price" has none.
         $this->putJson("/api/admin/listings/{$id}", ['type' => 'flat', 'title' => 'Renamed flat', 'location_id' => $mirpur, 'price' => '৳ 1 Crore', 'published' => false, 'features' => [$cctv]])
-            ->assertOk()->assertJsonPath('listing.slug', 'renamed-flat')->assertJsonPath('listing.features.0.slug', 'cctv')->assertJsonCount(1, 'listing.features');
+            ->assertOk()->assertJsonPath('listing.slug', 'renamed-flat')->assertJsonPath('listing.features.0.slug', 'cctv')->assertJsonCount(1, 'listing.features')
+            ->assertJsonPath('listing.price_amount', 10_000_000);
+        $this->putJson("/api/admin/listings/{$id}", ['type' => 'flat', 'title' => 'Renamed flat', 'location_id' => $mirpur, 'price' => '৳ 35 Lakh / katha', 'price_amount' => 10_500_000, 'published' => false])
+            ->assertOk()->assertJsonPath('listing.price_amount', 10_500_000);
+        $this->putJson("/api/admin/listings/{$id}", ['type' => 'flat', 'title' => 'Renamed flat', 'location_id' => $mirpur, 'call_for_price' => true, 'price_amount' => 5, 'published' => false])
+            ->assertOk()->assertJsonPath('listing.price_amount', null);
         $this->get('/flat/renamed-flat')->assertNotFound();
 
         $this->putJson('/api/admin/listings/featured', ['ids' => [$id, 1]])->assertOk()->assertJsonPath('listings.0.id', $id);
