@@ -227,6 +227,9 @@ details > summary::-webkit-details-marker { display: none; }
 .plan-label { background: transparent; border: 0; color: #111; font: 800 9px/1 Inter, sans-serif; padding: 0; box-shadow: none; pointer-events: none; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 3px #fff; }
 .plan-label::before { display: none; }
 .leaflet-container { background: #f6f5ec; font-family: var(--font-body); }
+/* Leaflet stacks its panes and controls at z-index 400-1000. Isolating the container keeps them inside the
+   map, so on phones the fixed bottom tab bar and the floating buttons (z-40/50) stay tappable above it. */
+.leaflet-container { isolation: isolate; z-index: 0; }
 
 @layer base {
   * {
