@@ -5,13 +5,17 @@ namespace Modules\Listing;
 use Illuminate\Routing\Router;
 use Laramod\Admin\Contracts\ProvidesDashboardScripts;
 use Laramod\Contracts\Module;
+use Laramod\Contracts\Ordered;
 use Laramod\Contracts\ProvidesApiRoutes;
 use Laramod\Contracts\ProvidesMigrations;
 use Laramod\Contracts\ProvidesRoutes;
+use Laramod\Contracts\ProvidesSeeders;
 use Laramod\Contracts\ProvidesViews;
 use Laramod\Contracts\ProvidesViteEntries;
+use Modules\Listing\Database\Seeders\FeatureSeeder;
+use Modules\Listing\Database\Seeders\ListingTypeSeeder;
 
-class ListingModule implements Module, ProvidesApiRoutes, ProvidesDashboardScripts, ProvidesMigrations, ProvidesRoutes, ProvidesViews, ProvidesViteEntries
+class ListingModule implements Module, Ordered, ProvidesApiRoutes, ProvidesDashboardScripts, ProvidesMigrations, ProvidesRoutes, ProvidesSeeders, ProvidesViews, ProvidesViteEntries
 {
     public function name(): string
     {
@@ -21,6 +25,12 @@ class ListingModule implements Module, ProvidesApiRoutes, ProvidesDashboardScrip
     public function path(): string
     {
         return __DIR__;
+    }
+
+    /** Wired last: the public /{type} routes are fallbacks that must come after every static page and the admin. */
+    public function order(): int
+    {
+        return -1;
     }
 
     public function routes(Router $router): void
@@ -36,6 +46,11 @@ class ListingModule implements Module, ProvidesApiRoutes, ProvidesDashboardScrip
     public function migrations(): array
     {
         return ['Database/Migrations'];
+    }
+
+    public function seeders(): array
+    {
+        return [ListingTypeSeeder::class, FeatureSeeder::class];
     }
 
     public function views(): string

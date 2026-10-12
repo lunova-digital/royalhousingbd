@@ -4,7 +4,6 @@ namespace Modules\Listing\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Modules\Listing\Models\Listing;
 use Modules\Site\Support\YouTube;
 
 /** The admin form; the same shape creates and updates. */
@@ -13,7 +12,7 @@ class ListingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::in(Listing::TYPES)],
+            'type' => ['required', 'string', Rule::exists('listing_types', 'slug')],
             'title' => ['required', 'string', 'max:200'],
             'location' => ['required', 'string', 'max:255'],
             'price' => ['nullable', 'string', 'max:255', Rule::requiredIf(! $this->boolean('call_for_price'))],
@@ -29,8 +28,8 @@ class ListingRequest extends FormRequest
                     $fail('Enter a YouTube video link.');
                 }
             }],
-            'facilities' => ['array'],
-            'facilities.*' => ['nullable', 'string', 'max:255'],
+            'features' => ['array'],
+            'features.*' => ['integer', Rule::exists('features', 'id')],
             'description' => ['nullable', 'string'],
             'published' => ['boolean'],
             'masterplan_id' => ['nullable', 'integer', 'exists:masterplans,id'],
@@ -41,7 +40,7 @@ class ListingRequest extends FormRequest
     {
         return [
             'price.required' => 'Enter a price or tick Call for Price.',
-            'type.in' => 'Type must be property, plot or flat.',
+            'type.exists' => 'Choose one of the listing types.',
         ];
     }
 
@@ -49,7 +48,6 @@ class ListingRequest extends FormRequest
     public function attributesForModel(): array
     {
         $data = $this->validated();
-        $facilities = array_values(array_filter(array_map('trim', $data['facilities'] ?? []), fn ($f) => $f !== ''));
 
         return [
             'type' => $data['type'],
@@ -64,10 +62,15 @@ class ListingRequest extends FormRequest
             'baths' => (int) ($data['baths'] ?? 0),
             'floor' => trim((string) ($data['floor'] ?? '')),
             'video_url' => trim((string) ($data['video_url'] ?? '')),
-            'facilities' => $facilities,
             'description' => trim((string) ($data['description'] ?? '')),
             'published' => (bool) ($data['published'] ?? false),
             'masterplan_id' => $data['masterplan_id'] ?? null,
         ];
+    }
+
+    /** The ids of the ticked features. */
+    public function featureIds(): array
+    {
+        return array_values(array_unique(array_map('intval', $this->validated()['features'] ?? [])));
     }
 }

@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from 'lucide-react'
+import { ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
@@ -15,7 +15,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { api, ApiError } from '@/lib/api'
 
 import { Gallery } from '../components/gallery'
-import { EMPTY_INPUT, LISTING_TYPES, listingUrl, type Listing, type ListingInput, type ListingType } from '../types'
+import { useFeatures, useListingTypes } from '../api'
+import { EMPTY_INPUT, listingUrl, toInput, type Feature, type Listing, type ListingInput } from '../types'
 
 export function ListingFormPage() {
   const { id } = useParams()
@@ -23,12 +24,20 @@ export function ListingFormPage() {
   const isNew = id === undefined
   const [listing, setListing] = useState<Listing | null>(null)
   const [form, setForm] = useState<ListingInput>(EMPTY_INPUT)
-  const [facilitiesText, setFacilitiesText] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [message, setMessage] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(!isNew)
   const [masterplans, setMasterplans] = useState<{ id: number; name: string }[]>([])
+  const types = useListingTypes()
+  const [features, setFeatures] = useFeatures()
+  const [newFeature, setNewFeature] = useState('')
+  const [featureError, setFeatureError] = useState<string | null>(null)
+
+  // A new listing starts as the first type once the list arrives.
+  useEffect(() => {
+    if (isNew && types?.length) setForm((f) => (f.type ? f : { ...f, type: types[0]!.slug }))
+  }, [isNew, types])
 
   useEffect(() => {
     api<{ masterplans: { id: number; name: string }[] }>('/admin/masterplans').then(({ masterplans }) => setMasterplans(masterplans)).catch(() => setMasterplans([]))
@@ -40,9 +49,7 @@ export function ListingFormPage() {
     api<{ listing: Listing }>(`/admin/listings/${id}`)
       .then(({ listing }) => {
         setListing(listing)
-        const { id: _id, slug: _slug, featured: _f, featured_order: _fo, images: _i, created_at: _c, updated_at: _u, ...input } = listing
-        setForm(input)
-        setFacilitiesText((listing.facilities ?? []).join('\n'))
+        setForm(toInput(listing))
       })
       .catch(() => navigate('/listings', { replace: true }))
       .finally(() => setLoading(false))
@@ -55,10 +62,7 @@ export function ListingFormPage() {
     setBusy(true)
     setErrors({})
     setMessage(null)
-    const payload: ListingInput = {
-      ...form,
-      facilities: facilitiesText.split('\n').map((s) => s.trim()).filter(Boolean),
-    }
+    const payload: ListingInput = form
     try {
       if (isNew) {
         const { listing } = await api<{ listing: Listing }>('/admin/listings', { method: 'POST', body: JSON.stringify(payload) })
@@ -76,13 +80,32 @@ export function ListingFormPage() {
     }
   }
 
+  const toggleFeature = (id: number, on: boolean) => set('features', on ? [...new Set([...form.features, id])] : form.features.filter((f) => f !== id))
+
+  // Adds a feature to the shared list (Content → Features) and ticks it here.
+  const addFeature = async () => {
+    const name = newFeature.trim()
+    if (!name) return
+    setFeatureError(null)
+    try {
+      const { feature, features: all } = await api<{ feature: Feature; features: Feature[] }>('/admin/features', { method: 'POST', body: JSON.stringify({ name }) })
+      setFeatures(all)
+      toggleFeature(feature.id, true)
+      setNewFeature('')
+    } catch (err) {
+      setFeatureError(err instanceof ApiError ? (err.fieldError('name') ?? err.message) : 'Could not add the feature.')
+    }
+  }
+
+  const builtIn = form.type === 'property' || form.type === 'plot' || form.type === 'flat'
+
   if (loading) return <p className="text-muted-foreground text-sm">Loading…</p>
 
   return (
     <form onSubmit={submit} className="grid gap-6">
       <PageHeader
         title={isNew ? 'New listing' : listing?.title ?? 'Edit listing'}
-        description={isNew ? 'Fill in the details, save, then add photos.' : `${LISTING_TYPES.find((t) => t.value === listing?.type)?.label} · ${listing?.location}`}
+        description={isNew ? 'Fill in the details, save, then add photos.' : `${listing?.type_label} · ${listing?.location}`}
         actions={
           <>
             {listing?.published && (
@@ -111,10 +134,10 @@ export function ListingFormPage() {
               </Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field id="type" label="Type" error={errors.type}>
-                  <NativeSelect id="type" value={form.type} onChange={(e) => set('type', e.target.value as ListingType)}>
-                    {LISTING_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>
-                        {t.label}
+                  <NativeSelect id="type" value={form.type} onChange={(e) => set('type', e.target.value)}>
+                    {(types ?? []).map((t) => (
+                      <option key={t.id} value={t.slug}>
+                        {t.name}
                       </option>
                     ))}
                   </NativeSelect>
@@ -142,6 +165,7 @@ export function ListingFormPage() {
                 {form.type === 'property' && 'Land and built-up area of the property.'}
                 {form.type === 'plot' && 'Plot size in katha or sqft.'}
                 {form.type === 'flat' && 'Size, rooms and floor of the flat.'}
+                {!builtIn && 'Fill in whatever applies; empty fields are not shown.'}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -160,7 +184,17 @@ export function ListingFormPage() {
                   <Input id="size" value={form.size} onChange={(e) => set('size', e.target.value)} placeholder="e.g. 3 katha" />
                 </Field>
               )}
-              {form.type === 'flat' && (
+              {!builtIn && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field id="land_area" label="Land area">
+                    <Input id="land_area" value={form.land_area} onChange={(e) => set('land_area', e.target.value)} placeholder="e.g. 2 acres" />
+                  </Field>
+                  <Field id="built_area" label="Built area">
+                    <Input id="built_area" value={form.built_area} onChange={(e) => set('built_area', e.target.value)} placeholder="e.g. 12 cottages, 40,000 sqft" />
+                  </Field>
+                </div>
+              )}
+              {(form.type === 'flat' || !builtIn) && (
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <Field id="size" label="Size (sqft)">
                     <Input id="size" value={form.size} onChange={(e) => set('size', e.target.value)} placeholder="e.g. 1450 sqft" />
@@ -176,8 +210,34 @@ export function ListingFormPage() {
                   </Field>
                 </div>
               )}
-              <Field id="facilities" label="Facilities" hint="One per line; shown as a checklist on the detail page.">
-                <Textarea id="facilities" rows={4} value={facilitiesText} onChange={(e) => setFacilitiesText(e.target.value)} placeholder={'Car parking\nGenerator\n24/7 security'} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Features</CardTitle>
+              <CardDescription>Amenities shown on the detail page; visitors filter by them. The list is managed under Content → Features.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              {features === null ? (
+                <p className="text-muted-foreground text-sm">Loading…</p>
+              ) : features.length === 0 ? (
+                <p className="text-muted-foreground text-sm">No features yet. Add the first one below.</p>
+              ) : (
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {features.map((f) => (
+                    <label key={f.id} className="flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2 text-sm has-[:checked]:border-foreground">
+                      <input type="checkbox" className="accent-foreground size-4" checked={form.features.includes(f.id)} onChange={(e) => toggleFeature(f.id, e.target.checked)} />
+                      {f.name}
+                    </label>
+                  ))}
+                </div>
+              )}
+              <Field id="new_feature" label="Add a feature" error={featureError ?? undefined} hint="Added to the shared list and ticked for this listing.">
+                <div className="flex gap-2">
+                  <Input id="new_feature" className="sm:max-w-xs" value={newFeature} onChange={(e) => setNewFeature(e.target.value)} placeholder="e.g. Solar backup" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void addFeature() } }} />
+                  <Button type="button" variant="outline" disabled={!newFeature.trim()} onClick={() => void addFeature()}><PlusIcon /> Add</Button>
+                </div>
               </Field>
             </CardContent>
           </Card>

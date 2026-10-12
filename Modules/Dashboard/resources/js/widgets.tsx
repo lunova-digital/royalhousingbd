@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { api } from '@/lib/api'
 
 interface Stats {
-  listings: Record<'property' | 'plot' | 'flat', number>
+  listings: { slug: string; name: string; count: number }[]
   maps: number
   plots: Record<'available' | 'booked' | 'sold', number>
 }
@@ -35,9 +35,11 @@ export function Widgets() {
 
   return (
     <>
-      <Stat label="Property listings" value={n(stats?.listings.property)} to="/listings?type=property" />
-      <Stat label="Plot listings" value={n(stats?.listings.plot)} to="/listings?type=plot" />
-      <Stat label="Flat listings" value={n(stats?.listings.flat)} to="/listings?type=flat" />
+      {stats === null ? (
+        <Stat label="Listings" value="…" to="/listings" />
+      ) : (
+        stats.listings.map((t) => <Stat key={t.slug} label={`${t.name} listings`} value={t.count} to={`/listings?type=${t.slug}`} />)
+      )}
       <Stat label="Masterplans" value={n(stats?.maps)} to="/masterplans" />
       <Stat label="Plots available" value={n(stats?.plots.available)} to="/masterplans" />
       <Stat label="Plots booked" value={n(stats?.plots.booked)} to="/masterplans" />
@@ -49,6 +51,8 @@ export function Widgets() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3 text-sm">
           <Link className="underline underline-offset-4" to="/listings/new">Add a listing</Link>
+          <Link className="underline underline-offset-4" to="/listing-types">Listing types</Link>
+          <Link className="underline underline-offset-4" to="/features">Features</Link>
           <Link className="underline underline-offset-4" to="/masterplans">Map builder</Link>
           <Link className="underline underline-offset-4" to="/homepage">Homepage content</Link>
           <Link className="underline underline-offset-4" to="/settings">Settings</Link>

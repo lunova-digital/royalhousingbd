@@ -11,7 +11,8 @@ import { NativeSelect } from '@/components/ui/native-select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { api, assetUrl } from '@/lib/api'
 
-import { LISTING_TYPES, listingUrl, typeLabel, type Listing } from '../types'
+import { useListingTypes } from '../api'
+import { listingUrl, type Listing } from '../types'
 
 const PER_PAGE = 20
 
@@ -23,6 +24,7 @@ export function ListingListPage() {
   const [draft, setDraft] = useState(query)
   const [rows, setRows] = useState<Listing[] | null>(null)
   const [total, setTotal] = useState(0)
+  const types = useListingTypes()
 
   const load = useCallback(async () => {
     const search = new URLSearchParams({ page: String(page), per_page: String(PER_PAGE) })
@@ -63,7 +65,7 @@ export function ListingListPage() {
     <div className="grid gap-6">
       <PageHeader
         title="Listings"
-        description="Property, plot and flat listings shown on the website."
+        description="Every listing shown on the website, of any type."
         actions={
           <Button nativeButton={false} render={<Link to="/listings/new" />}><PlusIcon /> New listing</Button>
         }
@@ -72,13 +74,13 @@ export function ListingListPage() {
       <form onSubmit={search} className="flex flex-wrap gap-2">
         <NativeSelect className="w-40" value={type} onChange={(e) => update({ type: e.target.value })}>
           <option value="">All types</option>
-          {LISTING_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
+          {(types ?? []).map((t) => (
+            <option key={t.id} value={t.slug}>
+              {t.name}
             </option>
           ))}
         </NativeSelect>
-        <Input className="w-64" placeholder="Search title or location" value={draft} onChange={(e) => setDraft(e.target.value)} />
+        <Input className="w-64" placeholder="Search title, location, feature…" value={draft} onChange={(e) => setDraft(e.target.value)} />
         <Button type="submit" variant="outline">
           Search
         </Button>
@@ -123,7 +125,7 @@ export function ListingListPage() {
                       {l.title}
                     </Link>
                   </TableCell>
-                  <TableCell>{typeLabel(l.type)}</TableCell>
+                  <TableCell>{l.type_label}</TableCell>
                   <TableCell>{l.location}</TableCell>
                   <TableCell>{l.call_for_price || !l.price ? 'Call for Price' : l.price}</TableCell>
                   <TableCell>

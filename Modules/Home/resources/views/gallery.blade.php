@@ -5,7 +5,7 @@
 
 <section class="container-x mt-6">
   <div class="scroll-row flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter photos">
-    @foreach (['all' => 'All photos', 'property' => 'Property', 'plot' => 'Land plots', 'flat' => 'Flats', 'masterplan' => 'Masterplans'] as $key => $label)
+    @foreach (['all' => 'All photos'] + $listingTypes->pluck('name', 'slug')->all() + ['masterplan' => 'Masterplans'] as $key => $label)
       <button type="button" data-gallery-filter="{{ $key }}" class="gallery-filter shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors {{ $key === 'all' ? 'bg-ink-950 text-white' : 'bg-fill text-fg hover:bg-line' }}">{{ $label }}</button>
     @endforeach
   </div>

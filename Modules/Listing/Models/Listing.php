@@ -5,17 +5,16 @@ namespace Modules\Listing\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Masterplan\Models\Masterplan;
 
-/** Feature 1: a Property / Plot / Flat listing (FR-LIST-*). */
+/** Feature 1: a listing of any ListingType (FR-LIST-*), with its features (amenities). */
 class Listing extends Model
 {
-    public const TYPES = ['property', 'plot', 'flat'];
-
     protected $guarded = [];
 
-    protected $attributes = ['facilities' => '[]'];
+    protected $appends = ['type_label'];
 
     protected function casts(): array
     {
@@ -23,21 +22,10 @@ class Listing extends Model
             'call_for_price' => 'boolean',
             'featured' => 'boolean',
             'published' => 'boolean',
-            'facilities' => 'array',
             'bedrooms' => 'integer',
             'baths' => 'integer',
             'featured_order' => 'integer',
         ];
-    }
-
-    public static function label(string $type): string
-    {
-        return match ($type) {
-            'property' => 'Property',
-            'plot' => 'Plot',
-            'flat' => 'Flat',
-            default => ucfirst($type),
-        };
     }
 
     public function images(): HasMany
@@ -45,10 +33,20 @@ class Listing extends Model
         return $this->hasMany(ListingImage::class)->orderBy('sort_order');
     }
 
+    public function features(): BelongsToMany
+    {
+        return $this->belongsToMany(Feature::class)->orderBy('name');
+    }
+
     /** The masterplan this development belongs to, if any. */
     public function masterplan(): BelongsTo
     {
         return $this->belongsTo(Masterplan::class);
+    }
+
+    public function listingType(): BelongsTo
+    {
+        return $this->belongsTo(ListingType::class, 'type', 'slug');
     }
 
     public function scopePublished(Builder $query): Builder
@@ -64,7 +62,12 @@ class Listing extends Model
 
     public function typeLabel(): string
     {
-        return self::label($this->type);
+        return ListingType::labelFor($this->type);
+    }
+
+    public function getTypeLabelAttribute(): string
+    {
+        return $this->typeLabel();
     }
 
     public function url(): string
@@ -89,10 +92,12 @@ class Listing extends Model
         return ['available' => $available, 'total' => $plan->plots->count(), 'percent' => (int) round($available * 100 / $plan->plots->count())];
     }
 
-    /** The headline size for a card: land area for property, size otherwise. */
+    /** The headline size for a card: land area for property, size otherwise, falling back to whatever is filled in. */
     public function sizeLabel(): string
     {
-        return $this->type === 'property' ? ($this->land_area ?: $this->built_area) : $this->size;
+        return $this->type === 'property'
+            ? ($this->land_area ?: $this->built_area ?: $this->size)
+            : ($this->size ?: $this->land_area ?: $this->built_area);
     }
 
     public function priceLabel(): string

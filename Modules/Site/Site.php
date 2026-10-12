@@ -2,6 +2,7 @@
 
 namespace Modules\Site;
 
+use Modules\Listing\Models\ListingType;
 use Modules\Settings\Settings;
 use Modules\Site\Support\WhatsApp;
 
@@ -21,12 +22,17 @@ class Site
         ['key' => 'contact', 'label' => 'Contact', 'href' => '/contact', 'icon' => 'phone'],
     ];
 
-    /** The listing type sub-navigation (Property · Plot · Flat), used on the projects page. */
-    public const TYPES = [
-        ['key' => 'property', 'label' => 'Property', 'href' => '/property'],
-        ['key' => 'plot', 'label' => 'Plot', 'href' => '/plot'],
-        ['key' => 'flat', 'label' => 'Flat', 'href' => '/flat'],
-    ];
+    /**
+     * The listing type sub-navigation (Property · Plot · Flat · …), in the admin's order.
+     *
+     * @return list<array{key: string, label: string, href: string}>
+     */
+    public static function types(): array
+    {
+        return ListingType::registry()->values()
+            ->map(fn (ListingType $t) => ['key' => $t->slug, 'label' => $t->name, 'href' => $t->url()])
+            ->all();
+    }
 
     private static ?array $settings = null;
 
@@ -59,6 +65,7 @@ class Site
             'og_image' => $image,
             'canonical' => self::baseUrl().'/'.ltrim(request()->path(), '/'),
             'nav' => self::NAV,
+            'types' => self::types(),
             'nav_active' => $meta['nav'] ?? '',
             'whatsapp_float' => self::whatsapp($s, "Hello, I found you on {$siteName} and I'd like to know more."),
         ];

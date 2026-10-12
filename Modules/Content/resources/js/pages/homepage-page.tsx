@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { api, ApiError, assetUrl } from '@/lib/api'
-import { typeLabel, type Listing } from '@listing/js/types'
+import type { Listing } from '@listing/js/types'
 import { useSettings, type Settings } from '@settings/js/public'
 
 export function HomepagePage() {
@@ -157,7 +157,7 @@ function FeaturedTab() {
       <span className="bg-muted size-10 shrink-0 overflow-hidden rounded">{l.images?.[0] && <img src={assetUrl(l.images[0].thumb_path || l.images[0].path)} alt="" className="size-full object-cover" />}</span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-medium">{l.title}</span>
-        <span className="text-muted-foreground block truncate text-xs">{typeLabel(l.type)} · {l.location}{!l.published && ' · draft (hidden)'}</span>
+        <span className="text-muted-foreground block truncate text-xs">{l.type_label} · {l.location}{!l.published && ' · draft (hidden)'}</span>
       </span>
     </span>
   )

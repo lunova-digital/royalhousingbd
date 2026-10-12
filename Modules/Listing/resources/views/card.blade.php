@@ -18,7 +18,7 @@
     <p class="mt-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-1"><span class="font-display text-lg font-extrabold leading-none">{{ $listing->priceLabel() }}</span>@if ($listing->sizeLabel())<span class="text-xs text-muted-fg">{{ $listing->sizeLabel() }}</span>@endif</p>
     <div class="mt-2.5 flex items-center justify-between gap-2">
       <span class="chip-green chip">{{ $listing->typeLabel() }}</span>
-      @if ($listing->type === 'flat' && $listing->bedrooms)<span class="text-xs text-muted-fg">{{ $listing->bedrooms }} bed · {{ $listing->baths }} bath</span>
+      @if ($listing->bedrooms)<span class="text-xs text-muted-fg">{{ $listing->bedrooms }} bed · {{ $listing->baths }} bath</span>
       @elseif ($avail)<span class="text-xs text-muted-fg">{{ $avail['total'] - $avail['available'] }} taken</span>@endif
     </div>
     @if ($avail)

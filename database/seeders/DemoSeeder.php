@@ -3,15 +3,19 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Modules\Content\Models\TickerItem;
 use Modules\Content\Models\Video;
+use Modules\Listing\Database\Seeders\FeatureSeeder;
+use Modules\Listing\Database\Seeders\ListingTypeSeeder;
+use Modules\Listing\Models\Feature;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Services\ListingService;
 use Modules\Masterplan\Services\MasterplanService;
 use Modules\Settings\Settings;
 
 /**
- * Sample content: one listing per type, four masterplans with layout images and
+ * Sample content: the standard types and features, one listing per type, four masterplans with layout images and
  * plots, ticker items, a video and contact settings. Runs only while there
  * are no listings, so it never touches real data.
  */
@@ -19,6 +23,7 @@ class DemoSeeder extends Seeder
 {
     public function run(ListingService $listings, MasterplanService $masterplans): void
     {
+        $this->call([ListingTypeSeeder::class, FeatureSeeder::class]);
         if (Listing::query()->exists()) {
             return;
         }
@@ -43,14 +48,21 @@ class DemoSeeder extends Seeder
 
         $ids = [];
         foreach ([
-            ['type' => 'property', 'title' => 'Duplex house at Bashundhara R/A', 'location' => 'Bashundhara R/A, Dhaka', 'price' => '৳ 4.5 Crore', 'land_area' => '5 katha', 'built_area' => '4,200 sqft', 'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'facilities' => ['Car parking', 'Generator', 'Rooftop garden', '24/7 security'], 'description' => "A south-facing duplex on a corner plot with a private garden.\nReady to move in."],
-            ['type' => 'plot', 'title' => 'Corner plot, Block C', 'location' => 'Purbachal, Dhaka', 'price' => '৳ 35 Lakh / katha', 'size' => '3 katha', 'facilities' => ['Boundary wall', 'Paved road', 'Electricity line', 'Gas line'], 'description' => 'Ready plot with all utilities, 200 m from the main road.'],
-            ['type' => 'flat', 'title' => '1450 sqft flat with lake view', 'location' => 'Uttara Sector 7, Dhaka', 'call_for_price' => true, 'size' => '1450 sqft', 'bedrooms' => 3, 'baths' => 3, 'floor' => '5th of 9', 'facilities' => ['Lift', 'Generator', 'CCTV', 'Community hall'], 'description' => 'Three-bedroom flat with a lake-facing balcony and covered parking.'],
+            ['type' => 'property', 'title' => 'Duplex house at Bashundhara R/A', 'location' => 'Bashundhara R/A, Dhaka', 'price' => '৳ 4.5 Crore', 'land_area' => '5 katha', 'built_area' => '4,200 sqft', 'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'features' => ['Parking', 'Generator', 'Rooftop garden', '24/7 security'], 'description' => "A south-facing duplex on a corner plot with a private garden.\nReady to move in."],
+            ['type' => 'plot', 'title' => 'Corner plot, Block C', 'location' => 'Purbachal, Dhaka', 'price' => '৳ 35 Lakh / katha', 'size' => '3 katha', 'features' => ['Boundary wall', 'Paved road', 'Electricity line', 'Gas connection'], 'description' => 'Ready plot with all utilities, 200 m from the main road.'],
+            ['type' => 'flat', 'title' => '1450 sqft flat with lake view', 'location' => 'Uttara Sector 7, Dhaka', 'call_for_price' => true, 'size' => '1450 sqft', 'bedrooms' => 3, 'baths' => 3, 'floor' => '5th of 9', 'features' => ['Lift', 'Generator', 'CCTV', 'Community hall'], 'description' => 'Three-bedroom flat with a lake-facing balcony and covered parking.'],
+            ['type' => 'resort', 'title' => 'Hilltop eco resort share', 'location' => 'Sajek Valley, Rangamati', 'price' => '৳ 25 Lakh / share', 'land_area' => '2 acres', 'built_area' => '12 cottages', 'features' => ['Swimming pool', 'Generator', '24/7 security', 'Parking'], 'description' => 'Co-own a cottage in a managed resort and earn from bookings.'],
+            ['type' => 'five-star-hotel', 'title' => 'Beachfront hotel suite, Cox\'s Bazar', 'location' => 'Marine Drive, Cox\'s Bazar', 'call_for_price' => true, 'size' => '850 sqft', 'bedrooms' => 1, 'baths' => 1, 'floor' => '9th of 14', 'features' => ['Lift', 'Swimming pool', 'Gym', 'Parking', 'CCTV'], 'description' => 'A sea-facing suite in a managed five star hotel with rental returns.'],
         ] as $attributes) {
+            $features = Feature::query()->whereIn('name', $attributes['features'])->pluck('id')->all();
+            foreach (array_diff($attributes['features'], Feature::query()->whereIn('name', $attributes['features'])->pluck('name')->all()) as $name) {
+                $features[] = Feature::query()->create(['name' => $name, 'slug' => Str::slug($name)])->id;
+            }
+            unset($attributes['features']);
             $ids[] = $listings->create($attributes + [
                 'price' => '', 'call_for_price' => false, 'land_area' => '', 'built_area' => '', 'size' => '',
                 'bedrooms' => 0, 'baths' => 0, 'floor' => '', 'video_url' => '', 'published' => true,
-            ])->id;
+            ], $features)->id;
         }
         $listings->setFeatured($ids);
 

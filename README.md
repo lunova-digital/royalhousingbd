@@ -48,7 +48,8 @@ Modules/<Name>/          one feature each; StudlyCase dirs hold classes, lowerca
   Media/                 ImageStore (resize + thumbnails via ImageMagick), UploadController
   Auth/                  AuthController — Blade login (`login` route), `logout`, password change; AdminUserSeeder
   Dashboard/             DashboardController (counts) + the widgets that fill the admin's dashboard
-  Listing/               Listing (optionally linked to a Masterplan for live availability), ListingImage, ListingService, ListingRequest, ListingController (admin API), ListingPages (public)
+  Listing/               Listing (optionally linked to a Masterplan for live availability), ListingType (admin-managed kinds: /{slug}), Feature (amenities, many-to-many),
+                         ListingImage, ListingService (search: keyword + feature filters), ListingRequest, Listing/ListingType/FeatureController (admin API), ListingPages (public)
   Masterplan/            Masterplan (an SVG layout), Plot (details of one `g.plan-plot`), MasterplanService, LayoutSvg (SVG validation), MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
   Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list)
   Home/                  HomeController — homepage, About, Gallery, Contact, Privacy/Terms, sitemap.xml, robots.txt
@@ -78,6 +79,11 @@ tests/Feature/           cross-module tests: public pages + admin API
   their module's views, which `@extends('site::layouts.app')`. A page's script is a
   Vite entry its module declares in `viteEntries()` and loads with
   `{{ Modules::vite('masterplan', 'resources/js/plan.ts') }}`.
+- Listing types and features are rows the admin manages (Content → Listing types /
+  Features), seeded by the Listing module's seeders. A type's slug is its public page
+  (`/plot`, `/plot/{listing}`), so the Listing module is wired last (`order() = -1`) and
+  registers `/{type}` as fallback routes: every static page and the admin match first,
+  and an unknown slug is a 404. `Site::types()` feeds the header, footer and search.
 - Admin: laramod-admin answers `/admin/*` (behind `auth`) and mounts the React shell.
   A module adds pages with a dashboard script: `resources/js/dashboard.tsx`, listed in
   both `viteEntries()` and `dashboardScripts()`, calls `registerModule({ id, order,

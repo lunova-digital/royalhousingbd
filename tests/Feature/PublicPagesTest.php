@@ -21,10 +21,10 @@ class PublicPagesTest extends TestCase
 
     public function test_every_sitemap_page_renders(): void
     {
-        foreach (['/', '/about', '/projects', '/property', '/plot', '/flat', '/map', '/gallery', '/contact', '/privacy', '/terms', '/robots.txt'] as $path) {
+        foreach (['/', '/about', '/projects', '/property', '/plot', '/flat', '/resort', '/five-star-hotel', '/map', '/gallery', '/contact', '/privacy', '/terms', '/robots.txt'] as $path) {
             $this->get($path)->assertOk();
         }
-        $this->get('/sitemap.xml')->assertOk()->assertSee('/plot/corner-plot-block-c');
+        $this->get('/sitemap.xml')->assertOk()->assertSee('/plot/corner-plot-block-c')->assertSee('/five-star-hotel</loc>', false);
     }
 
     public function test_listing_detail_has_whatsapp_reference(): void
@@ -42,6 +42,23 @@ class PublicPagesTest extends TestCase
         $this->get('/projects?location=Purbachal%2C+Dhaka')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
         $this->get('/flat?q=lake')->assertOk()->assertSee('1450 sqft flat');
         $this->get('/flat?q=nothing-matches')->assertOk()->assertSee('No projects match');
+    }
+
+    public function test_keyword_search_matches_features_types_and_project_names(): void
+    {
+        // A feature name, the masterplan the plot belongs to, a type name, and several words together.
+        $this->get('/projects?q=gas')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
+        $this->get('/projects?q=royal+city')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
+        $this->get('/projects?q=five+star')->assertOk()->assertSee('Beachfront hotel')->assertDontSee('Corner plot');
+        $this->get('/projects?q=lift+uttara')->assertOk()->assertSee('1450 sqft flat')->assertDontSee('Beachfront hotel');
+    }
+
+    public function test_feature_filter_requires_every_ticked_feature(): void
+    {
+        $this->get('/projects?features%5B%5D=generator')->assertOk()->assertSee('Duplex house')->assertSee('1450 sqft flat')->assertSee('Hilltop eco resort');
+        $this->get('/projects?features%5B%5D=generator&features%5B%5D=lift')->assertOk()->assertSee('1450 sqft flat')->assertDontSee('Duplex house');
+        $this->get('/projects?features%5B%5D=not-a-feature')->assertOk()->assertSee('Duplex house');
+        $this->get('/plot')->assertOk()->assertSee('name="features[]"', false)->assertSee('Boundary wall')->assertDontSee('Swimming pool');
     }
 
     public function test_masterplan_pages_render_plots(): void

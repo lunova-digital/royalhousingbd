@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Modules\Listing\Models\Feature;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingImage;
+use Modules\Listing\Models\ListingType;
 use Modules\Media\Services\ImageStore;
 
 class ListingService
@@ -16,11 +18,15 @@ class ListingService
     /**
      * Drives both the public grid (FR-LIST-002) and the admin table.
      *
-     * @param  array{type?: string, location?: string, q?: string, published?: bool}  $filter
+     * `q` is a keyword search: every word must match the title, location,
+     * description, type name, a feature name or the linked masterplan's name.
+     * `features` are slugs the listing must all have.
+     *
+     * @param  array{type?: string, location?: string, q?: string, features?: string[], published?: bool}  $filter
      */
     public function search(array $filter, int $perPage = 12, int $page = 1): LengthAwarePaginator
     {
-        $query = Listing::query()->with(['images', 'masterplan.plots'])->orderByDesc('id');
+        $query = Listing::query()->with(['images', 'features', 'masterplan.plots'])->orderByDesc('id');
         if (! empty($filter['type'])) {
             $query->where('type', $filter['type']);
         }
@@ -30,9 +36,25 @@ class ListingService
         if (($location = trim($filter['location'] ?? '')) !== '') {
             $query->where('location', $location);
         }
-        if (($term = trim($filter['q'] ?? '')) !== '') {
-            $like = '%'.mb_strtolower($term).'%';
-            $query->where(fn (Builder $q) => $q->whereRaw('LOWER(title) LIKE ?', [$like])->orWhereRaw('LOWER(location) LIKE ?', [$like]));
+        foreach ($filter['features'] ?? [] as $slug) {
+            $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));
+        }
+        foreach (preg_split('/\s+/', mb_strtolower(trim($filter['q'] ?? ''))) ?: [] as $term) {
+            if ($term === '') {
+                continue;
+            }
+            $like = "%{$term}%";
+            $typeSlugs = ListingType::registry()->filter(fn (ListingType $t) => str_contains(mb_strtolower($t->name), $term))->keys()->all();
+            $query->where(function (Builder $q) use ($like, $typeSlugs) {
+                $q->whereRaw('LOWER(title) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(location) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$like])
+                    ->orWhereHas('features', fn (Builder $f) => $f->whereRaw('LOWER(name) LIKE ?', [$like]))
+                    ->orWhereHas('masterplan', fn (Builder $m) => $m->whereRaw('LOWER(name) LIKE ?', [$like]));
+                if ($typeSlugs) {
+                    $q->orWhereIn('type', $typeSlugs);
+                }
+            });
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
@@ -46,26 +68,45 @@ class ListingService
             ->distinct()->orderBy('location')->pluck('location')->all();
     }
 
-    public function findPublished(string $type, string $slug): ?Listing
+    /** Features used by at least one published listing (of the type), with how many, for the filter. */
+    public function filterFeatures(?string $type = null): array
     {
-        return Listing::query()->with(['images', 'masterplan.plots'])->published()->where('type', $type)->where('slug', $slug)->first();
+        return Feature::query()->ordered()
+            ->whereHas('listings', fn (Builder $q) => $q->published()->when($type, fn ($q) => $q->where('type', $type)))
+            ->withCount(['listings' => fn (Builder $q) => $q->published()->when($type, fn ($q) => $q->where('type', $type))])
+            ->get()->all();
     }
 
-    public function create(array $attributes): Listing
+    public function findPublished(string $type, string $slug): ?Listing
+    {
+        return Listing::query()->with(['images', 'features', 'masterplan.plots'])->published()->where('type', $type)->where('slug', $slug)->first();
+    }
+
+    /** @param  int[]  $featureIds */
+    public function create(array $attributes, array $featureIds = []): Listing
     {
         $attributes['slug'] = $this->uniqueSlug($attributes['title']);
 
-        return Listing::query()->create($attributes)->load('images');
+        return DB::transaction(function () use ($attributes, $featureIds) {
+            $listing = Listing::query()->create($attributes);
+            $listing->features()->sync($featureIds);
+
+            return $listing->load(['images', 'features']);
+        });
     }
 
-    public function update(Listing $listing, array $attributes): Listing
+    /** @param  int[]  $featureIds */
+    public function update(Listing $listing, array $attributes, array $featureIds = []): Listing
     {
         if ($listing->title !== $attributes['title']) {
             $attributes['slug'] = $this->uniqueSlug($attributes['title'], $listing->id);
         }
-        $listing->update($attributes);
+        DB::transaction(function () use ($listing, $attributes, $featureIds) {
+            $listing->update($attributes);
+            $listing->features()->sync($featureIds);
+        });
 
-        return $listing->load('images');
+        return $listing->load(['images', 'features']);
     }
 
     public function delete(Listing $listing): void
@@ -116,7 +157,7 @@ class ListingService
     /** The admin-selected homepage row (FR-HOME-002), in order. */
     public function featured(bool $publishedOnly = true): array
     {
-        return Listing::query()->with(['images', 'masterplan.plots'])->where('featured', true)
+        return Listing::query()->with(['images', 'features', 'masterplan.plots'])->where('featured', true)
             ->when($publishedOnly, fn ($q) => $q->published())
             ->orderBy('featured_order')->get()->all();
     }

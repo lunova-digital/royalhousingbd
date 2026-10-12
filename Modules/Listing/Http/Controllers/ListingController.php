@@ -27,17 +27,17 @@ class ListingController
 
     public function show(Listing $listing): JsonResponse
     {
-        return response()->json(['listing' => $listing->load('images')]);
+        return response()->json(['listing' => $listing->load(['images', 'features'])]);
     }
 
     public function store(ListingRequest $request): JsonResponse
     {
-        return response()->json(['listing' => $this->listings->create($request->attributesForModel())], 201);
+        return response()->json(['listing' => $this->listings->create($request->attributesForModel(), $request->featureIds())], 201);
     }
 
     public function update(ListingRequest $request, Listing $listing): JsonResponse
     {
-        return response()->json(['listing' => $this->listings->update($listing, $request->attributesForModel())]);
+        return response()->json(['listing' => $this->listings->update($listing, $request->attributesForModel(), $request->featureIds())]);
     }
 
     public function destroy(Listing $listing): JsonResponse

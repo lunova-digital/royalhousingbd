@@ -53,8 +53,9 @@
 
       <ul class="mt-5 grid gap-2.5 text-sm">
         <li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) Prime location: {{ $l->location }}</li>
-        @if ($l->type === 'flat' && $l->bedrooms)<li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) {{ $l->bedrooms }} bedrooms · {{ $l->baths }} baths @if ($l->floor)· {{ $l->floor }} floor @endif</li>@endif
-        @if ($l->type === 'property' && $l->built_area)<li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) {{ $l->built_area }} built on {{ $l->land_area ?: 'the plot' }}</li>@endif
+        @if ($l->bedrooms)<li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) {{ $l->bedrooms }} {{ \Illuminate\Support\Str::plural('bedroom', $l->bedrooms) }} · {{ $l->baths }} {{ \Illuminate\Support\Str::plural('bath', $l->baths) }} @if ($l->floor)· {{ $l->floor }} floor @endif</li>@endif
+        @if ($l->built_area && $l->land_area)<li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) {{ $l->built_area }} built on {{ $l->land_area }}</li>@endif
+        @if ($l->features->count())<li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) {{ $l->features->take(4)->pluck('name')->join(', ') }}@if ($l->features->count() > 4) and {{ $l->features->count() - 4 }} more @endif</li>@endif
         <li class="flex items-center gap-2.5">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-success']) Site visits by appointment, flexible payment plans</li>
       </ul>
 
@@ -87,7 +88,7 @@
 {{-- Tabs: description, amenities, project map, video --}}
 @php($tabs = array_values(array_filter([
   ['description', 'Description', (bool) $l->description],
-  ['amenities', 'Amenities', (bool) $l->facilities],
+  ['amenities', 'Amenities', $l->features->isNotEmpty()],
   ['map', 'Project Map', (bool) ($plan && $plan->image_path)],
   ['video', 'Video', (bool) $videoId],
 ], fn ($t) => $t[2])))
@@ -107,9 +108,9 @@
           <dl class="card h-fit divide-y divide-line text-sm">
             @foreach (array_filter([
               ['Type', $l->typeLabel()], ['Location', $l->location],
-              ['Land area', $l->type === 'property' ? $l->land_area : ''], ['Built area', $l->type === 'property' ? $l->built_area : ''],
-              ['Size', $l->type !== 'property' ? $l->size : ''], ['Bedrooms', $l->type === 'flat' && $l->bedrooms ? $l->bedrooms : ''],
-              ['Baths', $l->type === 'flat' && $l->baths ? $l->baths : ''], ['Floor', $l->type === 'flat' ? $l->floor : ''],
+              ['Land area', $l->land_area], ['Built area', $l->built_area],
+              ['Size', $l->size], ['Bedrooms', $l->bedrooms ?: ''],
+              ['Baths', $l->baths ?: ''], ['Floor', $l->floor],
               ['Price', $l->priceLabel()], ['Reference', $l->reference()],
             ], fn ($r) => (string) $r[1] !== '') as [$dt, $dd])
               <div class="flex justify-between gap-4 px-5 py-3"><dt class="text-muted-fg">{{ $dt }}</dt><dd class="text-right font-semibold">{{ $dd }}</dd></div>
@@ -118,8 +119,8 @@
         </div>
       @elseif ($key === 'amenities')
         <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          @foreach ($l->facilities as $facility)
-            <li class="card flex items-center gap-3 p-4 text-sm font-medium">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5 shrink-0 text-success']){{ $facility }}</li>
+          @foreach ($l->features as $feature)
+            <li class="card flex items-center gap-3 p-4 text-sm font-medium">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5 shrink-0 text-success'])<a href="/projects?features%5B%5D={{ $feature->slug }}" class="hover:text-brand">{{ $feature->name }}</a></li>
           @endforeach
         </ul>
       @elseif ($key === 'map')

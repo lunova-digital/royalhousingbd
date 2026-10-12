@@ -5,6 +5,7 @@ namespace Modules\Listing\Http\Controllers;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Modules\Listing\Models\Listing;
+use Modules\Listing\Models\ListingType;
 use Modules\Listing\Services\ListingService;
 use Modules\Site\Site;
 
@@ -18,18 +19,25 @@ class ListingPages
     public function index(Request $request, ?string $type = null): View
     {
         $all = $type === null;
-        if ($all && in_array($request->query('type'), Listing::TYPES, true)) {
+        if (! $all && ! ListingType::bySlug($type)) {
+            abort(404);
+        }
+        if ($all && ListingType::bySlug((string) $request->query('type'))) {
             $type = $request->query('type');
         }
+        $typeName = $type ? ListingType::labelFor($type) : null;
 
+        $features = $this->listings->filterFeatures($type);
+        $wanted = array_values(array_intersect((array) $request->query('features', []), array_column($features, 'slug')));
         $filter = [
             'type' => $type,
-            'location' => $request->query('location', ''),
-            'q' => $request->query('q', ''),
+            'location' => (string) $request->query('location', ''),
+            'q' => (string) $request->query('q', ''),
+            'features' => $wanted,
             'published' => true,
         ];
         $page = $this->listings->search($filter, self::PER_PAGE, (int) $request->query('page', 1));
-        $title = $type ? Listing::label($type).' listings' : 'Our projects';
+        $title = $typeName ? "{$typeName} listings" : 'Our projects';
 
         return view('listing::index', Site::page([
             'title' => $title,
@@ -41,8 +49,10 @@ class ListingPages
             'pages' => $page->lastPage(),
             'page' => $page->currentPage(),
             'type' => $type,
-            'types' => Listing::TYPES,
+            'typeName' => $typeName,
+            'listingTypes' => ListingType::registry()->values(),
             'locations' => $this->listings->locations($type),
+            'features' => $features,
             'filter' => $filter,
             'path' => $all ? '/projects' : "/{$type}",
         ]));

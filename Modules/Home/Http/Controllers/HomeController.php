@@ -7,6 +7,7 @@ use Illuminate\Http\Response;
 use Modules\Content\Models\TickerItem;
 use Modules\Content\Models\Video;
 use Modules\Listing\Models\Listing;
+use Modules\Listing\Models\ListingType;
 use Modules\Listing\Services\ListingService;
 use Modules\Masterplan\Models\Masterplan;
 use Modules\Site\Site;
@@ -61,7 +62,7 @@ class HomeController
             'title' => 'Gallery',
             'description' => 'Photos of our properties, plots, flats and project masterplans.',
             'nav' => 'gallery',
-        ], ['photos' => $photos]));
+        ], ['photos' => $photos, 'listingTypes' => ListingType::registry()->values()]));
     }
 
     public function privacy(): View
@@ -91,6 +92,9 @@ class HomeController
     {
         $base = Site::baseUrl();
         $urls = collect(Site::NAV)->map(fn ($item) => [$item['href'], now()]);
+        foreach (ListingType::registry() as $type) {
+            $urls->push([$type->url(), now()]);
+        }
         foreach (Listing::query()->published()->get(['type', 'slug', 'updated_at']) as $listing) {
             $urls->push([$listing->url(), $listing->updated_at]);
         }

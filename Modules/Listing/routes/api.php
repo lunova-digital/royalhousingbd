@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Routing\Router;
+use Modules\Listing\Http\Controllers\FeatureController;
 use Modules\Listing\Http\Controllers\ListingController;
+use Modules\Listing\Http\Controllers\ListingTypeController;
 
 /** @var Router $router */
 $router->prefix('admin')->middleware('auth')->group(function (Router $router) {
@@ -11,4 +13,8 @@ $router->prefix('admin')->middleware('auth')->group(function (Router $router) {
     $router->post('listings/{listing}/images', [ListingController::class, 'addImages']);
     $router->put('listings/{listing}/images/order', [ListingController::class, 'reorderImages']);
     $router->delete('listings/{listing}/images/{image}', [ListingController::class, 'deleteImage']);
+
+    $router->put('listing-types/order', [ListingTypeController::class, 'reorder']);
+    $router->apiResource('listing-types', ListingTypeController::class)->except('show');
+    $router->apiResource('features', FeatureController::class)->except('show');
 });

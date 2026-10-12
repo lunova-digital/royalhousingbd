@@ -96,6 +96,11 @@ if (filters.length) {
   }
 }
 
+// Listing filters: a ticked feature applies at once; the search box still needs Apply.
+for (const box of document.querySelectorAll<HTMLInputElement>('[data-filter-form] [data-autosubmit]')) {
+  box.addEventListener('change', () => box.form?.requestSubmit())
+}
+
 // Listing page tabs (description / amenities / map / video).
 for (const tabs of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
   const buttons = tabs.querySelectorAll<HTMLButtonElement>('[data-tab]')

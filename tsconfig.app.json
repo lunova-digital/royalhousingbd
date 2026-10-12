@@ -37,9 +37,6 @@
       "@dashboard/*": [
         "./Modules/Dashboard/resources/*"
       ],
-      "@listing/*": [
-        "./Modules/Listing/resources/*"
-      ],
       "@masterplan/*": [
         "./Modules/Masterplan/resources/*"
       ],
@@ -51,6 +48,9 @@
       ],
       "@admin/*": [
         "./vendor/protibimbok/laramod-admin/resources/*"
+      ],
+      "@listing/*": [
+        "./Modules/Listing/resources/*"
       ]
     }
   },

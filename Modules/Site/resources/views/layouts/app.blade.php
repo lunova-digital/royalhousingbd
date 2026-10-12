@@ -22,7 +22,6 @@
     @stack('head')
   </head>
   <body class="min-h-svh bg-page font-body text-base text-fg antialiased pb-16 lg:pb-0">
-    @php($types = \Modules\Site\Site::TYPES)
     @php($path = '/'.ltrim(request()->path(), '/'))
     @php($whatsapp = $settings['whatsapp_number'] ?? '')
     @php($phone = $settings['phone'] ?? '')
