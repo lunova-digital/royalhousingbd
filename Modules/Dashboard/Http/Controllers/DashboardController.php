@@ -3,6 +3,7 @@
 namespace Modules\Dashboard\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Modules\Consultation\Http\Controllers\ConsultationController;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Masterplan\Models\Masterplan;
@@ -20,6 +21,7 @@ class DashboardController
             'listings' => ListingType::registry()->values()->map(fn (ListingType $t) => ['slug' => $t->slug, 'name' => $t->name, 'count' => (int) ($listings[$t->slug] ?? 0)]),
             'maps' => Masterplan::query()->count(),
             'plots' => collect(Plot::STATUSES)->mapWithKeys(fn ($s) => [$s => (int) ($plots[$s] ?? 0)]),
+            'consultations' => ConsultationController::counts(),
         ]);
     }
 }

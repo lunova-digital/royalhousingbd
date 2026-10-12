@@ -8,6 +8,7 @@ interface Stats {
   listings: { slug: string; name: string; count: number }[]
   maps: number
   plots: Record<'available' | 'booked' | 'sold', number>
+  consultations: { pending: number; upcoming: number }
 }
 
 function Stat({ label, value, to }: { label: string; value: number | string; to: string }) {
@@ -35,6 +36,8 @@ export function Widgets() {
 
   return (
     <>
+      <Stat label="Consultations to confirm" value={n(stats?.consultations.pending)} to="/consultations?filter=pending" />
+      <Stat label="Consultations upcoming" value={n(stats?.consultations.upcoming)} to="/consultations" />
       {stats === null ? (
         <Stat label="Listings" value="…" to="/listings" />
       ) : (
@@ -54,6 +57,7 @@ export function Widgets() {
           <Link className="underline underline-offset-4" to="/listing-types">Listing types</Link>
           <Link className="underline underline-offset-4" to="/features">Features</Link>
           <Link className="underline underline-offset-4" to="/masterplans">Map builder</Link>
+          <Link className="underline underline-offset-4" to="/consultations/availability">Consultation hours</Link>
           <Link className="underline underline-offset-4" to="/homepage">Homepage content</Link>
           <Link className="underline underline-offset-4" to="/settings">Settings</Link>
           <a className="underline underline-offset-4" href="/" target="_blank" rel="noreferrer">Open website</a>
