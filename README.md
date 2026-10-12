@@ -79,6 +79,14 @@ tests/Feature/           cross-module tests: public pages + admin API
   their module's views, which `@extends('site::layouts.app')`. A page's script is a
   Vite entry its module declares in `viteEntries()` and loads with
   `{{ Modules::vite('masterplan', 'resources/js/plan.ts') }}`.
+- The public site is bilingual (English default, Bangla): `?lang=bn` on any URL is
+  remembered in a plain `lang` cookie by `Modules\Site\Http\Middleware\SetLocale`
+  (a global middleware the Site module declares), which calls `app()->setLocale()`.
+  Only the chrome and static copy are translated: Blade uses `__()` / `trans_choice()`
+  with the English string as the key and each module ships `lang/bn.json` through
+  `ProvidesTranslations` (`lang/bn.json` at the root covers the error pages).
+  Admin-entered content stays as entered. For `bn` the layout also loads Noto Sans
+  Bengali and `app.css` swaps the font tokens under `html:lang(bn)`.
 - Listing types and features are rows the admin manages (Content → Listing types /
   Features), seeded by the Listing module's seeders. A type's slug is its public page
   (`/plot`, `/plot/{listing}`), so the Listing module is wired last (`order() = -1`) and

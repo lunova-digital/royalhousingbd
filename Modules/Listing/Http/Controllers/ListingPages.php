@@ -37,11 +37,11 @@ class ListingPages
             'published' => true,
         ];
         $page = $this->listings->search($filter, self::PER_PAGE, (int) $request->query('page', 1));
-        $title = $typeName ? "{$typeName} listings" : 'Our projects';
+        $title = $typeName ? __(':type listings', ['type' => $typeName]) : __('Our projects');
 
         return view('listing::index', Site::page([
             'title' => $title,
-            'description' => "Browse {$title} in Bangladesh. Contact us on WhatsApp for details and site visits.",
+            'description' => __('Browse :title in Bangladesh. Contact us on WhatsApp for details and site visits.', ['title' => $title]),
             'nav' => 'projects',
         ], [
             'listings' => $page->items(),
@@ -62,12 +62,13 @@ class ListingPages
     {
         $listing = $this->listings->findPublished($type, $slug) ?? abort(404);
         $settings = Site::settings();
-        $message = sprintf('Hello, I\'m interested in "%s" (%s, Ref: %s). %s%s',
-            $listing->title, $listing->location, $listing->reference(), Site::baseUrl(), $listing->url());
+        $message = __('Hello, I\'m interested in ":title" (:location, Ref: :ref). :url', [
+            'title' => $listing->title, 'location' => $listing->location, 'ref' => $listing->reference(), 'url' => Site::baseUrl().$listing->url(),
+        ]);
 
         return view('listing::show', Site::page([
             'title' => $listing->title,
-            'description' => "{$listing->typeLabel()} in {$listing->location}. {$listing->priceLabel()}.",
+            'description' => __(':type in :location. :price.', ['type' => $listing->typeLabel(), 'location' => $listing->location, 'price' => $listing->priceLabel()]),
             'image' => $listing->cover()?->path,
             'nav' => 'projects',
         ], [
