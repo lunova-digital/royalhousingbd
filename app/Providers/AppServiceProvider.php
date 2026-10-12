@@ -3,17 +3,21 @@
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Modules\Content\Translation\TextOverrideLoader;
 use Modules\Site\Site;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Every public string can be rewritten from the admin (Site → Site text): the
+        // Content module's loader lays those rows over the lang files as they load.
+        $this->app->extend('translation.loader', fn (Loader $loader) => new TextOverrideLoader($loader));
     }
 
     public function boot(): void

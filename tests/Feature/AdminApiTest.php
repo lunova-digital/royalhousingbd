@@ -261,6 +261,32 @@ class AdminApiTest extends TestCase
         $this->get('/about')->assertOk()->assertSee('Our Story');
     }
 
+    public function test_site_text_overrides_replace_public_copy_per_language(): void
+    {
+        $this->actingAs($this->admin);
+        $this->getJson('/api/admin/texts')->assertOk()
+            ->assertJsonPath('groups.0.label', 'Header & footer')
+            ->assertJsonFragment(['key' => 'home::index.faq', 'en' => 'Frequently asked questions', 'bn' => 'সচরাচর জিজ্ঞাসা', 'en_override' => '', 'bn_override' => '']);
+
+        $this->putJson('/api/admin/texts', ['texts' => [
+            'home::index.faq' => ['en' => ' Questions people ask ', 'bn' => 'প্রশ্নোত্তর'],
+            'site::common.type_listings' => ['en' => ':type for sale'],
+            'bogus::page.key' => ['en' => 'nope'],
+        ]])->assertOk()->assertJsonFragment(['key' => 'home::index.faq', 'en_override' => 'Questions people ask', 'bn_override' => 'প্রশ্নোত্তর']);
+        $this->assertDatabaseMissing('text_overrides', ['key' => 'bogus::page.key']);
+
+        $this->get('/')->assertOk()->assertSee('Questions people ask')->assertDontSee('Frequently asked questions');
+        $this->get('/?lang=bn')->assertOk()->assertSee('প্রশ্নোত্তর');
+        $this->get('/plot')->assertOk()->assertSee('Plot for sale'); // placeholders still fill in
+        $this->get('/plot?lang=bn')->assertOk()->assertSee('Plot লিস্টিং'); // bn untouched
+
+        // Clearing a text restores the default.
+        $this->putJson('/api/admin/texts', ['texts' => ['home::index.faq' => ['en' => '', 'bn' => '']]])->assertOk();
+        $this->get('/')->assertOk()->assertSee('Frequently asked questions');
+        $this->assertDatabaseMissing('text_overrides', ['key' => 'home::index.faq']);
+        $this->putJson('/api/admin/texts', ['texts' => 'x'])->assertStatus(422);
+    }
+
     public function test_ticker_and_videos_replace_lists(): void
     {
         $this->actingAs($this->admin);
