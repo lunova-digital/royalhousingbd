@@ -2,6 +2,7 @@
 
 use Laramod\Admin\AdminModule;
 use Modules\Auth\AuthModule;
+use Modules\Consultation\ConsultationModule;
 use Modules\Content\ContentModule;
 use Modules\Dashboard\DashboardModule;
 use Modules\Home\HomeModule;
@@ -20,6 +21,7 @@ return [
     ListingModule::class,
     MasterplanModule::class,
     ContentModule::class,
+    ConsultationModule::class,
     HomeModule::class,
     AdminModule::class,
 ];

@@ -28,6 +28,9 @@ class Settings
         'about_title', 'about_story', 'about_stats', 'team_members', 'partners',
         // Legal pages
         'privacy_text', 'terms_text',
+        // Free consultation availability (Modules\Consultation\Availability holds the defaults)
+        'consult_enabled', 'consult_days', 'consult_start', 'consult_end', 'consult_slot_minutes',
+        'consult_lead_hours', 'consult_horizon_days', 'consult_modes', 'consult_note',
     ];
 
     public const DEFAULTS = [
