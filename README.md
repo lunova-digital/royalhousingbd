@@ -49,9 +49,10 @@ Modules/<Name>/          one feature each; StudlyCase dirs hold classes, lowerca
   Auth/                  AuthController — Blade login (`login` route), `logout`, password change; AdminUserSeeder
   Dashboard/             DashboardController (counts) + the widgets that fill the admin's dashboard
   Listing/               Listing (optionally linked to a Masterplan for live availability; optional PDF brochure), ListingType (admin-managed kinds: /{slug}), Feature (amenities, many-to-many),
-                         ListingImage, ListingService (search: keyword + feature filters), ListingRequest, Listing/ListingType/FeatureController (admin API), ListingPages (public)
+                         ListingImage, ListingService (search: keyword, feature and budget filters), Support/Price (Taka amounts for the budget filter), ListingRequest, Listing/ListingType/FeatureController (admin API), ListingPages (public)
   Masterplan/            Masterplan (an SVG layout), Plot (details of one `g.plan-plot`), MasterplanService, LayoutSvg (SVG validation), MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
-  Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list)
+  Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list); TextOverride + SiteTexts + TextOverrideLoader
+                         (Site → Site text: every public string, rewritable per language), TextController
   Consultation/          Free consultation booking: Availability (the admin's hours, from settings), Scheduler (slot calendar, double-booking guard), Consultation (a booking),
                          ConsultationPages (public: /consultation, slot feed, booking, confirmation + .ics), ConsultationController (admin: bookings list, availability),
                          ConsultationBooked mail, the floating launcher partial + consult.ts widget
@@ -93,6 +94,18 @@ tests/Feature/           cross-module tests: public pages + admin API
   file and its translation to `bn`.
   Admin-entered content stays as entered. For `bn` the layout also loads Noto Sans
   Bengali and `app.css` swaps the font tokens under `html:lang(bn)`.
+- Every one of those strings can be rewritten from the admin (Site → Site text), so
+  public copy must live in a lang file, never inline in Blade. `AppServiceProvider`
+  wraps the translation loader in `Modules\Content\Translation\TextOverrideLoader`,
+  which lays `text_overrides` rows (locale + key such as `home::index.faq`) over a
+  lang file as it loads; `SiteTexts` builds the admin's catalogue from the modules'
+  `lang/en` files and flushes the translator after a save. An empty override means
+  the built-in text.
+- Listing prices are free text; `price_amount` (Taka) drives the budget filter on the
+  projects grid (`budget_min` / `budget_max`, 5 lakh to 100 crore). The admin can type
+  it, otherwise `Price::parse` reads it from the price text ("৳ 4.5 Crore", "35 Lakh /
+  katha", Bangla digits); "call for price" listings have none and drop out of a budget
+  search.
 - Listing types and features are rows the admin manages (Content → Listing types /
   Features), seeded by the Listing module's seeders. A type's slug is its public page
   (`/plot`, `/plot/{listing}`), so the Listing module is wired last (`order() = -1`) and
