@@ -11,6 +11,7 @@ use Modules\Listing\Models\Feature;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingImage;
 use Modules\Listing\Models\ListingType;
+use Modules\Media\Services\DocumentStore;
 use Modules\Media\Services\ImageStore;
 
 class ListingService
@@ -114,7 +115,26 @@ class ListingService
         foreach ($listing->images as $image) {
             ImageStore::delete($image->path, $image->thumb_path);
         }
+        DocumentStore::delete($listing->brochure_path);
         $listing->delete();
+    }
+
+    /** Store the PDF brochure, replacing the current one. */
+    public function setBrochure(Listing $listing, UploadedFile $file): Listing
+    {
+        $stored = DocumentStore::storePdf($file, 'file', 'brochures');
+        DocumentStore::delete($listing->brochure_path);
+        $listing->update(['brochure_path' => $stored['path'], 'brochure_size' => $stored['size']]);
+
+        return $listing;
+    }
+
+    public function deleteBrochure(Listing $listing): Listing
+    {
+        DocumentStore::delete($listing->brochure_path);
+        $listing->update(['brochure_path' => '', 'brochure_size' => 0]);
+
+        return $listing;
     }
 
     /**

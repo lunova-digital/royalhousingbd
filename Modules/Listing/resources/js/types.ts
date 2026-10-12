@@ -37,6 +37,8 @@ export interface Listing {
   baths: number
   floor: string
   video_url: string
+  brochure_path: string
+  brochure_size: number
   description: string
   featured: boolean
   featured_order: number
@@ -49,7 +51,7 @@ export interface Listing {
 }
 
 // What the form sends: the listing's own columns plus the ids of its features.
-export type ListingInput = Omit<Listing, 'id' | 'slug' | 'type_label' | 'featured' | 'featured_order' | 'images' | 'features' | 'created_at' | 'updated_at'> & { features: number[] }
+export type ListingInput = Omit<Listing, 'id' | 'slug' | 'type_label' | 'featured' | 'featured_order' | 'brochure_path' | 'brochure_size' | 'images' | 'features' | 'created_at' | 'updated_at'> & { features: number[] }
 
 export const EMPTY_INPUT: ListingInput = {
   type: '',
@@ -71,7 +73,7 @@ export const EMPTY_INPUT: ListingInput = {
 }
 
 export function toInput(listing: Listing): ListingInput {
-  const { id: _id, slug: _slug, type_label: _tl, featured: _f, featured_order: _fo, images: _i, features, created_at: _c, updated_at: _u, ...columns } = listing
+  const { id: _id, slug: _slug, type_label: _tl, featured: _f, featured_order: _fo, brochure_path: _bp, brochure_size: _bs, images: _i, features, created_at: _c, updated_at: _u, ...columns } = listing
   return { ...columns, features: (features ?? []).map((f) => f.id) }
 }
 

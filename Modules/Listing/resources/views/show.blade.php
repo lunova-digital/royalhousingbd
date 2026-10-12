@@ -75,6 +75,9 @@
         @if ($whatsappOn)<a href="{{ $whatsapp }}" target="_blank" rel="noreferrer" class="btn-primary h-13 rounded-xl text-base">Book now</a>@else<a href="/contact" class="btn-primary h-13 rounded-xl text-base">Book now</a>@endif
         <a href="{{ $planLive ? $plan->url() : '/map' }}" class="btn-outline size-13 rounded-xl px-0" aria-label="Project map">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-5'])</a>
       </div>
+      @if ($l->hasBrochure())
+        <a href="{{ $asset($l->brochure_path) }}" download="{{ $l->brochureFilename() }}" class="btn-outline mt-3 h-12 w-full rounded-xl text-sm">@include('site::partials.icon', ['name' => 'download', 'class' => 'size-4']) Download brochure <span class="font-normal text-muted-fg">(PDF · {{ \Illuminate\Support\Number::fileSize((int) $l->brochure_size, 1) }})</span></a>
+      @endif
 
       <div class="mt-5 grid grid-cols-3 gap-3">
         @foreach ([['pin', 'Prime location', $l->location], ['file-check', 'Verified papers', 'Full document set'], ['wallet', 'Easy payment', 'Instalments available']] as [$icon, $heading, $text])
@@ -149,6 +152,7 @@
     </div>
     <div class="flex flex-wrap gap-3">
       @if ($whatsappOn)<a href="{{ $whatsapp }}" target="_blank" rel="noreferrer" class="btn-dark h-12 px-6">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-4']) Ask on WhatsApp</a>@endif
+      @if ($l->hasBrochure())<a href="{{ $asset($l->brochure_path) }}" download="{{ $l->brochureFilename() }}" class="btn-light h-12 px-6">@include('site::partials.icon', ['name' => 'download', 'class' => 'size-4']) Download brochure</a>@endif
       <a href="/contact" class="btn-light h-12 px-6">Schedule a visit</a>
     </div>
   </div>

@@ -45,10 +45,10 @@ Modules/<Name>/          one feature each; StudlyCase dirs hold classes, lowerca
   Site/                  Site — shared page data (settings, nav, meta, WhatsApp links), Support/ (YouTube id parsing, WhatsApp link builder),
                          the public layout + partials (`site::layouts.app`, `site::partials.*`) and the site.ts island
   Settings/              Setting, Settings (key/value: WhatsApp, contact, social, SEO, brand, hero), SettingsController
-  Media/                 ImageStore (resize + thumbnails via ImageMagick), UploadController
+  Media/                 ImageStore (resize + thumbnails via ImageMagick), DocumentStore (PDF brochures), UploadController
   Auth/                  AuthController — Blade login (`login` route), `logout`, password change; AdminUserSeeder
   Dashboard/             DashboardController (counts) + the widgets that fill the admin's dashboard
-  Listing/               Listing (optionally linked to a Masterplan for live availability), ListingType (admin-managed kinds: /{slug}), Feature (amenities, many-to-many),
+  Listing/               Listing (optionally linked to a Masterplan for live availability; optional PDF brochure), ListingType (admin-managed kinds: /{slug}), Feature (amenities, many-to-many),
                          ListingImage, ListingService (search: keyword + feature filters), ListingRequest, Listing/ListingType/FeatureController (admin API), ListingPages (public)
   Masterplan/            Masterplan (an SVG layout), Plot (details of one `g.plan-plot`), MasterplanService, LayoutSvg (SVG validation), MasterplanRequest, PlotsRequest, MasterplanController, MasterplanPages, plan.ts island
   Content/               TickerItem, Video, ContentController (homepage ticker + YouTube list)

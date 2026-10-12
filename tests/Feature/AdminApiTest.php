@@ -69,6 +69,39 @@ class AdminApiTest extends TestCase
         $this->assertDatabaseMissing('listings', ['id' => $id]);
     }
 
+    public function test_listing_brochure_is_a_pdf_that_can_be_replaced_and_removed(): void
+    {
+        $this->actingAs($this->admin);
+        $listing = Listing::query()->where('slug', 'corner-plot-block-c')->firstOrFail();
+        $pdf = fn (string $name) => UploadedFile::fake()->createWithContent($name, "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF");
+
+        // The extension does not make it a PDF: the content is checked.
+        $this->post("/api/admin/listings/{$listing->id}/brochure", ['file' => UploadedFile::fake()->createWithContent('fake.pdf', 'hello')], ['Accept' => 'application/json'])
+            ->assertStatus(422)->assertJsonValidationErrors(['file']);
+        $this->post("/api/admin/listings/{$listing->id}/brochure", ['file' => UploadedFile::fake()->createWithContent('layout.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>')], ['Accept' => 'application/json'])
+            ->assertStatus(422)->assertJsonValidationErrors(['file']);
+
+        $first = $this->post("/api/admin/listings/{$listing->id}/brochure", ['file' => $pdf('a.pdf')], ['Accept' => 'application/json'])
+            ->assertOk()->json('listing.brochure_path');
+        $this->assertStringEndsWith('.pdf', $first);
+        Storage::disk('public')->assertExists($first);
+
+        $this->get('/plot/corner-plot-block-c')->assertOk()
+            ->assertSee('Download brochure')
+            ->assertSee('download="corner-plot-block-c-brochure.pdf"', false)
+            ->assertSee('/storage/'.$first, false);
+
+        $second = $this->post("/api/admin/listings/{$listing->id}/brochure", ['file' => $pdf('b.pdf')], ['Accept' => 'application/json'])
+            ->assertOk()->json('listing.brochure_path');
+        $this->assertNotSame($first, $second);
+        Storage::disk('public')->assertMissing($first);
+        Storage::disk('public')->assertExists($second);
+
+        $this->deleteJson("/api/admin/listings/{$listing->id}/brochure")->assertOk()->assertJsonPath('listing.brochure_path', '')->assertJsonPath('listing.brochure_size', 0);
+        Storage::disk('public')->assertMissing($second);
+        $this->get('/plot/corner-plot-block-c')->assertOk()->assertDontSee('Download brochure');
+    }
+
     public function test_listing_types_are_managed_and_drive_public_routes(): void
     {
         $this->actingAs($this->admin);

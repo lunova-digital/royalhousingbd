@@ -25,6 +25,7 @@ class Listing extends Model
             'bedrooms' => 'integer',
             'baths' => 'integer',
             'featured_order' => 'integer',
+            'brochure_size' => 'integer',
         ];
     }
 
@@ -73,6 +74,17 @@ class Listing extends Model
     public function url(): string
     {
         return "/{$this->type}/{$this->slug}";
+    }
+
+    public function hasBrochure(): bool
+    {
+        return (string) $this->brochure_path !== '';
+    }
+
+    /** The file name the brochure downloads as, e.g. "corner-plot-block-c-brochure.pdf". */
+    public function brochureFilename(): string
+    {
+        return "{$this->slug}-brochure.pdf";
     }
 
     public function cover(): ?ListingImage

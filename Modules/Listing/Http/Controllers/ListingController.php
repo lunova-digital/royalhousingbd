@@ -70,6 +70,18 @@ class ListingController
         return response()->json(['message' => 'Deleted.']);
     }
 
+    public function setBrochure(Request $request, Listing $listing): JsonResponse
+    {
+        $request->validate(['file' => ['required', 'file', 'max:20480']]);
+
+        return $this->show($this->listings->setBrochure($listing, $request->file('file')));
+    }
+
+    public function deleteBrochure(Listing $listing): JsonResponse
+    {
+        return $this->show($this->listings->deleteBrochure($listing));
+    }
+
     public function featured(): JsonResponse
     {
         return response()->json(['listings' => $this->listings->featured(publishedOnly: false)]);

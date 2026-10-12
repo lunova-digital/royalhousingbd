@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { api, ApiError } from '@/lib/api'
 
+import { Brochure } from '../components/brochure'
 import { Gallery } from '../components/gallery'
 import { useFeatures, useListingTypes } from '../api'
 import { EMPTY_INPUT, listingUrl, toInput, type Feature, type Listing, type ListingInput } from '../types'
@@ -69,7 +70,7 @@ export function ListingFormPage() {
         navigate(`/listings/${listing.id}`, { replace: true, state: { created: true } })
       } else {
         const { listing } = await api<{ listing: Listing }>(`/admin/listings/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
-        setListing((current) => ({ ...listing, images: current?.images ?? listing.images }))
+        setListing((current) => ({ ...listing, images: current?.images ?? listing.images, brochure_path: current?.brochure_path ?? listing.brochure_path, brochure_size: current?.brochure_size ?? listing.brochure_size }))
         setMessage('Saved.')
       }
     } catch (err) {
@@ -272,6 +273,18 @@ export function ListingFormPage() {
             {!isNew && listing && (
               <CardContent>
                 <Gallery listingId={listing.id} images={listing.images ?? []} onChange={(images) => setListing({ ...listing, images })} />
+              </CardContent>
+            )}
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Brochure</CardTitle>
+              <CardDescription>{isNew ? 'Create the listing first, then upload a PDF brochure here.' : 'Offered as a download on the detail page.'}</CardDescription>
+            </CardHeader>
+            {!isNew && listing && (
+              <CardContent>
+                <Brochure listing={listing} onChange={setListing} />
               </CardContent>
             )}
           </Card>
