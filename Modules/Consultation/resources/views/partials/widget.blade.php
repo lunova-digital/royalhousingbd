@@ -74,7 +74,6 @@
     <p class="mt-1 text-sm text-muted-fg">{{ __('consultation::widget.success_text') }}</p>
     <p class="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-fg">{{ __('consultation::widget.reference') }} <span data-consult-ref class="ml-1 rounded-md bg-fill px-2 py-1 font-mono text-sm tracking-normal text-fg"></span></p>
     <div class="mx-auto mt-6 grid max-w-sm gap-2">
-      <a data-consult-ics href="#" class="btn-dark h-12 rounded-xl">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-4']) {{ __('consultation::widget.add_to_calendar') }}</a>
       <a data-consult-wa href="#" target="_blank" rel="noreferrer" hidden class="btn-green h-12 rounded-xl">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-4']) {{ __('consultation::widget.whatsapp_me') }}</a>
       <a data-consult-url href="#" class="btn-outline h-12 rounded-xl">{{ __('consultation::widget.view_booking') }}</a>
     </div>

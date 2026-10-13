@@ -5,7 +5,6 @@ namespace Modules\Consultation\Http\Controllers;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use Modules\Consultation\Availability;
 use Modules\Consultation\Http\Requests\BookingRequest;
@@ -73,32 +72,6 @@ class ConsultationPages
         ], ['consultation' => $consultation, 'summary' => $this->summary($consultation)]));
     }
 
-    /** An .ics the visitor can add to their phone's calendar. */
-    public function ics(string $reference): Response
-    {
-        $c = Consultation::query()->where('reference', $reference)->first() ?? abort(404);
-        $site = Site::settings()['site_name'];
-        $stamp = fn ($at) => $at->utc()->format('Ymd\THis\Z');
-        $escape = fn (string $s) => addcslashes($s, ',;\\');
-        $lines = [
-            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//'.$escape($site).'//Consultation//EN', 'METHOD:PUBLISH',
-            'BEGIN:VEVENT',
-            'UID:'.$c->reference.'@'.parse_url(Site::baseUrl(), PHP_URL_HOST),
-            'DTSTAMP:'.$stamp($c->created_at),
-            'DTSTART:'.$stamp($c->scheduled_at),
-            'DTEND:'.$stamp($c->scheduled_at->addMinutes($c->duration_minutes)),
-            'SUMMARY:'.$escape(__('consultation::page.ics_summary', ['site' => $site])),
-            'DESCRIPTION:'.$escape(__('consultation::page.ics_description', ['ref' => $c->reference, 'mode' => __('consultation::widget.mode_'.$c->mode)])),
-            'URL:'.Site::baseUrl().$c->url(),
-            'END:VEVENT', 'END:VCALENDAR',
-        ];
-
-        return response(implode("\r\n", $lines)."\r\n", 200, [
-            'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="consultation-'.strtolower($c->reference).'.ics"',
-        ]);
-    }
-
     /** The booking as the widget's success state and the confirmation page show it. */
     private function summary(Consultation $c): array
     {
@@ -108,7 +81,6 @@ class ConsultationPages
         return [
             'reference' => $c->reference,
             'url' => $c->url(),
-            'ics_url' => $c->icsUrl(),
             'date' => $c->startsAt()->isoFormat('dddd, D MMMM YYYY'),
             'time' => $c->startsAt()->isoFormat('h:mm A').' – '.$c->endsAt()->isoFormat('h:mm A'),
             'mode' => __('consultation::widget.mode_'.$c->mode),

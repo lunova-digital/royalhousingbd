@@ -82,11 +82,6 @@ class Consultation extends Model
         return '/consultation/'.$this->reference;
     }
 
-    public function icsUrl(): string
-    {
-        return $this->url().'/calendar.ics';
-    }
-
     public function isActive(): bool
     {
         return in_array($this->status, self::ACTIVE, true);

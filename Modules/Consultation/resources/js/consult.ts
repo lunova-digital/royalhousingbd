@@ -4,7 +4,7 @@
 
 interface Slot { time: string; label: string; taken: boolean }
 interface Day { date: string; weekday: string; day: string; month: string; label: string; open: number; slots: Slot[] }
-interface Summary { reference: string; url: string; ics_url: string; date: string; time: string; whatsapp_url: string | null }
+interface Summary { reference: string; url: string; date: string; time: string; whatsapp_url: string | null }
 type Labels = Record<'open' | 'full' | 'no_slots' | 'no_days' | 'load_failed' | 'generic' | 'slot' | 'selected' | 'submitting', string>
 
 const q = <T extends HTMLElement>(root: ParentNode, selector: string) => root.querySelector<T>(selector)
@@ -152,7 +152,6 @@ class Widget {
     const panel = q(this.root, '[data-consult-success]')!
     q(panel, '[data-consult-when]')!.textContent = `${c.date} · ${c.time}`
     q(panel, '[data-consult-ref]')!.textContent = c.reference
-    q<HTMLAnchorElement>(panel, '[data-consult-ics]')!.href = c.ics_url
     q<HTMLAnchorElement>(panel, '[data-consult-url]')!.href = c.url
     const wa = q<HTMLAnchorElement>(panel, '[data-consult-wa]')!
     wa.hidden = !c.whatsapp_url

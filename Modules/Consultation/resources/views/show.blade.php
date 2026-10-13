@@ -18,7 +18,6 @@
     </dl>
     @if ($c->isActive())
       <div class="mt-6 flex flex-wrap gap-2">
-        <a href="{{ $summary['ics_url'] }}" class="btn-dark h-12 rounded-xl px-5">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-4']) {{ __('consultation::widget.add_to_calendar') }}</a>
         @if ($summary['whatsapp_url'])<a href="{{ $summary['whatsapp_url'] }}" target="_blank" rel="noreferrer" class="btn-green h-12 rounded-xl px-5">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-4']) {{ __('consultation::widget.whatsapp_me') }}</a>@endif
         <a href="/projects" class="btn-outline h-12 rounded-xl px-5">{{ __('consultation::page.browse_projects') }}</a>
       </div>
@@ -32,7 +31,7 @@
       <div class="card p-5">
         <h3 class="font-semibold">{{ __('consultation::page.next_title') }}</h3>
         <ol class="mt-4 grid gap-3 text-sm">
-          @foreach (['next_1', 'next_2', 'next_3'] as $i => $key)
+          @foreach (['next_1', 'next_3'] as $i => $key)
             <li class="flex items-start gap-3"><span class="consult-step mt-0.5">{{ $i + 1 }}</span><span class="pt-0.5">{{ __('consultation::page.'.$key) }}</span></li>
           @endforeach
         </ol>

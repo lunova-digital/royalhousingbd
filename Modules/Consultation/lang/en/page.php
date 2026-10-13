@@ -32,10 +32,7 @@ return [
     'listing' => 'Listing',
     'next_title' => 'What happens next',
     'next_1' => 'I confirm the time on WhatsApp or by phone.',
-    'next_2' => 'Add it to your calendar so you do not miss it.',
     'next_3' => 'Have your questions and budget in mind — the more I know, the more useful I can be.',
     'browse_projects' => 'Browse projects meanwhile',
-    'ics_summary' => 'Free consultation – :site',
-    'ics_description' => 'Reference :ref. :mode.',
     'whatsapp_message' => 'Hello, I booked a free consultation (ref :ref) for :when. Looking forward to it.',
 ];

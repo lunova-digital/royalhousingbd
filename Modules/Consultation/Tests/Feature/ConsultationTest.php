@@ -105,7 +105,7 @@ class ConsultationTest extends TestCase
         $this->assertSame(0, Consultation::query()->count());
     }
 
-    public function test_confirmation_page_and_calendar_file(): void
+    public function test_confirmation_page(): void
     {
         $reference = $this->postJson('/consultation', $this->book())->json('consultation.reference');
 
@@ -114,14 +114,11 @@ class ConsultationTest extends TestCase
             ->assertSee('Your consultation is booked')
             ->assertSee($reference)
             ->assertSee('Tuesday, 13 October 2026')
-            ->assertSee("/consultation/{$reference}/calendar.ics")
+            ->assertDontSee("/consultation/{$reference}/calendar.ics")
+            ->assertDontSee('Add to calendar')
             ->assertDontSee('01712 345678');
 
-        $this->get("/consultation/{$reference}/calendar.ics")
-            ->assertOk()
-            ->assertHeader('Content-Type', 'text/calendar; charset=utf-8')
-            ->assertSee('DTSTART:20261013T080000Z', false)
-            ->assertSee('DTEND:20261013T083000Z', false);
+        $this->get("/consultation/{$reference}/calendar.ics")->assertNotFound();
 
         $this->get('/consultation/RC-ZZZZZZ')->assertNotFound();
     }

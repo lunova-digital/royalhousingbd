@@ -43,7 +43,6 @@ return [
     'success_title' => 'You are booked!',
     'success_text' => 'I will confirm on WhatsApp or by phone before we talk.',
     'reference' => 'Reference',
-    'add_to_calendar' => 'Add to calendar',
     'whatsapp_me' => 'Message on WhatsApp',
     'view_booking' => 'View booking',
     'book_another' => 'Book another time',
