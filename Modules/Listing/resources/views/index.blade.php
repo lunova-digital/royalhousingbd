@@ -1,153 +1,64 @@
 @extends('site::layouts.app')
 @section('content')
 @php($label = $typeName)
-@php($base = ['q' => $filter['q'], 'location' => $filter['location'], 'features' => $filter['features'], 'budget_min' => $filter['budget_min'] ?: null, 'budget_max' => $filter['budget_max'] ?: null])
-{{-- A link to this grid with some filters changed; features[] stay plain so the checkboxes read them back. --}}
-@php($query = fn (array $extra, ?string $to = null) => rtrim(($to ?? $path).'?'.preg_replace('/%5B\d+%5D=/', '%5B%5D=', http_build_query(array_filter($extra + $base, fn ($v) => $v !== null && $v !== '' && $v !== []))), '?'))
-@php($budget = $filter['budget_min'] > 0 || $filter['budget_max'] > 0)
-@php($active = $filter['q'] !== '' || $filter['location'] !== '' || $filter['features'] !== [] || $budget)
-@php($money = fn (int $amount) => \Modules\Listing\Support\Price::format($amount))
-@php($featureNames = array_column(array_filter($features, fn ($f) => in_array($f->slug, $filter['features'], true)), 'name'))
+@php($heading = $label ? __('site::common.type_listings', ['type' => $label]) : __('site::common.all_projects'))
+@php($labels = [
+  'type' => __('listing::index.chip_type'), 'location' => __('listing::index.chip_location'), 'budget' => __('listing::index.chip_budget'), 'features' => __('listing::index.chip_features'), 'sort' => __('listing::index.chip_sort'),
+  'between' => __('listing::index.budget_between', ['min' => ':min', 'max' => ':max']), 'from' => __('listing::index.budget_from', ['min' => ':min']), 'upTo' => __('listing::index.budget_up_to', ['max' => ':max']),
+  'show' => __('listing::index.show_results'), 'selected' => __('listing::index.n_selected'), 'remove' => __('listing::index.remove_filter'), 'filters' => __('listing::index.filters_btn'),
+  'search' => __('listing::index.search_label'), 'loading' => __('listing::index.loading'),
+])
 
-<section class="container-x pt-5">
-  @include('site::partials.breadcrumb', ['items' => $label ? [[__('site::common.projects'), '/projects'], [__('site::common.type_listings', ['type' => $label]), null]] : [[__('site::common.projects'), null]]])
+<section class="container-x pt-5 lg:pt-8">
+  <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+    <div>
+      @include('site::partials.breadcrumb', ['items' => $label ? [[__('site::common.projects'), '/projects'], [$heading, null]] : [[__('site::common.projects'), null]]])
+      <h1 class="mt-2 font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[32px]">{{ $heading }}</h1>
+    </div>
+  </div>
+</section>
 
-  {{-- Department-style dark panel --}}
-  <div class="dark-panel mt-4 p-6 sm:p-10 lg:p-12">
-    <span class="pill-tag">@include('site::partials.icon', ['name' => 'grid', 'class' => 'size-3.5 text-brand']) {{ $label ? __('listing::index.listing_type') : __('listing::index.catalogue') }}</span>
-    <h1 class="mt-4 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[40px]">{{ $label ? __('site::common.type_listings', ['type' => $label]) : __('site::common.all_projects') }}</h1>
-    <p class="mt-3 max-w-2xl text-base text-white/70 sm:text-lg">{{ $label ? __('listing::index.intro_type', ['type' => app()->getLocale() === 'en' ? strtolower($label) : $label, 'site' => $site_name]) : __('listing::index.intro_all', ['site' => $site_name]) }}</p>
-    <div class="mt-6 flex flex-wrap gap-2">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-2 text-xs font-bold text-white">@include('site::partials.icon', ['name' => 'grid', 'class' => 'size-3.5']) {{ trans_choice('listing::index.listing_count', $total) }}</span>
-      @foreach ([['shield-check', __('site::common.legal_documents')], ['pin', __('site::common.prime_locations')], ['wallet', __('site::common.book_over_whatsapp')]] as [$icon, $text])
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white/90">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-3.5']) {{ $text }}</span>
-      @endforeach
+<div data-filter-root data-labels="{{ json_encode($labels, JSON_UNESCAPED_UNICODE) }}" data-base="/projects">
+  {{-- Sticky bar: search + filter chips (phones) --}}
+  <div class="sticky top-16 z-30 mt-4 border-b border-line bg-page/95 backdrop-blur lg:top-[72px]" data-bar>
+    <div class="container-x py-3">
+      <div class="flex items-center gap-2">
+        <label class="relative min-w-0 flex-1"><span class="sr-only">{{ __('listing::index.search_label') }}</span><span class="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted-fg">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-[18px]'])</span><input form="lf" type="search" name="q" value="{{ $filter['q'] }}" placeholder="{{ __('listing::index.search_placeholder') }}" autocomplete="off" enterkeyhint="search" class="input h-11 rounded-full pl-11" /></label>
+        <button type="button" data-open-sheet="all" class="relative inline-flex h-11 shrink-0 items-center gap-2 rounded-full border border-line bg-white px-4 text-sm font-semibold text-fg transition-colors duration-150 hover:border-ink-950 lg:hidden">@include('site::partials.icon', ['name' => 'sliders', 'class' => 'size-[18px]']) <span>{{ __('listing::index.filters_btn') }}</span><span data-filter-count hidden class="inline-flex min-w-5 items-center justify-center rounded-full bg-ink-950 px-1.5 text-[11px] leading-5 text-white"></span></button>
+      </div>
+      <div class="scroll-row -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:hidden" data-chips>
+        @foreach (['type', 'location', 'budget', 'features', 'sort'] as $panel)
+          @continue(($panel === 'location' && ! count($locations)) || ($panel === 'features' && ! count($features)))
+          <button type="button" data-open-sheet="{{ $panel }}" data-chip="{{ $panel }}" class="filter-chip">{{ $labels[$panel] }} @include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5 opacity-70'])</button>
+        @endforeach
+      </div>
+      <ul class="mt-3 flex flex-wrap gap-2 empty:hidden" data-active-chips aria-label="{{ __('listing::index.active_filters') }}"></ul>
     </div>
   </div>
 
-  {{-- Browse by location (FR-LIST-002) --}}
-  @if (count($locations))
-    <h2 class="mt-8 flex items-baseline gap-2 font-display text-lg font-extrabold">{{ __('listing::index.browse_by_location') }} <span class="text-sm font-medium text-muted-fg">{{ trans_choice('listing::index.option_count', count($locations)) }}</span></h2>
-    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-      @foreach ($locations as $location)
-        @php($on = $location->getRawOriginal('name') === $filter['location'])
-        <a href="{{ $query(['location' => $on ? '' : $location->getRawOriginal('name'), 'page' => null]) }}" class="card flex items-center gap-3 p-3 text-sm font-semibold transition-colors hover:border-ink-950 {{ $on ? 'border-ink-950 ring-1 ring-ink-950' : '' }}">
-          <span class="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-fill font-display font-extrabold">{{ mb_strtoupper(mb_substr($location->name, 0, 1)) }}</span>
-          <span class="min-w-0 flex-1 truncate">{{ $location->name }}<span class="block truncate text-xs font-medium text-muted-fg">{{ trans_choice('site::common.project_count', $location->listings_count) }}</span></span>
-          @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4 shrink-0 text-faint-fg'])
-        </a>
-      @endforeach
-    </div>
-  @endif
-</section>
-
-<section class="container-x mt-8 grid gap-6 lg:grid-cols-[250px_1fr]">
-  {{-- Filters: type and location are links; search and features submit one GET form --}}
-  <aside class="card h-fit p-5 lg:sticky lg:top-4">
-    <div class="flex items-center justify-between gap-3">
-      <h2 class="font-display text-lg font-bold">{{ __('listing::index.filters') }}</h2>
-      @if ($active)<a href="{{ $path }}" class="text-xs font-medium text-muted-fg hover:text-fg">{{ __('listing::index.clear_all') }}</a>@endif
-    </div>
-
-    <form method="get" action="{{ $path }}" data-filter-form class="mt-4 border-t border-line pt-4">
-      @if ($filter['location'])<input type="hidden" name="location" value="{{ $filter['location'] }}" />@endif
-      <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('site::common.search') }}</h3>
-      <label class="relative mt-3 block"><span class="sr-only">{{ __('site::common.search') }}</span><span class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-faint-fg">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-4'])</span><input type="search" name="q" value="{{ $filter['q'] }}" placeholder="{{ __('listing::index.search_placeholder') }}" class="input h-10 pl-10" /></label>
-      <button type="submit" class="btn-dark mt-2 h-10 w-full">{{ __('listing::index.apply') }}</button>
-
-      {{-- Budget range: min/max in Taka, up to 100 crore; a change applies at once --}}
-      <div class="mt-5 border-t border-line pt-4">
-        <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('listing::index.budget') }}</h3>
-        <p class="mt-1 text-xs text-muted-fg">{{ __('listing::index.budget_hint') }}</p>
-        <div class="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-1">
-          @foreach (['budget_min' => __('listing::index.budget_min'), 'budget_max' => __('listing::index.budget_max')] as $name => $label)
-            <label class="grid gap-1 text-xs font-medium text-muted-fg"><span>{{ $label }}</span>
-              <span class="relative"><select name="{{ $name }}" data-autosubmit class="input h-10 appearance-none pr-8 text-sm font-semibold text-fg">
-                <option value="">{{ __('listing::index.budget_any') }}</option>
-                @foreach ($budgetSteps as $step)<option value="{{ $step }}" @selected($filter[$name] === $step)>{{ $money($step) }}</option>@endforeach
-              </select><span class="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-fg">@include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5'])</span></span>
-            </label>
-          @endforeach
-        </div>
+  <section class="container-x pt-5 pb-16 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8 lg:pt-6">
+    <div data-sheet-backdrop hidden class="fixed inset-0 z-[55] bg-ink-950/50 opacity-0 transition-opacity duration-200 lg:hidden"></div>
+    <aside data-sheet class="filter-sheet" aria-label="{{ __('listing::index.filters') }}">
+      <div class="sheet-grip lg:hidden" data-sheet-grip aria-hidden="true"><span></span></div>
+      <div class="flex items-center justify-between px-5 pt-1 pb-2 lg:px-0 lg:pt-0">
+        <h2 class="font-display text-lg font-bold tracking-[-0.02em] text-fg" data-sheet-title>{{ __('listing::index.filters') }}</h2>
+        <button type="button" data-clear-all hidden class="hidden text-sm font-medium text-muted-fg hover:text-fg lg:inline">{{ __('listing::index.clear_all') }}</button>
+        <button type="button" data-close-sheet aria-label="{{ __('listing::index.close_filters') }}" class="inline-flex size-10 items-center justify-center rounded-full text-muted-fg hover:bg-fill lg:hidden">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
       </div>
+      <div class="sheet-body px-5 lg:px-0">@include('listing::partials.filter')</div>
+      <div class="sheet-foot lg:hidden">
+        <button type="button" data-clear-all class="btn-ghost-light">{{ __('listing::index.clear') }}</button>
+        <button type="button" data-close-sheet data-show-button class="btn-consult flex-1">{{ trans_choice('listing::index.show_results', $total, ['count' => $total]) }}</button>
+      </div>
+    </aside>
 
-      @if (count($features))
-        <div class="mt-5 border-t border-line pt-4">
-          <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('listing::index.features') }}</h3>
-          <p class="mt-1 text-xs text-muted-fg">{{ __('listing::index.features_hint') }}</p>
-          <ul class="mt-3 grid gap-2.5">
-            @foreach ($features as $feature)
-              @php($on = in_array($feature->slug, $filter['features'], true))
-              <li>
-                <label class="flex cursor-pointer items-center gap-2.5 text-sm {{ $on ? 'font-semibold text-fg' : 'text-ink-800 hover:text-fg' }}">
-                  <input type="checkbox" name="features[]" value="{{ $feature->slug }}" @checked($on) data-autosubmit class="size-4 shrink-0 rounded border-faint-fg accent-ink-950" />
-                  <span class="flex-1">{{ $feature->name }}</span>
-                  <span class="text-xs text-faint-fg">{{ $feature->listings_count }}</span>
-                </label>
-              </li>
-            @endforeach
-          </ul>
-        </div>
-      @endif
-    </form>
-
-    <div class="mt-5 border-t border-line pt-4">
-      <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('site::common.type') }}</h3>
-      <ul class="mt-3 flex flex-wrap gap-2 lg:flex-col lg:gap-2.5">
-        @foreach (array_merge([[null, __('listing::index.all_types'), '/projects']], $listingTypes->map(fn ($t) => [$t->slug, $t->name, $t->url()])->all()) as [$key, $name, $href])
-          @php($on = $type === $key)
-          <li><a href="{{ $query(['page' => null], $href) }}" class="flex items-center gap-2.5 text-sm {{ $on ? 'font-semibold text-fg' : 'text-ink-800 hover:text-fg' }}"><span class="inline-flex size-4 items-center justify-center rounded-full border {{ $on ? 'border-ink-950 bg-ink-950' : 'border-faint-fg' }}">@if ($on)<span class="size-1.5 rounded-full bg-white"></span>@endif</span>{{ $name }}</a></li>
-        @endforeach
-      </ul>
+    <div data-results role="region" aria-label="{{ __('listing::index.results_region') }}" aria-busy="false">
+      @include('listing::partials.results')
     </div>
-    @if (count($locations))
-      <div class="mt-5 border-t border-line pt-4">
-        <h3 class="text-xs font-bold uppercase tracking-[0.14em] text-muted-fg">{{ __('site::common.location') }}</h3>
-        <ul class="mt-3 flex flex-wrap gap-2 lg:flex-col lg:gap-2.5">
-          @foreach ($locations as $location)
-            @php($on = $location->getRawOriginal('name') === $filter['location'])
-            <li><a href="{{ $query(['location' => $on ? '' : $location->getRawOriginal('name'), 'page' => null]) }}" class="flex items-center gap-2.5 text-sm {{ $on ? 'font-semibold text-fg' : 'text-ink-800 hover:text-fg' }}"><span class="inline-flex size-4 items-center justify-center rounded border {{ $on ? 'border-ink-950 bg-ink-950 text-white' : 'border-faint-fg' }}">@if ($on)@include('site::partials.icon', ['name' => 'check', 'class' => 'size-3'])@endif</span><span class="flex-1">{{ $location->name }}</span><span class="text-xs tabular-nums text-faint-fg">{{ $location->listings_count }}</span></a></li>
-          @endforeach
-        </ul>
-      </div>
-    @endif
-  </aside>
-
-  <div>
-    <div class="card flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 text-sm">
-      <p>{!! __('listing::index.showing', ['shown' => '<strong class="font-semibold">'.count($listings).'</strong>', 'total' => $total]) !!}</p>
-      <p class="flex flex-wrap items-center gap-1.5 text-muted-fg">
-        @if ($filter['q'])<span>{!! __('listing::index.for_query', ['q' => '<strong class="font-semibold text-fg">'.e($filter['q']).'</strong>']) !!}</span>@endif
-        @if ($filter['location'])<span>{!! __('listing::index.in_location', ['location' => '<strong class="font-semibold text-fg">'.e($filter['location']).'</strong>']) !!}</span>@endif
-        @if ($budget)<span class="chip chip-gray">@if ($filter['budget_min'] > 0 && $filter['budget_max'] > 0){{ __('listing::index.budget_between', ['min' => $money($filter['budget_min']), 'max' => $money($filter['budget_max'])]) }}@elseif ($filter['budget_min'] > 0){{ __('listing::index.budget_from', ['min' => $money($filter['budget_min'])]) }}@else{{ __('listing::index.budget_up_to', ['max' => $money($filter['budget_max'])]) }}@endif</span>@endif
-        @foreach ($featureNames as $name)<span class="chip chip-gray">{{ $name }}</span>@endforeach
-        @if (! $active){{ __('listing::index.sorted_by_newest') }} @endif
-      </p>
-    </div>
-    @if (count($listings))
-      <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        @foreach ($listings as $listing)
-          @include('listing::card', ['listing' => $listing])
-        @endforeach
-      </div>
-    @else
-      <div class="card mt-4 flex flex-col items-center p-12 text-center">
-        <span class="icon-box">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-5'])</span>
-        <p class="mt-4 font-semibold">{{ __('listing::index.no_match') }}</p>
-        <p class="mt-1 text-sm text-muted-fg">{{ __('listing::index.no_match_hint') }}</p>
-        <a href="{{ $path }}" class="btn-outline mt-5 h-10">{{ __('listing::index.clear_filters') }}</a>
-      </div>
-    @endif
-
-    @if ($pages > 1)
-      <nav class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="{{ __('listing::index.pagination') }}">
-        @for ($p = 1; $p <= $pages; $p++)
-          <a href="{{ $query(['page' => $p > 1 ? $p : null]) }}"
-             class="inline-flex size-10 items-center justify-center rounded-full border text-sm font-semibold {{ $p === $page ? 'border-ink-950 bg-ink-950 text-white' : 'border-line bg-white text-fg hover:bg-fill' }}"
-             @if ($p === $page) aria-current="page" @endif>{{ $p }}</a>
-        @endfor
-      </nav>
-    @endif
-  </div>
-</section>
+  </section>
+</div>
 @endsection
+
+@push('scripts')
+  {{ Modules::vite('listing', 'resources/js/public-filter.ts') }}
+@endpush

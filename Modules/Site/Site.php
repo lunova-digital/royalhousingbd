@@ -160,7 +160,14 @@ class Site
         $parts = preg_split('/(<script\b.*?<\/script>|<style\b.*?<\/style>|<[^>]*>)/is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
         foreach ($parts as $i => $part) {
             if ($part !== '' && $part[0] !== '<') {
-                $parts[$i] = strtr($part, self::BN_DIGITS);
+                // Numeric entities (&#039;) keep their ASCII digits.
+                $pieces = preg_split('/(&#x?[0-9a-f]+;)/i', $part, -1, PREG_SPLIT_DELIM_CAPTURE);
+                foreach ($pieces as $j => $piece) {
+                    if (! str_starts_with($piece, '&#')) {
+                        $pieces[$j] = strtr($piece, self::BN_DIGITS);
+                    }
+                }
+                $parts[$i] = implode('', $pieces);
             }
         }
 

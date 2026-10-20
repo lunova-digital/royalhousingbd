@@ -26,19 +26,27 @@ class ListingService
      * `features` are slugs the listing must all have. `budget_min` / `budget_max` are Taka
      * (0 = open); setting either leaves out listings without a numeric price (call for price).
      *
-     * @param  array{type?: string, location?: string, q?: string, features?: string[], budget_min?: int, budget_max?: int, published?: bool}  $filter
+     * @param  array{type?: string, location?: string|string[], sort?: string, q?: string, features?: string[], budget_min?: int, budget_max?: int, published?: bool}  $filter
      */
     public function search(array $filter, int $perPage = 12, int $page = 1): LengthAwarePaginator
     {
-        $query = Listing::query()->with(['images', 'features', 'masterplan.plots:id,masterplan_id,status'])->orderByDesc('id');
+        $query = Listing::query()->with(['images', 'features', 'masterplan.plots:id,masterplan_id,status']);
+        // Newest first by default; price sorts leave "call for price" listings last.
+        match ($filter['sort'] ?? 'newest') {
+            'price_asc' => $query->orderByRaw('price_amount IS NULL')->orderBy('price_amount')->orderByDesc('id'),
+            'price_desc' => $query->orderByRaw('price_amount IS NULL')->orderByDesc('price_amount')->orderByDesc('id'),
+            default => $query->orderByDesc('id'),
+        };
         if (! empty($filter['type'])) {
             $query->where('type', $filter['type']);
         }
         if (! empty($filter['published'])) {
             $query->published();
         }
-        if (($location = trim($filter['location'] ?? '')) !== '') {
-            $query->where('location', $location);
+        // One location or several (names as stored, i.e. the English ones)
+        $locations = array_values(array_filter(array_map('trim', (array) ($filter['location'] ?? [])), fn ($l) => $l !== ''));
+        if ($locations) {
+            $query->whereIn('location', $locations);
         }
         foreach ($filter['features'] ?? [] as $slug) {
             $query->whereHas('features', fn (Builder $q) => $q->where('slug', $slug));

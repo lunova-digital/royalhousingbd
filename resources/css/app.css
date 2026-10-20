@@ -297,6 +297,38 @@ html.js .reveal.in { opacity: 1; transform: none; }
 .ticker-item { opacity: 0; transition: opacity 0.4s ease; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .ticker-item[data-on] { opacity: 1; }
 
-/* EN ⇄ বাং is a full server render; a cross-document view transition makes the swap a quick cross-fade instead of a flash. */
-@view-transition { navigation: auto; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.12s; }
+/* ---- Listings filter: sidebar on desktop, bottom sheet on phones ---- */
+@layer components {
+  .filter-chip { @apply inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-white px-4 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950; }
+  .filter-chip[data-active] { @apply border-ink-950 font-semibold text-fg; }
+  .active-chip { @apply inline-flex h-9 items-center gap-1.5 rounded-full bg-ink-950 pr-2.5 pl-3.5 text-[13px] font-medium text-white transition-opacity duration-150; }
+  .active-chip.is-leaving { opacity: 0; }
+  .btn-ghost-light { @apply inline-flex h-12 items-center justify-center rounded-full px-5 text-[15px] font-semibold text-fg transition-colors duration-150 hover:bg-fill disabled:opacity-40; }
+  .sheet-grip { @apply flex cursor-grab touch-none justify-center pt-2.5 pb-1; }
+  .sheet-grip span { @apply h-1 w-10 rounded-full bg-line; }
+  .sheet-foot { @apply flex items-center gap-3 border-t border-line bg-white px-5 pt-3; padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+  .info-tip { @apply relative inline-flex; }
+  .info-bubble { @apply pointer-events-none invisible absolute top-full left-0 z-20 mt-2 w-60 rounded-xl bg-ink-950 p-3 text-xs leading-snug font-normal text-white opacity-0 transition-opacity duration-150; }
+  .info-tip:hover .info-bubble, .info-tip:focus .info-bubble { @apply visible opacity-100; }
+
+  .filter-sheet { position: fixed; inset: auto 0 0 0; z-index: 60; display: flex; flex-direction: column; max-height: 80svh; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 32px rgb(15 23 42 / 0.18);
+    transform: translateY(105%); visibility: hidden; transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.25s; }
+  .filter-sheet[data-open] { transform: none; visibility: visible; transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s; }
+  .filter-sheet .sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  @media (min-width: 1024px) {
+    .filter-sheet { position: sticky; inset: auto; top: 9.5rem; z-index: auto; max-height: calc(100svh - 10.5rem); overflow-y: auto; background: transparent; border-radius: 0; box-shadow: none; transform: none; visibility: visible; transition: none; display: block; align-self: start; scrollbar-width: thin; }
+    .filter-sheet .sheet-body { overflow: visible; }
+  }
+}
+/* Single-panel mode (a chip opened just its own options): unlayered so it beats the utility classes on <summary>/<details> */
+.filter-sheet[data-single] details:not([data-active]) { display: none; }
+.filter-sheet[data-single] summary { display: none; }
+.filter-sheet[data-single] details { border-bottom: 0; }
+.card-in { animation: card-in 0.18s ease-out both; animation-delay: calc(var(--i, 0) * 30ms); }
+@keyframes card-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.skeleton { background: linear-gradient(90deg, var(--color-fill) 25%, #fbf9f6 50%, var(--color-fill) 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .card-in, .skeleton { animation: none; }
+  .filter-sheet, .filter-sheet[data-open] { transition: none; }
+}

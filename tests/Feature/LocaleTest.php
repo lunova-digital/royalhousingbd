@@ -59,7 +59,7 @@ class LocaleTest extends TestCase
     {
         $this->withUnencryptedCookie('lang', 'bn')->get('/projects')
             ->assertOk()
-            ->assertSee('এলাকা অনুযায়ী দেখুন')
+            ->assertSee('এলাকা')
             ->assertSee('ফিল্টার')
             ->assertSee('জিজ্ঞাসা করুন')
             ->assertSee('Corner plot, Block C')

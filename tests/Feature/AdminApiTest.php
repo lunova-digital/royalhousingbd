@@ -303,7 +303,7 @@ class AdminApiTest extends TestCase
     public function test_unpublished_listing_is_hidden_from_public_but_counted(): void
     {
         Listing::query()->where('type', 'plot')->update(['published' => false]);
-        $this->get('/plot')->assertOk()->assertSee('No projects match');
+        $this->get('/plot')->assertOk()->assertSee('No exact match');
         $this->actingAs($this->admin)->getJson('/api/admin/listings?type=plot')->assertOk()->assertJsonPath('total', 1);
         $this->getJson('/api/admin/listings?q=paved')->assertOk()->assertJsonPath('total', 1)->assertJsonPath('listings.0.type', 'plot');
     }

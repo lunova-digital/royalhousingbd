@@ -47,6 +47,7 @@ $icons = [
   'shield-check' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
   'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   'external' => '<path d="M7 17 17 7M8 7h9v9"/>',
+  'sliders' => '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
   'minus' => '<path d="M5 12h14"/>',
   'message-circle' => '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
   'layers' => '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5M2 17l10 5 10-5"/>',

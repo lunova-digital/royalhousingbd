@@ -42,7 +42,7 @@ class PublicPagesTest extends TestCase
         $this->get('/projects?location=Hasara+%28Munshiganj%29')->assertOk()->assertSee('Corner plot')->assertDontSee('Duplex house');
         $this->get('/plot')->assertOk()->assertSee('Narayanganj');
         $this->get('/flat?q=lake')->assertOk()->assertSee('1450 sqft flat');
-        $this->get('/flat?q=nothing-matches')->assertOk()->assertSee('No projects match');
+        $this->get('/flat?q=nothing-matches')->assertOk()->assertSee('No exact match');
     }
 
     public function test_keyword_search_matches_features_types_and_project_names(): void
@@ -65,17 +65,16 @@ class PublicPagesTest extends TestCase
     public function test_budget_range_filter_compares_the_taka_amount(): void
     {
         // Demo prices: duplex ৳ 4.5 Crore, corner plot ৳ 35 Lakh / katha, resort share ৳ 25 Lakh; the flat is "call for price".
-        $this->get('/projects?budget_max=5000000')->assertOk()->assertSee('Corner plot')->assertSee('Hilltop eco resort')->assertDontSee('Duplex house')->assertDontSee('1450 sqft flat')
-            ->assertSee('up to ৳ 50 Lakh');
-        $this->get('/projects?budget_min=10000000')->assertOk()->assertSee('Duplex house')->assertDontSee('Corner plot')->assertSee('from ৳ 1 Crore');
-        $this->get('/projects?budget_min=3000000&budget_max=4000000')->assertOk()->assertSee('Corner plot')->assertDontSee('Hilltop eco resort')->assertSee('৳ 30 Lakh – ৳ 40 Lakh');
+        $this->get('/projects?budget_max=5000000')->assertOk()->assertSee('Corner plot')->assertSee('Hilltop eco resort')->assertDontSee('Duplex house')->assertDontSee('1450 sqft flat');
+        $this->get('/projects?budget_min=10000000')->assertOk()->assertSee('Duplex house')->assertDontSee('Corner plot');
+        $this->get('/projects?budget_min=3000000&budget_max=4000000')->assertOk()->assertSee('Corner plot')->assertDontSee('Hilltop eco resort');
         // Swapped bounds are put in order; bounds are capped at 100 crore; junk is ignored.
         $this->get('/projects?budget_min=4000000&budget_max=3000000')->assertOk()->assertSee('Corner plot')->assertDontSee('Hilltop eco resort');
-        $this->get('/projects?budget_max=99999999999')->assertOk()->assertSee('Duplex house')->assertSee('up to ৳ 100 Crore');
-        $this->get('/projects?budget_min=abc')->assertOk()->assertSee('1450 sqft flat')->assertSee('Sorted by newest');
-        // The selects keep their choice and the type links carry the range along.
-        $this->get('/projects?budget_max=5000000')->assertSee('value="5000000" selected', false)->assertSee('href="/plot?budget_max=5000000"', false);
-        $this->get('/projects?budget_max=5000000&lang=bn')->assertOk()->assertSee('৳ ৫০ লাখ পর্যন্ত')->assertSee('বাজেট');
+        $this->get('/projects?budget_max=99999999999')->assertOk()->assertSee('Duplex house');
+        $this->get('/projects?budget_min=abc')->assertOk()->assertSee('1450 sqft flat');
+        // The select keeps its choice; the budget labels follow the language.
+        $this->get('/projects?budget_max=5000000')->assertSee('value="5000000" selected', false);
+        $this->get('/projects?budget_max=5000000&lang=bn')->assertOk()->assertSee('৳ ৫০ লাখ')->assertSee('বাজেট');
     }
 
     public function test_masterplan_pages_render_plots(): void
@@ -107,5 +106,20 @@ class PublicPagesTest extends TestCase
         $this->get('/nope')->assertNotFound();
         $this->get('/plot/does-not-exist')->assertNotFound();
         $this->get('/api/admin/dashboard')->assertUnauthorized();
+    }
+
+    public function test_filter_bar_asks_for_the_results_block_only(): void
+    {
+        $page = $this->get('/projects')->assertOk()->assertSee('data-filter-root', false)->assertSee('<html', false);
+        $fragment = $this->get('/projects?fragment=1&type=plot')->assertOk()->assertSee('data-results-inner', false)->assertSee('data-total="1"', false)->assertSee('Corner plot')->assertDontSee('<html', false);
+        $this->get('/projects?fragment=1&q=nothing-matches')->assertOk()->assertSee('No exact match')->assertSee('wa.me', false);
+    }
+
+    public function test_several_locations_and_price_sort(): void
+    {
+        $this->get('/projects?fragment=1&locations%5B%5D=Uttara&locations%5B%5D=Hasara+%28Munshiganj%29')->assertOk()->assertSee('Duplex house')->assertSee('Corner plot')->assertDontSee('Beachfront hotel');
+        $this->get('/projects?fragment=1&location=Uttara')->assertOk()->assertSee('Duplex house')->assertDontSee('Corner plot');
+        $this->get('/projects?fragment=1&sort=price_asc')->assertOk()->assertSeeInOrder(['Hilltop eco resort', 'Corner plot', 'Duplex house']);
+        $this->get('/projects?fragment=1&sort=price_desc')->assertOk()->assertSeeInOrder(['Duplex house', 'Corner plot', 'Hilltop eco resort']);
     }
 }

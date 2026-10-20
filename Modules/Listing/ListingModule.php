@@ -67,7 +67,7 @@ class ListingModule implements Module, Ordered, ProvidesApiRoutes, ProvidesDashb
 
     public function viteEntries(): array
     {
-        return ['resources/js/dashboard.tsx'];
+        return ['resources/js/dashboard.tsx', 'resources/js/public-filter.ts'];
     }
 
     public function dashboardScripts(): array

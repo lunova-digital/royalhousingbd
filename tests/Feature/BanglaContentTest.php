@@ -71,4 +71,9 @@ class BanglaContentTest extends TestCase
         $md = file_get_contents(base_path('storage/framework/testing/gaps.md'));
         $this->assertStringContainsString('Corner plot, Block C', $md);
     }
+
+    public function test_bangla_digits_leave_html_entities_alone(): void
+    {
+        $this->assertSame('Cox&#039;s ১২ &#x27;', Site::localizeHtml('Cox&#039;s 12 &#x27;'));
+    }
 }

@@ -34,9 +34,13 @@ class ListingPages
         if ($min > 0 && $max > 0 && $min > $max) {
             [$min, $max] = [$max, $min];
         }
+        // `locations[]` (several) and the older single `location` both work.
+        $locations = array_values(array_unique(array_filter(array_map('strval', array_merge((array) $request->query('locations', []), (array) $request->query('location', []))), fn ($l) => trim($l) !== '')));
+        $sort = in_array($request->query('sort'), ['price_asc', 'price_desc'], true) ? $request->query('sort') : 'newest';
         $filter = [
             'type' => $type,
-            'location' => (string) $request->query('location', ''),
+            'location' => $locations,
+            'sort' => $sort,
             'q' => (string) $request->query('q', ''),
             'features' => $wanted,
             'budget_min' => $min,
@@ -46,7 +50,10 @@ class ListingPages
         $page = $this->listings->search($filter, self::PER_PAGE, (int) $request->query('page', 1));
         $title = $typeName ? __('site::common.type_listings', ['type' => $typeName]) : __('listing::index.our_projects');
 
-        return view('listing::index', Site::page([
+        // The filter bar updates the results in place: it asks for just the results block.
+        $view = $request->boolean('fragment') ? 'listing::partials.results' : 'listing::index';
+
+        return view($view, Site::page([
             'title' => $title,
             'description' => __('listing::index.description', ['title' => $title]),
             'nav' => 'projects',
@@ -63,6 +70,7 @@ class ListingPages
             'filter' => $filter,
             'budgetSteps' => Price::STEPS,
             'path' => $all ? '/projects' : "/{$type}",
+            'perPage' => self::PER_PAGE,
         ]));
     }
 
