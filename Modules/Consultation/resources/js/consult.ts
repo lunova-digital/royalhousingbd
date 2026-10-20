@@ -196,7 +196,8 @@ class Widget {
 // ":count free" / ":count টি খালি" with Laravel's "singular|plural" form.
 function count(template: string, n: number): string {
   const forms = template.split('|')
-  return (forms.length > 1 && n !== 1 ? forms[1]! : forms[0]!).replace(':count', String(n))
+  const digits = document.documentElement.lang === 'bn' ? String(n).replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[Number(d)]!) : String(n)
+  return (forms.length > 1 && n !== 1 ? forms[1]! : forms[0]!).replace(':count', digits)
 }
 
 function escape(text: string): string {

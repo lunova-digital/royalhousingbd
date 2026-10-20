@@ -49,7 +49,7 @@
       @if ($stats)
         <dl class="mt-7 grid grid-cols-3 divide-x divide-white/20 sm:flex">
           @foreach ($stats as $stat)
-            <div class="px-3 first:pl-0 sm:px-8"><dt class="font-display text-xl leading-none font-bold tracking-[-0.02em] sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ $stat['label'] ?? '' }}</dd></div>
+            <div class="px-3 first:pl-0 sm:px-8"><dt class="font-display text-xl leading-none font-bold tracking-[-0.02em] sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
           @endforeach
         </dl>
       @endif

@@ -31,6 +31,11 @@ class SetLocale
             $response->headers->setCookie(cookie()->forever(self::COOKIE, $chosen, httpOnly: false, sameSite: 'lax'));
         }
 
+        // বাং: digits in the page's text become Bangla digits (counts, prices, dates, the year).
+        if ($locale === 'bn' && ! $response->isRedirection() && str_contains((string) $response->headers->get('Content-Type'), 'text/html') && is_string($response->getContent())) {
+            $response->setContent(Site::localizeHtml($response->getContent()));
+        }
+
         return $response;
     }
 }

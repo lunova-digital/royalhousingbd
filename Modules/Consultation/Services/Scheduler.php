@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Modules\Consultation\Availability;
 use Modules\Consultation\Models\Consultation;
+use Modules\Site\Site;
 
 /** The slot calendar: what the widget shows, and booking one slot without double-booking it. */
 class Scheduler
@@ -42,7 +43,7 @@ class Scheduler
                 if ($slot < $earliest) {
                     continue;
                 }
-                $slots[] = ['time' => $slot->format('H:i'), 'label' => $slot->isoFormat('h:mm A'), 'taken' => isset($taken[$slot->format('Y-m-d H:i')])];
+                $slots[] = ['time' => $slot->format('H:i'), 'label' => Availability::timeLabel($slot), 'taken' => isset($taken[$slot->format('Y-m-d H:i')])];
             }
             if ($slots === []) {
                 continue;
@@ -50,9 +51,9 @@ class Scheduler
             $days[] = [
                 'date' => $day->format('Y-m-d'),
                 'weekday' => $day->isoFormat('ddd'),
-                'day' => $day->format('j'),
+                'day' => Site::digits($day->format('j')),
                 'month' => $day->isoFormat('MMM'),
-                'label' => $day->isoFormat('dddd, D MMMM'),
+                'label' => Site::digits($day->isoFormat('dddd, D MMMM')),
                 'open' => count(array_filter($slots, fn ($s) => ! $s['taken'])),
                 'slots' => $slots,
             ];

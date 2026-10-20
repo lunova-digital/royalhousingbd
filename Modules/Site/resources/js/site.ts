@@ -19,7 +19,7 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-youtube
     if (!id) return
     const frame = document.createElement('iframe')
     frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1`
-    frame.title = 'YouTube video'
+    frame.title = button.getAttribute('aria-label') ?? ''
     frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
     frame.allowFullscreen = true
     frame.className = 'aspect-video w-full rounded-2xl'
@@ -260,7 +260,7 @@ if (videoDialog) {
     button.addEventListener('click', () => {
       const frame = document.createElement('iframe')
       frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(button.dataset.video ?? '')}?autoplay=1&rel=0&playsinline=1`
-      frame.title = 'YouTube video'
+      frame.title = button.getAttribute('aria-label') ?? ''
       frame.allow = 'autoplay; encrypted-media; picture-in-picture; web-share'
       frame.allowFullscreen = true
       frame.className = 'size-full'

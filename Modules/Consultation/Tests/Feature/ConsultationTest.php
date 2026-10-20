@@ -57,7 +57,7 @@ class ConsultationTest extends TestCase
         $days = $this->getJson('/consultation/availability?lang=bn')->assertOk()->json('days');
 
         $this->assertSame('সোম', $days[0]['weekday']);
-        $this->assertSame('12:00 PM', $days[0]['slots'][0]['label']);
+        $this->assertSame('দুপুর ১২:০০', $days[0]['slots'][0]['label']);
     }
 
     public function test_booking_a_slot_takes_it_and_notifies_the_consultant(): void

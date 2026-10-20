@@ -21,7 +21,7 @@
   @if ($stats)
     <div class="grid h-fit grid-cols-2 gap-3">
       @foreach ($stats as $i => $stat)
-        <div class="card p-5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => ['building', 'users', 'award', 'shield-check'][$i % 4], 'class' => 'size-5'])</span><p class="mt-4 font-display text-2xl font-extrabold">{{ $stat['value'] ?? '' }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ $stat['label'] ?? '' }}</p></div>
+        <div class="card p-5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => ['building', 'users', 'award', 'shield-check'][$i % 4], 'class' => 'size-5'])</span><p class="mt-4 font-display text-2xl font-extrabold">{{ $stat['value'] ?? '' }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</p></div>
       @endforeach
     </div>
   @endif
@@ -37,10 +37,10 @@
       @foreach ($leaders as $member)
         <figure class="card overflow-hidden">
           <div class="relative aspect-[4/5] bg-fill">
-            @if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ $member['name'] ?? '' }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-12'])</span>@endif
+            @if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ \Modules\Site\Site::tr($member['name'] ?? '') }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-12'])</span>@endif
             <span class="badge-sale absolute top-3 left-3">{{ __('home::about.leadership') }}</span>
           </div>
-          <figcaption class="p-4"><p class="font-display text-lg font-bold">{{ $member['name'] ?? '' }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ $member['role'] ?? '' }}</p></figcaption>
+          <figcaption class="p-4"><p class="font-display text-lg font-bold">{{ \Modules\Site\Site::tr($member['name'] ?? '') }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($member['role'] ?? '') }}</p></figcaption>
         </figure>
       @endforeach
     </div>
@@ -50,8 +50,8 @@
     <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       @foreach ($members as $member)
         <figure class="card overflow-hidden">
-          <div class="aspect-square bg-fill">@if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ $member['name'] ?? '' }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-10'])</span>@endif</div>
-          <figcaption class="p-3"><p class="text-sm font-semibold">{{ $member['name'] ?? '' }}</p><p class="mt-0.5 text-xs text-muted-fg">{{ $member['role'] ?? '' }}</p></figcaption>
+          <div class="aspect-square bg-fill">@if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ \Modules\Site\Site::tr($member['name'] ?? '') }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-10'])</span>@endif</div>
+          <figcaption class="p-3"><p class="text-sm font-semibold">{{ \Modules\Site\Site::tr($member['name'] ?? '') }}</p><p class="mt-0.5 text-xs text-muted-fg">{{ \Modules\Site\Site::tr($member['role'] ?? '') }}</p></figcaption>
         </figure>
       @endforeach
     </div>
@@ -66,9 +66,9 @@
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
       @foreach ($partners as $partner)
         <figure class="tile relative flex min-h-24 flex-col items-center justify-center gap-2 p-4 text-center">
-          @if ($partner['role'] ?? '')<span class="absolute top-2 right-2 text-[10px] text-faint-fg">{{ $partner['role'] }}</span>@endif
-          @if ($partner['logo'] ?? '')<img src="{{ $asset($partner['logo']) }}" alt="{{ $partner['name'] ?? '' }}" class="h-10 w-20 object-contain" />@endif
-          <figcaption class="font-display text-sm font-bold">{{ $partner['name'] ?? '' }}</figcaption>
+          @if ($partner['role'] ?? '')<span class="absolute top-2 right-2 text-[10px] text-faint-fg">{{ \Modules\Site\Site::tr($partner['role']) }}</span>@endif
+          @if ($partner['logo'] ?? '')<img src="{{ $asset($partner['logo']) }}" alt="{{ \Modules\Site\Site::tr($partner['name'] ?? '') }}" class="h-10 w-20 object-contain" />@endif
+          <figcaption class="font-display text-sm font-bold">{{ \Modules\Site\Site::tr($partner['name'] ?? '') }}</figcaption>
         </figure>
       @endforeach
     </div>

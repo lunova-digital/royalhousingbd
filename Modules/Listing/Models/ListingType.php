@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
+use Modules\Content\Models\Concerns\HasTranslations;
 
 /**
  * A kind of listing (Property, Plot, Flat, Resort…), managed in the admin. The
@@ -15,6 +16,16 @@ use Illuminate\Support\Facades\Route;
  */
 class ListingType extends Model
 {
+    use HasTranslations;
+
+    /** @var list<string> */
+    public static array $translatable = ['name'];
+
+    public static function translationGroup(): string
+    {
+        return 'listing_type';
+    }
+
     protected $guarded = [];
 
     protected function casts(): array

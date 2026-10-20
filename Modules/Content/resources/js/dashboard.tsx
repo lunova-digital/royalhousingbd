@@ -5,6 +5,7 @@ import { addToGroup } from '@/lib/menu'
 
 import { HomepagePage } from './pages/homepage-page'
 import { TextsPage } from './pages/texts-page'
+import { TranslationsPage } from './pages/translations-page'
 
 registerModule({
   id: 'content',
@@ -13,9 +14,11 @@ registerModule({
     [
       { label: 'Homepage', icon: HomeIcon, path: '/homepage' },
       { label: 'Site text', icon: LanguagesIcon, path: '/texts' },
+      { label: 'Bangla content', icon: LanguagesIcon, path: '/bangla' },
     ].reduce((m, item) => addToGroup(m, 'Site', item), menu),
   routes: [
     { path: 'homepage', element: <HomepagePage /> },
     { path: 'texts', element: <TextsPage /> },
+    { path: 'bangla', element: <TranslationsPage /> },
   ],
 })

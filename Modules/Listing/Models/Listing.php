@@ -7,11 +7,41 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Content\Models\Concerns\HasTranslations;
 use Modules\Masterplan\Models\Masterplan;
 
 /** Feature 1: a listing of any ListingType (FR-LIST-*), with its features (amenities). */
 class Listing extends Model
 {
+    use HasTranslations;
+
+    /** @var list<string> */
+    public static array $translatable = ['title', 'description', 'location'];
+
+    /** @var list<string> */
+    public static array $localizedNumbers = ['price', 'size', 'land_area', 'built_area', 'floor'];
+
+    public static function translationGroup(): string
+    {
+        return 'listing';
+    }
+
+    /** A listing's location is the location's English name, translated through the locations group. */
+    public function translationGroupFor(string $field): string
+    {
+        return $field === 'location' ? 'location' : 'listing';
+    }
+
+    public function translationField(string $field): string
+    {
+        return $field === 'location' ? 'value' : $field;
+    }
+
+    public function translationKey(string $field): string
+    {
+        return $field === 'location' ? (string) $this->getRawOriginal('location') : (string) $this->getKey();
+    }
+
     protected $guarded = [];
 
     protected $appends = ['type_label'];

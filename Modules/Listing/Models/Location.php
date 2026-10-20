@@ -5,6 +5,7 @@ namespace Modules\Listing\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Content\Models\Concerns\HasTranslations;
 
 /**
  * An area a listing can be in (Uttara, Mirpur, Cox's Bazar…), managed in the admin.
@@ -13,6 +14,26 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Location extends Model
 {
+    use HasTranslations;
+
+    /** @var list<string> */
+    public static array $translatable = ['name'];
+
+    public static function translationGroup(): string
+    {
+        return 'location';
+    }
+
+    public function translationField(string $field): string
+    {
+        return 'value';
+    }
+
+    public function translationKey(string $field): string
+    {
+        return (string) $this->getRawOriginal('name');
+    }
+
     protected $guarded = [];
 
     protected static function booted(): void

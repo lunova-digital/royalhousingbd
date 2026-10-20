@@ -296,3 +296,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
 /* Ticker: one announcement at a time, cross-fading */
 .ticker-item { opacity: 0; transition: opacity 0.4s ease; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .ticker-item[data-on] { opacity: 1; }
+
+/* EN ⇄ বাং is a full server render; a cross-document view transition makes the swap a quick cross-fade instead of a flash. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.12s; }

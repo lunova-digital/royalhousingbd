@@ -5,6 +5,7 @@ namespace Modules\Masterplan\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Content\Models\Concerns\HasTranslations;
 
 /**
  * Feature 2: an interactive project layout (FR-MAP-*). A masterplan is an
@@ -14,6 +15,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Masterplan extends Model
 {
+    use HasTranslations;
+
+    /** @var list<string> */
+    public static array $translatable = ['name', 'description'];
+
+    public static function translationGroup(): string
+    {
+        return 'masterplan';
+    }
+
     protected $guarded = [];
 
     protected function casts(): array

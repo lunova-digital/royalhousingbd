@@ -76,13 +76,13 @@ class ConsultationPages
     private function summary(Consultation $c): array
     {
         $settings = Site::settings();
-        $when = $c->startsAt()->isoFormat('dddd, D MMMM').' · '.$c->startsAt()->isoFormat('h:mm A');
+        $when = Site::digits($c->startsAt()->isoFormat('dddd, D MMMM')).' · '.Availability::timeLabel($c->startsAt());
 
         return [
             'reference' => $c->reference,
             'url' => $c->url(),
-            'date' => $c->startsAt()->isoFormat('dddd, D MMMM YYYY'),
-            'time' => $c->startsAt()->isoFormat('h:mm A').' – '.$c->endsAt()->isoFormat('h:mm A'),
+            'date' => Site::digits($c->startsAt()->isoFormat('dddd, D MMMM YYYY')),
+            'time' => Availability::timeLabel($c->startsAt()).' – '.Availability::timeLabel($c->endsAt()),
             'mode' => __('consultation::widget.mode_'.$c->mode),
             'status' => $c->status,
             'whatsapp_url' => ($settings['whatsapp_number'] ?? '') ? Site::whatsapp($settings, __('consultation::page.whatsapp_message', ['ref' => $c->reference, 'when' => $when])) : null,

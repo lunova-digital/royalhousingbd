@@ -75,7 +75,7 @@ class PublicPagesTest extends TestCase
         $this->get('/projects?budget_min=abc')->assertOk()->assertSee('1450 sqft flat')->assertSee('Sorted by newest');
         // The selects keep their choice and the type links carry the range along.
         $this->get('/projects?budget_max=5000000')->assertSee('value="5000000" selected', false)->assertSee('href="/plot?budget_max=5000000"', false);
-        $this->get('/projects?budget_max=5000000&lang=bn')->assertOk()->assertSee('৳ 50 লাখ পর্যন্ত')->assertSee('বাজেট');
+        $this->get('/projects?budget_max=5000000&lang=bn')->assertOk()->assertSee('৳ ৫০ লাখ পর্যন্ত')->assertSee('বাজেট');
     }
 
     public function test_masterplan_pages_render_plots(): void

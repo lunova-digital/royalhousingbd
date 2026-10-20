@@ -2,6 +2,8 @@
 
 namespace Modules\Site;
 
+use Modules\Content\Services\Translations;
+use Modules\Content\Services\TranslationSources;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Settings\Settings;
@@ -60,6 +62,13 @@ class Site
     {
         if (self::$settings === null || self::$settingsFor !== app('request')) {
             self::$settings = Settings::all();
+            if (Translations::active()) {
+                foreach (array_keys(TranslationSources::SETTINGS) as $key) {
+                    if (($bn = Translations::get('setting', $key)) !== null) {
+                        self::$settings[$key] = $bn;
+                    }
+                }
+            }
             self::$settingsFor = app('request');
         }
 
@@ -121,6 +130,47 @@ class Site
     public static function typeKey(string $slug): string
     {
         return $slug === 'five-star-hotel' ? 'hotel' : $slug;
+    }
+
+    private const BN_DIGITS = ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯'];
+
+    /** 0-9 → ০-৯ on the বাং site; untouched otherwise. */
+    public static function digits(string $text): string
+    {
+        return app()->getLocale() === 'bn' ? strtr($text, self::BN_DIGITS) : $text;
+    }
+
+    /** An admin-typed amount or size ("৳ 35 Lakh / katha") in the visitor's language: unit words and digits. */
+    public static function num(string $text): string
+    {
+        if (app()->getLocale() === 'en' || $text === '') {
+            return $text;
+        }
+        $words = require __DIR__.'/Support/units-bn.php';
+        if ($words) {
+            $text = preg_replace_callback('/[A-Za-z][A-Za-z.]*/', fn ($m) => $words[mb_strtolower($m[0])] ?? $m[0], $text);
+        }
+
+        return self::digits($text);
+    }
+
+    /** Digits inside the text of a rendered page (not tags, scripts, styles or attributes). */
+    public static function localizeHtml(string $html): string
+    {
+        $parts = preg_split('/(<script\b.*?<\/script>|<style\b.*?<\/style>|<[^>]*>)/is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+        foreach ($parts as $i => $part) {
+            if ($part !== '' && $part[0] !== '<') {
+                $parts[$i] = strtr($part, self::BN_DIGITS);
+            }
+        }
+
+        return implode('', $parts);
+    }
+
+    /** A free-standing English string (a stat label, a role) in the visitor's language. */
+    public static function tr(?string $english): string
+    {
+        return Translations::tr($english);
     }
 
     /** Turn a stored relative path ("uploads/…/x.jpg") into its URL. */

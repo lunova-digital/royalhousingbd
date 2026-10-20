@@ -6,10 +6,12 @@ use Illuminate\Routing\Router;
 use Laramod\Admin\Contracts\ProvidesDashboardScripts;
 use Laramod\Contracts\Module;
 use Laramod\Contracts\ProvidesApiRoutes;
+use Laramod\Contracts\ProvidesCommands;
 use Laramod\Contracts\ProvidesMigrations;
 use Laramod\Contracts\ProvidesViteEntries;
+use Modules\Content\Console\TranslationGapsCommand;
 
-class ContentModule implements Module, ProvidesApiRoutes, ProvidesDashboardScripts, ProvidesMigrations, ProvidesViteEntries
+class ContentModule implements Module, ProvidesApiRoutes, ProvidesCommands, ProvidesDashboardScripts, ProvidesMigrations, ProvidesViteEntries
 {
     public function name(): string
     {
@@ -24,6 +26,11 @@ class ContentModule implements Module, ProvidesApiRoutes, ProvidesDashboardScrip
     public function apiRoutes(Router $router): void
     {
         require __DIR__.'/routes/api.php';
+    }
+
+    public function commands(): array
+    {
+        return [TranslationGapsCommand::class];
     }
 
     public function migrations(): array

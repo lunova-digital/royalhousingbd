@@ -3,6 +3,7 @@
 namespace Modules\Consultation;
 
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Modules\Settings\Settings;
 use Modules\Site\Site;
 
@@ -96,6 +97,20 @@ final class Availability
     public static function now(): CarbonImmutable
     {
         return CarbonImmutable::now(self::TIMEZONE);
+    }
+
+    /** "4:30 PM", or in বাং "বিকাল ৪:৩০" (time-of-day word first, Bangla digits). */
+    public static function timeLabel(CarbonInterface $t): string
+    {
+        if (app()->getLocale() !== 'bn') {
+            return $t->isoFormat('h:mm A');
+        }
+        $h = (int) $t->format('G');
+        $word = match (true) {
+            $h < 4 => 'রাত', $h < 12 => 'সকাল', $h < 15 => 'দুপুর', $h < 18 => 'বিকাল', $h < 20 => 'সন্ধ্যা', default => 'রাত',
+        };
+
+        return $word.' '.Site::digits($t->isoFormat('h:mm'));
     }
 
     /** The first slot a visitor may still book. */
