@@ -180,6 +180,18 @@ class Site
         return Translations::tr($english);
     }
 
+    /**
+     * One of the brand SVGs (public/images/brand/{name}.svg) inlined with a class, so its text uses the page's loaded fonts
+     * (an <img> SVG would fall back to system fonts). '' when the file is missing.
+     */
+    public static function logo(string $name, string $class): string
+    {
+        static $cache = [];
+        $svg = $cache[$name] ??= (is_file($f = public_path("images/brand/{$name}.svg")) ? (string) file_get_contents($f) : '');
+
+        return $svg === '' ? '' : preg_replace('/<svg\b/', '<svg class="'.e($class).'" role="img"', $svg, 1);
+    }
+
     /** Turn a stored relative path ("uploads/…/x.jpg") into its URL. */
     public static function asset(?string $path): string
     {

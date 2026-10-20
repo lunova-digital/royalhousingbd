@@ -13,7 +13,7 @@
           @endif
         @endforeach
       </dl>
-      <div class="mt-6 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row lg:flex-col xl:flex-row">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'flex-1'])@include('site::partials.cta', ['kind' => 'consult', 'class' => 'flex-1'])</div>
+      <div class="mt-6 flex flex-col gap-3 border-t border-line pt-6 sm:flex-row lg:flex-col xl:flex-row">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'w-full'])@include('site::partials.cta', ['kind' => 'consult', 'class' => 'w-full'])</div>
     </div>
     @if ($settings['map_embed_url'] ?? '')
       <div class="card overflow-hidden"><iframe src="{{ $settings['map_embed_url'] }}" class="aspect-[4/3] w-full" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="{{ __('home::contact.location_map') }}" allowfullscreen></iframe></div>

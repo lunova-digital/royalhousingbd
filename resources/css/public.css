@@ -1,0 +1,260 @@
+/* The public site's theme, components and motion ("Ivory & Ink"). Imported by site.css (public pages) and app.css (admin). */
+
+/* Public-site theme: "Ivory & Ink". Warm ivory page, white bordered cards, near-black ink for
+   headings / dark bands / primary buttons, one brass accent. Brand red is the logo mark only;
+   WhatsApp green is the WhatsApp button only; status colours are availability only.
+   Everything below is the single place to retune the palette. */
+@theme {
+  --font-display: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-page: #faf8f5; /* --bg: page background */
+  --color-surface: #ffffff; /* cards */
+  --color-fill: #f3efe8; /* quiet fills: inputs, tracks, tiles */
+  --color-line: #e9e4dc; /* borders, dividers */
+
+  --color-ink-950: #0f172a; /* --ink: headings, primary dark buttons, dark bands */
+  --color-ink-900: #0f172a;
+  --color-ink-800: #1e293b;
+  --color-fg: #0f172a; /* headings / strong text */
+  --color-text: #334155; /* body */
+  --color-muted-fg: #5a6a7e; /* --muted: secondary text (a touch darker than #64748B so small text passes AA on ivory) */
+  --color-faint-fg: #94a3b8;
+
+  --color-accent: #b8893b; /* brass: the ONLY decorative accent (marks, dots, active states) */
+  --color-accent-text: #8a6420; /* the same brass darkened to pass AA as small text on ivory / white */
+  --color-accent-soft: #e6c98f; /* brass on dark bands */
+
+  --color-brand: #e11d2a; /* logo mark only */
+  --color-brand-600: #b91c1c;
+  --color-brand-50: #fdecec;
+
+  --color-wa: #25d366; /* WhatsApp: icon / brand green */
+  --color-wa-solid: #0c7c3d; /* WhatsApp button fill: white text passes AA on it */
+  --color-wa-text: #086b32; /* WhatsApp text links */
+  --color-whatsapp: #25d366;
+
+  --color-status-available: #16a34a;
+  --color-status-booked: #d97706;
+  --color-status-sold: #94a3b8;
+
+  /* Legacy tokens still used by inner pages (map, listing detail) */
+  --color-success: #0f8c5a;
+  --color-success-50: #e6f5ee;
+  --color-info: #1d4ed8;
+  --color-info-50: #e8effc;
+  --color-warn: #b45309;
+  --color-warn-50: #fef3c7;
+  --color-plot-available: #10b981;
+  --color-plot-booked: #f59e0b;
+  --color-plot-sold: #ef4444;
+
+  --shadow-lift: 0 8px 24px rgb(15 23 42 / 0.06);
+}
+
+/* Bangla (html lang="bn"): a face with Bengali glyphs in front of the Latin stack; the
+   layout only loads it for that locale. Bengali conjuncts need more leading and no
+   negative tracking, so the heading utilities' letter-spacing is reset too. */
+html:lang(bn) {
+  --font-display: 'Hind Siliguri', 'Noto Sans Bengali', 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Hind Siliguri', 'Noto Sans Bengali', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+html:lang(bn) :is(h1, h2, h3, .font-display) { letter-spacing: 0; }
+html:lang(bn) :is(h1, h2, h3) { line-height: 1.3; }
+html:lang(bn) :is(.pill-tag, .pill-tag-light, .eyebrow) { letter-spacing: 0.04em; text-transform: none; }
+html:lang(bn) :is(h1, h2, h3, .font-display) { font-weight: 600; }
+
+@layer components {
+  .font-display { font-family: var(--font-display); }
+  .container-x { @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.12em] text-accent-text; }
+  .accent { @apply text-accent-text; }
+  .card { @apply rounded-[20px] border border-line bg-white; }
+  .tile { @apply rounded-xl bg-fill; }
+  .dark-panel { @apply rounded-3xl bg-ink-950 text-white; }
+  .dark-band { @apply text-white; background: radial-gradient(40% 90% at 15% 50%, rgb(232 0 45 / 0.22), transparent 60%), linear-gradient(90deg, #0b0d12, #0e1a2b); }
+  .sale-band { @apply rounded-3xl text-white; background: linear-gradient(90deg, #5a0014 0%, #2a000a 45%, #0b0d12 100%); }
+  .btn, .btn-primary, .btn-dark, .btn-light, .btn-outline, .btn-ghost, .btn-green { @apply inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-sm font-semibold transition-colors duration-200; }
+  .btn-primary { @apply bg-ink-950 text-white hover:bg-ink-800; }
+  .btn-dark { @apply bg-ink-950 text-white hover:bg-ink-800; }
+  .btn-light { @apply bg-white text-fg shadow-sm hover:bg-fill; }
+  .btn-outline { @apply border border-line bg-white text-fg hover:bg-fill; }
+  .btn-ghost { @apply border border-white/15 text-white hover:bg-white/10; }
+  .btn-green { @apply bg-wa-solid text-white hover:bg-wa-text; }
+  .btn-arrow { @apply inline-flex size-8 items-center justify-center rounded-full bg-ink-950 text-white; }
+  .chip { @apply inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold; }
+  .chip-gray { @apply bg-fill text-ink-800; }
+  .chip-red { @apply bg-brand-50 text-brand; }
+  .chip-green { @apply bg-success-50 text-success; }
+  .chip-amber { @apply bg-warn-50 text-warn; }
+  .badge-sale { @apply inline-flex items-center rounded-md bg-brand px-2 py-1 text-xs font-bold text-white; }
+  .pill-tag { @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-white/90; }
+  .pill-tag-light { @apply inline-flex items-center gap-2 rounded-full border border-brand/15 bg-brand-50 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand; }
+  .pill-nav { @apply whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-fg transition-colors hover:text-accent-text; }
+  .pill-nav-active { @apply text-fg; }
+  .icon-box { @apply inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-fill text-fg; }
+  .input { @apply h-11 w-full rounded-xl border border-line bg-white px-4 text-sm text-fg outline-none placeholder:text-faint-fg focus:border-ink-950; }
+  .link-muted { @apply text-sm text-white/65 transition-colors hover:text-white; }
+  .availability-bar { @apply bg-status-booked; }
+  .prose-light { @apply leading-relaxed text-ink-800; }
+  .prose-light h2 { @apply mt-8 mb-3 font-display text-xl font-bold text-fg; }
+
+  /* Free consultation: the booking dialog and widget */
+  .consult-dialog { @apply m-auto max-h-[calc(100svh-1.5rem)] w-[min(100%-1.5rem,44rem)] overflow-y-auto rounded-3xl border border-line bg-white p-0 text-fg shadow-2xl; }
+  .consult-dialog::backdrop { background: rgb(11 13 18 / 0.65); }
+  .consult-step { @apply inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-ink-950 text-xs font-bold text-white; }
+  .consult-day { @apply flex w-[4.75rem] shrink-0 flex-col items-center gap-0.5 rounded-2xl border border-line bg-white py-2.5 text-fg transition-colors hover:border-ink-950 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line; }
+  .consult-day[aria-pressed='true'] { @apply border-ink-950 bg-ink-950 text-white; }
+  .consult-slot { @apply h-11 rounded-xl border border-line bg-white text-sm font-semibold text-fg transition-colors hover:border-ink-950 disabled:cursor-not-allowed disabled:bg-fill disabled:text-faint-fg disabled:line-through disabled:hover:border-line; }
+  .consult-slot[aria-pressed='true'] { @apply border-ink-950 bg-ink-950 text-white; }
+  .consult-mode { @apply flex cursor-pointer items-center gap-2 rounded-xl border border-line px-3 py-2.5 text-sm font-medium transition-colors hover:border-ink-950 has-[:checked]:border-ink-950 has-[:checked]:bg-ink-950 has-[:checked]:text-white has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand; }
+}
+
+/* FAQ accordion: + closed, − open */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+.faq-minus { display: none; }
+details[open] .faq-plus { display: none; }
+details[open] .faq-minus { display: block; }
+
+/* Horizontal scrollers hide their scrollbar like the reference's category row */
+.scroll-row { scrollbar-width: none; }
+.scroll-row::-webkit-scrollbar { display: none; }
+
+/* Interactive map: plot labels mimic a printed layout (9px, 800, white halo). */
+.plan-filter[aria-pressed="false"] { opacity: 0.45; }
+.plan-label { background: transparent; border: 0; color: #111; font: 800 9px/1 Inter, sans-serif; padding: 0; box-shadow: none; pointer-events: none; text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 3px #fff; }
+.plan-label::before { display: none; }
+.leaflet-container { background: #f6f5ec; font-family: var(--font-body); }
+/* Leaflet stacks its panes and controls at z-index 400-1000. Isolating the container keeps them inside the
+   map, so on phones the fixed bottom tab bar and the floating buttons (z-40/50) stay tappable above it. */
+.leaflet-container { isolation: isolate; z-index: 0; }
+
+
+/* ---- Public chrome & homepage (Ivory & Ink) ---- */
+@layer components {
+  /* Three buttons, sitewide: WhatsApp, consult, ghost link. */
+  .btn-wa, .btn-consult { @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-[15px] font-semibold transition-colors duration-200; }
+  .btn-wa { @apply bg-wa-solid text-white hover:bg-wa-text; }
+  .btn-consult { @apply bg-ink-950 text-white hover:bg-ink-800; }
+  .on-dark .btn-consult, .btn-consult.on-dark { @apply ring-1 ring-white/30 hover:bg-white/10; }
+  .btn-sm { @apply h-10 px-4 text-sm; }
+  .link-arrow { @apply inline-flex items-center gap-1.5 text-sm font-semibold text-fg transition-colors duration-200 hover:text-accent-text; }
+  .link-arrow svg { @apply transition-transform duration-200; }
+  .link-arrow:hover svg { transform: translateX(2px); }
+
+  .section { @apply py-14 lg:py-24; }
+  .section-title { @apply font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[32px]; }
+  .lift { @apply transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift; }
+  .nav-link { @apply inline-flex h-10 items-center gap-1 rounded-full px-3.5 text-sm font-medium text-text transition-colors duration-150 hover:bg-fill hover:text-fg; }
+  .nav-link[aria-current='page'] { @apply text-fg; box-shadow: inset 0 -2px 0 var(--color-accent); border-radius: 0; }
+
+  /* Bottom sheet / popover (mobile: sheet; lg: small card above the FAB) */
+  .sheet { @apply m-0 w-full max-w-none border-0 bg-white p-0 text-fg shadow-2xl; position: fixed; inset: auto 0 0 0; border-radius: 24px 24px 0 0; max-height: 85svh; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sheet::backdrop { background: rgb(15 23 42 / 0.5); }
+  .sheet[open] { animation: sheet-up 0.2s ease-out; }
+  .chooser { }
+  @media (min-width: 1024px) {
+    .chooser { inset: auto 24px 92px auto; width: 340px; border-radius: 20px; border: 1px solid var(--color-line); }
+    .chooser[open] { animation: fade-in 0.15s ease-out; }
+  }
+  .search-dialog { @apply m-auto mt-[12svh] w-[min(100%-1.5rem,40rem)] rounded-3xl border border-line bg-white p-0 text-fg shadow-2xl; }
+  .search-dialog::backdrop { background: rgb(15 23 42 / 0.5); }
+  .video-dialog { @apply m-auto w-[min(100%-1.5rem,56rem)] rounded-3xl border-0 bg-ink-950 p-3 text-white shadow-2xl; }
+  .video-dialog::backdrop { background: rgb(15 23 42 / 0.75); }
+
+  .snap-row { @apply -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0 lg:pb-0; scroll-padding-inline: 1rem; scrollbar-width: none; }
+  .snap-row::-webkit-scrollbar { display: none; }
+  .snap-row > * { @apply w-[82%] shrink-0 snap-start sm:w-[46%] lg:w-auto; }
+}
+
+@keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Fade-up on section enter, once. Only armed when JS is running (html.js) so nothing is hidden without it. */
+html.js .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+html.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal { opacity: 1; transform: none; transition: none; }
+  .sheet[open], .chooser[open] { animation: none; }
+  .lift, .link-arrow svg { transition: none; }
+}
+
+/* Tabs on Available now: orphan cards stay hidden on lg so the grid is always full rows */
+@media (min-width: 1024px) { [data-orphan] { display: none !important; } }
+[data-tab-chip][aria-selected='true'] { background: var(--color-ink-950); color: #fff; border-color: var(--color-ink-950); }
+
+/* Ticker: one announcement at a time, cross-fading */
+.ticker-item { opacity: 0; transition: opacity 0.4s ease; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.ticker-item[data-on] { opacity: 1; }
+
+/* ---- Listings filter: sidebar on desktop, bottom sheet on phones ---- */
+@layer components {
+  .filter-chip { @apply inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-white px-4 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950; }
+  .filter-chip[data-active] { @apply border-ink-950 font-semibold text-fg; }
+  .active-chip { @apply inline-flex h-9 items-center gap-1.5 rounded-full bg-ink-950 pr-2.5 pl-3.5 text-[13px] font-medium text-white transition-opacity duration-150; }
+  .active-chip.is-leaving { opacity: 0; }
+  .btn-ghost-light { @apply inline-flex h-12 items-center justify-center rounded-full px-5 text-[15px] font-semibold text-fg transition-colors duration-150 hover:bg-fill disabled:opacity-40; }
+  .sheet-grip { @apply flex cursor-grab touch-none justify-center pt-2.5 pb-1; }
+  .sheet-grip span { @apply h-1 w-10 rounded-full bg-line; }
+  .sheet-foot { @apply flex items-center gap-3 border-t border-line bg-white px-5 pt-3; padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+  .info-tip { @apply relative inline-flex; }
+  .info-bubble { @apply pointer-events-none invisible absolute top-full left-0 z-20 mt-2 w-60 rounded-xl bg-ink-950 p-3 text-xs leading-snug font-normal text-white opacity-0 transition-opacity duration-150; }
+  .info-tip:hover .info-bubble, .info-tip:focus .info-bubble { @apply visible opacity-100; }
+
+  .filter-sheet { position: fixed; inset: auto 0 0 0; z-index: 60; display: flex; flex-direction: column; max-height: 80svh; background: #fff; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 32px rgb(15 23 42 / 0.18);
+    transform: translateY(105%); visibility: hidden; transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s 0.25s; }
+  .filter-sheet[data-open] { transform: none; visibility: visible; transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s; }
+  .filter-sheet .sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  @media (min-width: 1024px) {
+    .filter-sheet { position: sticky; inset: auto; top: 9.5rem; z-index: auto; max-height: calc(100svh - 10.5rem); overflow-y: auto; background: transparent; border-radius: 0; box-shadow: none; transform: none; visibility: visible; transition: none; display: block; align-self: start; scrollbar-width: thin; }
+    .filter-sheet .sheet-body { overflow: visible; }
+  }
+}
+/* Single-panel mode (a chip opened just its own options): unlayered so it beats the utility classes on <summary>/<details> */
+.filter-sheet[data-single] details:not([data-active]) { display: none; }
+.filter-sheet[data-single] summary { display: none; }
+.filter-sheet[data-single] details { border-bottom: 0; }
+.card-in { animation: card-in 0.18s ease-out both; animation-delay: calc(var(--i, 0) * 30ms); }
+@keyframes card-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.skeleton { background: linear-gradient(90deg, var(--color-fill) 25%, #fbf9f6 50%, var(--color-fill) 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .card-in, .skeleton { animation: none; }
+  .filter-sheet, .filter-sheet[data-open] { transition: none; }
+}
+
+/* ---- The consultation call to action: the only animated element on the site ----
+   Gradient drift (ink → dark brass → burnt orange, kept dark enough for white text to pass AA), a breathing glow,
+   a diagonal shine every ~5s and a tiny calendar wiggle. Hover/press lifts it and pauses the motion. */
+.consult-grad { background-color: #0f172a; background-image: linear-gradient(115deg, #0f172a 0%, #0f172a 28%, #7a5a22 58%, #b45309 78%, #7a5a22 100%); background-size: 300% 100%; animation: hot-shift 6s ease-in-out infinite; }
+.consult-glow { animation: hot-breathe 2.4s ease-in-out infinite; }
+.consult-grad.consult-glow { animation: hot-shift 6s ease-in-out infinite, hot-breathe 2.4s ease-in-out infinite; }
+.consult-shine { position: relative; overflow: hidden; isolation: isolate; }
+.consult-shine::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 40%; pointer-events: none; transform: translateX(-160%) skewX(-20deg); background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent); animation: hot-shine 5s ease-in-out infinite; }
+.consult-wiggle svg:first-child, .consult-wiggle > span > svg:first-child { transform-origin: 50% 70%; animation: hot-wiggle 4s ease-in-out infinite; }
+.consult-glow, .consult-shine { transition: transform 0.18s ease-out; }
+.consult-glow:hover, .consult-glow:focus-visible { transform: translateY(-2px) scale(1.02); animation-play-state: paused; }
+.consult-glow:hover::after, .consult-glow:hover svg, .consult-glow:hover { animation-play-state: paused; }
+.consult-glow:active { transform: scale(0.99); }
+@keyframes hot-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes hot-breathe { 0%, 100% { box-shadow: 0 0 0 0 rgb(184 137 59 / 0), 0 4px 14px rgb(184 137 59 / 0.16); } 50% { box-shadow: 0 0 0 7px rgb(184 137 59 / 0.14), 0 6px 22px rgb(184 137 59 / 0.3); } }
+@keyframes hot-shine { 0%, 62% { transform: translateX(-160%) skewX(-20deg); } 100% { transform: translateX(420%) skewX(-20deg); } }
+@keyframes hot-wiggle { 0%, 88%, 100% { transform: rotate(0); } 91% { transform: rotate(-14deg); } 94% { transform: rotate(12deg); } 97% { transform: rotate(-6deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .consult-grad, .consult-glow, .consult-grad.consult-glow { animation: none; }
+  .consult-grad { background-size: 100% 100%; background-image: linear-gradient(115deg, #0f172a 0%, #5a4220 100%); }
+  .consult-shine::after, .consult-wiggle svg { animation: none; display: none; }
+  .consult-glow, .consult-shine { transition: none; }
+}
+
+/* Long-form text (privacy, terms): 720px measure, generous leading */
+.legal-prose { font-size: 17px; line-height: 1.8; color: var(--color-text); }
+.legal-prose p + p { margin-top: 1.1em; }
+html:lang(bn) .legal-prose { line-height: 1.95; }
+
+/* Project map: the selected-plots panel is a side card on desktop and a bottom sheet on phones */
+.plot-sheet { position: fixed; inset: auto 0 0 0; z-index: 55; max-height: 62svh; overflow-y: auto; overscroll-behavior: contain; border-radius: 24px 24px 0 0; background: #fff; padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -8px 32px rgb(15 23 42 / 0.18); animation: sheet-up 0.22s ease-out; }
+.plot-sheet[hidden] { display: none; }
+@media (min-width: 1024px) { .plot-sheet { position: sticky; inset: auto; top: 6.5rem; z-index: auto; max-height: none; overflow: visible; border-radius: 20px; border: 1px solid var(--color-line); box-shadow: none; animation: none; } }
+@media (prefers-reduced-motion: reduce) { .plot-sheet { animation: none; } }

@@ -1,0 +1,25 @@
+/* The public site's stylesheet: Tailwind over the public views and islands only (the admin's React is not scanned),
+   so visitors download the public CSS and nothing else. */
+@import 'tailwindcss' source(none);
+@import './public.css';
+
+@source '../views';
+@source '../../Modules';
+/* ...but not the admin's React (pages, components, dashboards) */
+@source not '../../Modules/Auth';
+@source not '../../Modules/Dashboard';
+@source not '../../Modules/Settings';
+@source not '../../Modules/Media';
+@source not '../../Modules/Content/resources/js';
+@source not '../../Modules/Listing/resources/js/pages';
+@source not '../../Modules/Listing/resources/js/components';
+@source not '../../Modules/Listing/resources/js/dashboard.tsx';
+@source not '../../Modules/Masterplan/resources/js/pages';
+@source not '../../Modules/Masterplan/resources/js/components';
+@source not '../../Modules/Masterplan/resources/js/dashboard.tsx';
+@source not '../../Modules/Consultation/resources/js/pages';
+@source not '../../Modules/Consultation/resources/js/dashboard.tsx';
+
+@layer base {
+  * { border-color: var(--color-line); }
+}

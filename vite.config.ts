@@ -7,7 +7,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [
     laramod({
-      input: ['resources/css/app.css'],
+      input: ['resources/css/app.css', 'resources/css/site.css'],
       refresh: true,
     }),
     react(),

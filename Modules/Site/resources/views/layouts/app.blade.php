@@ -14,14 +14,19 @@
     @if ($og_image)<meta property="og:image" content="{{ $og_image }}" />@endif
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#faf8f5" />
-    @if ($settings['logo'] ?? '')<link rel="icon" href="{{ \Modules\Site\Site::asset($settings['logo']) }}" />@endif
+    @if ($settings['logo'] ?? '')<link rel="icon" href="{{ \Modules\Site\Site::asset($settings['logo']) }}" />@else
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    @endif
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.bunny.net" />
     {{-- Fonts load without blocking the first paint (swap shows the fallback meanwhile) --}}
     @php($fonts = 'https://fonts.bunny.net/css?family=inter:400,500,600|plus-jakarta-sans:700'.(app()->getLocale() === 'bn' ? '|hind-siliguri:400,500,600' : '').'&display=swap')
     <link rel="preload" as="style" href="{{ $fonts }}" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript><link rel="stylesheet" href="{{ $fonts }}" /></noscript>
     <script>document.documentElement.classList.add('js')</script>
-    @vite('resources/css/app.css')
+    @vite('resources/css/site.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}
     @stack('head')
   </head>
@@ -80,13 +85,12 @@
       <div class="container-x">
         <div class="on-dark rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:flex lg:items-center lg:justify-between lg:gap-10">
           <div class="max-w-xl">
-            <a href="/" class="flex items-center gap-2.5" aria-label="{{ $site_name }}">
+            <a href="/" class="inline-flex items-center">
               @if ($settings['logo'] ?? '')
-                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-white object-contain p-1" width="40" height="40" loading="lazy" />
+                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-white object-contain p-1" width="40" height="40" loading="lazy" /><span class="ml-2.5 font-display text-lg font-bold tracking-[-0.02em]">{{ $site_name }}</span>
               @else
-                <span class="inline-flex size-10 items-center justify-center rounded-xl bg-brand font-display text-lg font-bold text-white">{{ mb_substr($site_name, 0, 1) }}</span>
+                {!! \Modules\Site\Site::logo('logo-full-on-dark', 'h-10 w-auto') !!}
               @endif
-              <span class="font-display text-lg font-bold tracking-[-0.02em]">{{ $site_name }}</span>
             </a>
             <p class="mt-4 text-[15px] leading-relaxed text-white/70">{{ $settings['about_text'] ? \Illuminate\Support\Str::words($settings['about_text'], 18) : __('site::layout.footer_blurb_short') }}</p>
           </div>
@@ -98,7 +102,7 @@
 
         <div class="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_listings') }}</h3>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_listings') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm">
               <li><a href="/projects" class="text-muted-fg hover:text-fg">{{ __('site::common.all_projects') }}</a></li>
               @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="text-muted-fg hover:text-fg">{{ $t['label'] }}</a></li>@endforeach
@@ -106,7 +110,7 @@
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.company') }}</h3>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.company') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm">
               <li><a href="/about" class="text-muted-fg hover:text-fg">{{ __('site::layout.about_us') }}</a></li>
               <li><a href="/about#team" class="text-muted-fg hover:text-fg">{{ __('site::common.our_team') }}</a></li>
@@ -115,7 +119,7 @@
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.support') }}</h3>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.support') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm">
               <li><a href="/consultation" class="text-muted-fg hover:text-fg">{{ __('site::layout.free_consultation') }}</a></li>
               <li><a href="/contact" class="text-muted-fg hover:text-fg">{{ __('site::layout.book_site_visit') }}</a></li>
@@ -123,7 +127,7 @@
             </ul>
           </div>
           <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_contact') }}</h3>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_contact') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm text-muted-fg">
               @if ($phone)<li>{{ __('site::layout.hotline') }}: <a href="tel:{{ $phone }}" class="font-medium text-fg hover:underline">{{ $phone }}</a></li>@endif
               @if ($settings['email'] ?? '')<li><a href="mailto:{{ $settings['email'] }}" class="hover:text-fg">{{ $settings['email'] }}</a></li>@endif

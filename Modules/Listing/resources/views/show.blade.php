@@ -70,7 +70,7 @@
       @if ($facts)
         <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           @foreach ($facts as [$icon, $label, $value])
-            <div class="rounded-2xl border border-line bg-white p-4"><span class="text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span><dt class="mt-2 text-xs text-muted-fg">{{ $label }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $value }}</dd></div>
+            <div class="rounded-2xl border border-line bg-white p-4"><dt class="text-xs text-muted-fg"><span class="mb-2 block text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span>{{ $label }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $value }}</dd></div>
           @endforeach
         </dl>
       @endif
@@ -111,7 +111,7 @@
       <div>
         <h2 class="section-title">{{ __('site::common.project_map_title') }}</h2>
         <div class="card mt-5 overflow-hidden">
-          <button type="button" data-lightbox-src="{{ $asset($plan->image_path) }}" data-lightbox-caption="{{ __('listing::show.name_masterplan', ['name' => $plan->name]) }}" class="block w-full cursor-zoom-in bg-fill"><img src="{{ $asset($plan->image_path) }}" alt="{{ __('listing::show.name_masterplan', ['name' => $plan->name]) }}" loading="lazy" class="mx-auto max-h-[70svh] object-contain" /></button>
+          <button type="button" data-lightbox-src="{{ $asset($plan->image_path) }}" data-lightbox-caption="{{ __('listing::show.name_masterplan', ['name' => $plan->name]) }}" class="block w-full cursor-zoom-in bg-fill"><img src="{{ $asset($plan->image_path) }}" alt="{{ __('listing::show.name_masterplan', ['name' => $plan->name]) }}" width="{{ max(1, $plan->image_width) }}" height="{{ max(1, $plan->image_height) }}" loading="lazy" class="mx-auto max-h-[70svh] object-contain" /></button>
           <div class="flex flex-wrap items-center justify-between gap-3 border-t border-line p-4">
             <p class="text-sm text-muted-fg">{{ $planLive ? __('listing::show.layout_hint_interactive') : __('listing::show.layout_hint') }}</p>
             @if ($planLive)<a href="{{ $plan->url() }}" class="link-arrow">{{ __('site::common.interactive_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>@endif

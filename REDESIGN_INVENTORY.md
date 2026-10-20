@@ -70,3 +70,57 @@ The *After* column is where each item lives now; every row was checked against t
 
 Inner pages (listing index/show, map, about, contact, gallery, consultation) keep their markup; they inherit the new
 tokens, header and footer. The booking widget markup, `consult.ts` and `/consultation` endpoints are reused as-is.
+
+---
+
+# Phase 2 — every other page
+
+Same rule: nothing removed, only merged or moved. *After* is where it lives now.
+
+## Projects grid (`/projects`, `/{type}`)
+
+| Feature (before) | After |
+|---|---|
+| Dark intro panel with count + trust pills | Breadcrumb + H1; the live count is in the results line (trust pills were repeats of the homepage trust items) |
+| "Browse by location" card grid | Location filter (searchable checkbox list; chip on phones, accordion on desktop) |
+| Filter sidebar: keyword, budget min/max (+ "call for price excluded" note), features, type links, location links, Apply | One form: sticky search bar, Type pills, Budget selects (note is an info tooltip), Location, Features, **Sort** (new); instant apply, URL state, skeletons |
+| Result count line + active-filter text | "Showing X of Y" + removable chips under the bar |
+| Pagination | Same, swapped in place |
+| "No projects match" | Advisor empty state with WhatsApp + consult |
+
+## Listing detail
+
+| Feature (before) | After |
+|---|---|
+| Gallery with thumbs + lightbox | Swipeable scroll-snap gallery, counter, thumbs (desktop), lightbox with arrows/swipe/keys |
+| Availability badge / verified badge / ref | Type pill on the photo; verified tick + ref under the title; availability bar in the price block |
+| Price + size chip | Price block ("Price on request — ask an advisor"); size in the facts grid |
+| Legal note, prime location, visits note, 3 trust tiles | "Documents & verification" aside (the legal/verified/instalment items; location and visits notes were repeats) |
+| Beds/baths/floor/areas bullet list | Facts grid |
+| Call now / Book now (WhatsApp, pre-filled with the reference) / Map icon | WhatsApp (same pre-filled link) + Book consultation (carries the listing id); Call, View on map and Brochure as ghost links; sticky bar on phones |
+| Free consultation about this listing | Same button (`data-consult-listing`) |
+| PDF brochure | Ghost link |
+| Tabs: description / amenities / project map / video | One scrolling page, same four blocks |
+| Related listings | Carousel / 3-up |
+| "Need more information?" CTA band | The sticky bar + top CTAs (a third copy removed) |
+
+## Project map (`/map`, `/map/{slug}`)
+
+| Feature (before) | After |
+|---|---|
+| Dark header, legend buttons filtering statuses | Light header, legend chips (still filter) |
+| Zoom −/+/reset + percentage | Compact vertical control over the map, 44px targets |
+| Selected-plots panel, clear, per-plot remove, ref, WhatsApp (all plots in one message), call | Side card on desktop, bottom sheet on phones; WhatsApp + consultation + call link |
+| Project cards (count, price tier, status chips, "View Map") | Cards with thumbnail, availability bar, "Open map →" |
+| Plot colours | Status tokens: green / amber / **grey for sold** (was red) |
+
+## Gallery · About · Contact · Legal · Consultation · Errors
+
+| Page | Features kept |
+|---|---|
+| Gallery | Category chips, masonry grid, per-photo link to its listing, lightbox (now arrows/swipe/keys), empty states |
+| About | Story, "what makes us different", stats, leadership + team, partners; contact details moved to the footer and Contact page; closing CTA pair |
+| Contact | Hotline, email, address, hours, map embed, WhatsApp form (opens a chat), both CTAs |
+| Privacy / Terms | Admin text, 720px article, empty state |
+| Consultation page + dialog | Details → Day → Time → Confirm with progress; same slot feed, booking POST, success screen (.ics was already removed), booking reference page |
+| 404 / 500 | Back to home, browse projects, both CTAs |

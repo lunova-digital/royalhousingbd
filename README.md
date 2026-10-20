@@ -4,9 +4,9 @@ Real estate platform from the SRS (`tmp/Final SRS - Royalhousingbd.com.pdf`):
 a public website (Blade), a single-admin React panel, and Android/iOS WebView
 shells. Laravel 13 / PHP 8.3+, sqlite by default, Vite + React 19 + Tailwind v4.
 
-The public site follows the layout and interaction patterns of evaly.com.bd:
-a light, high-contrast marketplace look (white bordered cards, red accent,
-near-black hero panels and footer, Plus Jakarta Sans headings) applied to these
+The public site uses the "Ivory & Ink" theme: a warm ivory page, white bordered cards,
+near-black ink for headings and dark bands, one brass accent, Plus Jakarta Sans headings
+and the Royal Housing logo (public/images/brand), applied to these
 pages — Home, About, Projects (+ Property / Plot / Flat filters), Project Map
 (project cards → interactive layout with legend, zoom and a plot side panel),
 Gallery (derived from listing and masterplan photos), Contact (info cards + a

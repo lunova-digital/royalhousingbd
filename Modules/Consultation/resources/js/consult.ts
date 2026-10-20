@@ -23,7 +23,7 @@ class Widget {
     this.form.addEventListener('submit', (e) => void this.submit(e))
     for (const button of this.root.querySelectorAll<HTMLElement>('[data-consult-next]')) button.addEventListener('click', () => this.next())
     for (const button of this.root.querySelectorAll<HTMLElement>('[data-consult-back]')) button.addEventListener('click', () => this.goTo(this.step - 1))
-    this.goTo(1)
+    this.goTo(1, false)
     for (const input of this.form.querySelectorAll<HTMLElement>('input, select, textarea')) {
       input.addEventListener('input', () => this.clearError(input.getAttribute('name') ?? ''))
     }
@@ -115,7 +115,7 @@ class Widget {
   }
 
   // Stepped form: 1 details, 2 day, 3 time (+ the confirm button); the progress bar fills as you go.
-  private goTo(step: number) {
+  private goTo(step: number, scroll = true) {
     this.step = Math.max(1, Math.min(3, step))
     const names = ['details', 'day', 'time']
     for (const section of this.root.querySelectorAll<HTMLElement>('[data-consult-step]')) section.hidden = section.dataset.consultStep !== names[this.step - 1]
@@ -127,7 +127,7 @@ class Widget {
       if (n === this.step) item.setAttribute('aria-current', 'step')
       else item.removeAttribute('aria-current')
     }
-    this.root.closest('dialog')?.scrollTo({ top: 0 })
+    if (scroll) this.root.closest('dialog')?.scrollTo({ top: 0 })
   }
 
   private next() {

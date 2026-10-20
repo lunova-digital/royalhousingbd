@@ -7,7 +7,7 @@
 @php($meta = array_values(array_filter([$listing->sizeLabel(), $listing->bedrooms ? __('listing::card.bed', ['count' => $listing->bedrooms]) : '', $listing->bedrooms && $listing->baths ? __('listing::card.bath', ['count' => $listing->baths]) : ''])))
 <article class="card group lift relative flex h-full flex-col overflow-hidden" data-type="{{ $listing->type }}">
   <div class="relative aspect-[4/3] overflow-hidden rounded-t-[20px] bg-fill">
-    @if ($img)<img src="{{ $img }}" alt="" width="800" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif
+    @if ($img)<img src="{{ $img }}" alt="" width="800" height="600" @if ($eager ?? false) fetchpriority="high" @else loading="lazy" @endif class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif
     <span class="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-xs font-semibold text-fg">{{ $listing->typeLabel() }}</span>
   </div>
   <div class="flex flex-1 flex-col p-5">

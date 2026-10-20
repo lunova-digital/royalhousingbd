@@ -2,11 +2,12 @@
      data-total feeds the sheet's "Show N results" button. --}}
 @php($query = fn (array $extra) => rtrim($path.'?'.preg_replace('/%5B\d+%5D=/', '%5B%5D=', http_build_query(array_filter($extra + ['type' => $filter['type'] && $path === '/projects' ? $filter['type'] : null, 'q' => $filter['q'], 'locations' => $filter['location'], 'features' => $filter['features'], 'budget_min' => $filter['budget_min'] ?: null, 'budget_max' => $filter['budget_max'] ?: null, 'sort' => $filter['sort'] !== 'newest' ? $filter['sort'] : null], fn ($v) => $v !== null && $v !== '' && $v !== []))), '?'))
 <div data-results-inner data-total="{{ $total }}" data-page="{{ $page }}">
+  <h2 class="sr-only">{{ __('listing::index.results_region') }}</h2>
   <p class="text-sm text-muted-fg" aria-live="polite" data-count-line>{!! __('listing::index.showing', ['shown' => '<strong class="font-semibold text-fg">'.count($listings).'</strong>', 'total' => $total]) !!}</p>
   @if (count($listings))
     <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-grid>
       @foreach ($listings as $i => $listing)
-        <div class="card-in" style="--i: {{ min($i, 4) }}">@include('listing::card', ['listing' => $listing])</div>
+        <div class="card-in" style="--i: {{ min($i, 4) }}">@include('listing::card', ['listing' => $listing, 'eager' => $i === 0])</div>
       @endforeach
     </div>
   @else
