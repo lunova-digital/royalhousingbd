@@ -7,6 +7,7 @@ use Modules\Content\Services\Translations;
 use Modules\Content\Services\TranslationSources;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
+use Modules\Service\Models\Service;
 use Modules\Settings\Settings;
 use Modules\Site\Http\Middleware\SetLocale;
 use Modules\Site\Support\WhatsApp;
@@ -100,6 +101,7 @@ class Site
             'canonical' => self::baseUrl().'/'.ltrim(request()->path(), '/'),
             'nav' => self::NAV,
             'types' => self::types(),
+            'services' => Service::footer(),
             'nav_active' => $meta['nav'] ?? '',
             'whatsapp_float' => self::whatsapp($s, __('site::common.whatsapp_float_message', ['site' => $siteName])),
         ];

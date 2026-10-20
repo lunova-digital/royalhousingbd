@@ -103,7 +103,7 @@
           </div>
         </div>
 
-        <div class="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-10 py-12 sm:grid-cols-2 {{ $services->count() ? 'lg:grid-cols-5' : 'lg:grid-cols-4' }}">
           <div>
             <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_listings') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm">
@@ -129,6 +129,14 @@
               <li><a href="/#faq" class="text-muted-fg hover:text-fg">{{ __('home::index.faq') }}</a></li>
             </ul>
           </div>
+          @if ($services->count())
+          <div>
+            <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('service::service.other_services') }}</h2>
+            <ul class="mt-4 space-y-2.5 text-sm">
+              @foreach ($services as $service)<li><a href="{{ $service->url() }}" class="text-muted-fg hover:text-fg">{{ $service->text('title') }}</a></li>@endforeach
+            </ul>
+          </div>
+          @endif
           <div>
             <h2 class="text-xs font-semibold uppercase tracking-[0.12em] text-fg">{{ __('site::layout.footer_contact') }}</h2>
             <ul class="mt-4 space-y-2.5 text-sm text-muted-fg">

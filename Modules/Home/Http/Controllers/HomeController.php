@@ -10,6 +10,7 @@ use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Listing\Services\ListingService;
 use Modules\Masterplan\Models\Masterplan;
+use Modules\Service\Models\Service;
 use Modules\Site\Site;
 
 /** The homepage (FR-HOME-*), About/Contact (FR-COMM-002), sitemap.xml and robots.txt. */
@@ -101,6 +102,10 @@ class HomeController
         }
         foreach (Masterplan::query()->published()->get(['slug', 'updated_at']) as $masterplan) {
             $urls->push([$masterplan->url(), $masterplan->updated_at]);
+        }
+
+        foreach (Service::query()->active()->get(['slug', 'updated_at']) as $service) {
+            $urls->push([$service->url(), $service->updated_at]);
         }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";

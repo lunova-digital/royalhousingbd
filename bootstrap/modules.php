@@ -9,6 +9,7 @@ use Modules\Home\HomeModule;
 use Modules\Listing\ListingModule;
 use Modules\Masterplan\MasterplanModule;
 use Modules\Media\MediaModule;
+use Modules\Service\ServiceModule;
 use Modules\Settings\SettingsModule;
 use Modules\Site\SiteModule;
 
@@ -22,6 +23,7 @@ return [
     MasterplanModule::class,
     ContentModule::class,
     ConsultationModule::class,
+    ServiceModule::class,
     HomeModule::class,
     AdminModule::class,
 ];
