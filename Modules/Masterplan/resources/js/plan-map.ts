@@ -12,9 +12,9 @@ export type PlotStatus = 'available' | 'booked' | 'sold'
 export type PlotState = 'idle' | 'selected' | 'dimmed'
 
 export const STATUS_COLORS: Record<PlotStatus, string> = {
-  available: '#22c55e',
-  booked: '#f59e0b',
-  sold: '#ef4444',
+  available: '#16a34a',
+  booked: '#d97706',
+  sold: '#94a3b8',
 }
 
 export const STATUS_LABELS: Record<PlotStatus, string> = {

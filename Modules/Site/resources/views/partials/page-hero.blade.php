@@ -1,10 +1,10 @@
-{{-- Full-bleed dark band with breadcrumb, like the reference's About/Legal pages.
+{{-- A calm page header: breadcrumb, optional eyebrow, one title, one sub-line.
      @include('site::partials.page-hero', ['crumbs' => [['About', null]], 'title' => ..., 'text' => ..., 'chip' => ...]) --}}
-<section class="dark-band">
-  <div class="container-x py-10 sm:py-14 lg:py-16">
-    @include('site::partials.breadcrumb', ['items' => $crumbs ?? [], 'dark' => true])
-    <h1 class="mt-6 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[40px]">{{ $title }}</h1>
-    @if ($text ?? '')<p class="mt-3 max-w-2xl text-base text-white/70 sm:text-lg">{{ $text }}</p>@endif
-    @if ($chip ?? '')<span class="pill-tag mt-5">{{ $chip }}</span>@endif
+<section class="container-x pt-5 lg:pt-8">
+  @include('site::partials.breadcrumb', ['items' => $crumbs ?? []])
+  <div class="mt-4 max-w-3xl">
+    @if ($chip ?? '')<p class="eyebrow">{{ $chip }}</p>@endif
+    <h1 class="{{ ($chip ?? '') ? 'mt-2' : '' }} font-display text-[32px] leading-[1.1] font-bold tracking-[-0.02em] text-fg lg:text-[40px]">{{ $title }}</h1>
+    @if ($text ?? '')<p class="mt-3 text-base text-muted-fg sm:text-lg">{{ $text }}</p>@endif
   </div>
 </section>

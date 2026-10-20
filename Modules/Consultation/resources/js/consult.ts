@@ -5,7 +5,7 @@
 interface Slot { time: string; label: string; taken: boolean }
 interface Day { date: string; weekday: string; day: string; month: string; label: string; open: number; slots: Slot[] }
 interface Summary { reference: string; url: string; date: string; time: string; whatsapp_url: string | null }
-type Labels = Record<'open' | 'full' | 'no_slots' | 'no_days' | 'load_failed' | 'generic' | 'slot' | 'selected' | 'submitting', string>
+type Labels = Record<'open' | 'full' | 'no_slots' | 'no_days' | 'load_failed' | 'generic' | 'slot' | 'selected' | 'submitting' | 'required', string>
 
 const q = <T extends HTMLElement>(root: ParentNode, selector: string) => root.querySelector<T>(selector)
 
@@ -15,11 +15,15 @@ class Widget {
   private days: Day[] = []
   private selected: { day: Day; slot?: Slot } | null = null
   private loaded = false
+  private step = 1
 
   constructor(private root: HTMLElement) {
     this.form = q<HTMLFormElement>(root, '[data-consult-form]')!
     this.labels = JSON.parse(root.dataset.consultLabels ?? '{}') as Labels
     this.form.addEventListener('submit', (e) => void this.submit(e))
+    for (const button of this.root.querySelectorAll<HTMLElement>('[data-consult-next]')) button.addEventListener('click', () => this.next())
+    for (const button of this.root.querySelectorAll<HTMLElement>('[data-consult-back]')) button.addEventListener('click', () => this.goTo(this.step - 1))
+    this.goTo(1)
     for (const input of this.form.querySelectorAll<HTMLElement>('input, select, textarea')) {
       input.addEventListener('input', () => this.clearError(input.getAttribute('name') ?? ''))
     }
@@ -110,6 +114,37 @@ class Widget {
     }
   }
 
+  // Stepped form: 1 details, 2 day, 3 time (+ the confirm button); the progress bar fills as you go.
+  private goTo(step: number) {
+    this.step = Math.max(1, Math.min(3, step))
+    const names = ['details', 'day', 'time']
+    for (const section of this.root.querySelectorAll<HTMLElement>('[data-consult-step]')) section.hidden = section.dataset.consultStep !== names[this.step - 1]
+    for (const item of this.root.querySelectorAll<HTMLElement>('[data-progress-step]')) {
+      const n = Number(item.dataset.progressStep)
+      const bar = item.firstElementChild as HTMLElement
+      bar.className = `h-1 rounded-full transition-colors duration-200 ${n <= this.step ? 'bg-ink-950' : 'bg-line'}`
+      item.classList.toggle('text-fg', n <= this.step)
+      if (n === this.step) item.setAttribute('aria-current', 'step')
+      else item.removeAttribute('aria-current')
+    }
+    this.root.closest('dialog')?.scrollTo({ top: 0 })
+  }
+
+  private next() {
+    if (this.step === 1) {
+      let ok = true
+      for (const field of ['name', 'phone']) {
+        const input = q<HTMLInputElement>(this.form, `[name="${field}"]`)
+        if (input && input.value.trim() === '') {
+          this.showError(field, this.labels.required)
+          ok = false
+        }
+      }
+      if (!ok) return
+    }
+    this.goTo(this.step + 1)
+  }
+
   setListing(id: string) {
     q<HTMLInputElement>(this.form, '[data-consult-listing]')!.value = id
   }
@@ -118,6 +153,7 @@ class Widget {
     event.preventDefault()
     this.clearErrors()
     if (!this.selected?.slot) {
+      this.goTo(3)
       this.showError('time', this.labels.slot)
       return
     }
@@ -139,6 +175,9 @@ class Widget {
       }
       if (response.status === 422 && payload.errors) {
         for (const [field, messages] of Object.entries(payload.errors)) this.showError(field, messages[0] ?? '')
+        const fields = Object.keys(payload.errors)
+        if (fields.some((f) => ['name', 'phone', 'email', 'mode', 'topic', 'message'].includes(f))) this.goTo(1)
+        else if (fields.some((f) => ['date', 'time'].includes(f))) this.goTo(3)
         if (payload.errors.time) void this.load(true)
         return
       }
@@ -153,6 +192,10 @@ class Widget {
 
   private success(c: Summary) {
     this.form.hidden = true
+    for (const item of this.root.querySelectorAll<HTMLElement>('[data-progress-step]')) {
+      ;(item.firstElementChild as HTMLElement).className = 'h-1 rounded-full bg-ink-950'
+      item.classList.add('text-fg')
+    }
     const panel = q(this.root, '[data-consult-success]')!
     q(panel, '[data-consult-when]')!.textContent = `${c.date} · ${c.time}`
     q(panel, '[data-consult-ref]')!.textContent = c.reference

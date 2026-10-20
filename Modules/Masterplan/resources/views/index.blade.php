@@ -1,51 +1,40 @@
 @extends('site::layouts.app')
 @section('content')
 @php($asset = fn ($p) => \Modules\Site\Site::asset($p))
-<section class="container-x pt-5">
-  @include('site::partials.breadcrumb', ['items' => [[__('site::common.project_map'), null]]])
-  <div class="dark-panel mt-4 p-6 sm:p-10 lg:p-12">
-    <span class="pill-tag">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-3.5 text-brand']) {{ __('masterplan::index.eyebrow') }}</span>
-    <h1 class="mt-4 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[40px]">{{ __('masterplan::index.heading') }}</h1>
-    <p class="mt-3 max-w-2xl text-base text-white/70 sm:text-lg">{{ __('masterplan::index.intro') }}</p>
-    <div class="mt-6 flex flex-wrap gap-2">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-2 text-xs font-bold text-white">{{ trans_choice('site::common.project_count', $masterplans->count()) }}</span>
-      @foreach ([['available', 'bg-plot-available', __('site::common.available')], ['booked', 'bg-plot-booked', __('site::common.booked')], ['sold', 'bg-plot-sold', __('site::common.sold')]] as [$k, $dot, $text])
-        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3.5 py-2 text-xs font-semibold text-white/90"><span class="size-2 rounded-full {{ $dot }}"></span>{{ $text }}</span>
-      @endforeach
-    </div>
-  </div>
-</section>
+@php($totals = ['available' => 0, 'booked' => 0, 'sold' => 0])
+@foreach ($masterplans as $map)@php($c = $map->statusCounts())@php($totals = ['available' => $totals['available'] + $c['available'], 'booked' => $totals['booked'] + $c['booked'], 'sold' => $totals['sold'] + $c['sold']])@endforeach
+@include('site::partials.page-hero', ['crumbs' => [[__('site::common.project_map'), null]], 'title' => __('masterplan::index.heading'), 'text' => __('masterplan::index.intro'), 'chip' => __('masterplan::index.eyebrow')])
 
-<section class="container-x mt-8">
+<section class="container-x pt-6 pb-16 lg:pb-24">
+  <ul class="flex flex-wrap gap-2" aria-label="{{ __('masterplan::show.plot_status') }}">
+    <li class="inline-flex items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-fg">{{ trans_choice('site::common.project_count', $masterplans->count()) }}</li>
+    @foreach ([['available', 'bg-status-available', __('site::common.available')], ['booked', 'bg-status-booked', __('site::common.booked')], ['sold', 'bg-status-sold', __('site::common.sold')]] as [$k, $dot, $text])
+      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$k] }}</span> {{ $text }}</li>
+    @endforeach
+  </ul>
+
   @if ($masterplans->count())
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       @foreach ($masterplans as $map)
         @php($c = $map->statusCounts())
+        @php($total = max(1, $map->plots->count()))
         @php($prices = $map->plots->pluck('price')->filter()->unique()->values())
-        <article class="card group flex flex-col overflow-hidden transition-shadow hover:shadow-lg hover:shadow-ink-950/5">
-          <a href="{{ $map->url() }}" class="relative block aspect-[16/10] overflow-hidden bg-fill">
-            @if ($map->image_path)<img src="{{ $asset($map->image_path) }}" alt="{{ $map->name }}" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@endif
-            <span class="badge-sale absolute top-3 left-3">{{ __('masterplan::index.n_available', ['count' => $c['available']]) }}</span>
-          </a>
-          <div class="flex flex-1 flex-col p-4">
-            <h2 class="font-display text-lg font-bold">{{ $map->name }}</h2>
-            @if ($map->description)<p class="mt-1 flex items-center gap-1.5 text-sm text-muted-fg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4 shrink-0 text-brand'])<span class="truncate">{{ $map->description }}</span></p>@endif
-            <div class="mt-4 grid grid-cols-2 gap-3">
-              <div class="tile p-3 text-center"><p class="font-display text-lg font-extrabold">{{ $map->plots->count() }}</p><p class="text-xs text-muted-fg">{{ __('masterplan::index.total_plots') }}</p></div>
-              <div class="tile p-3 text-center"><p class="truncate font-display text-lg font-extrabold text-brand">{{ $prices->count() === 1 ? $prices[0] : ($prices->count() > 1 ? trans_choice('masterplan::index.price_tier_count', $prices->count()) : __('site::common.call_for_price')) }}</p><p class="text-xs text-muted-fg">{{ __('site::common.price') }}</p></div>
-            </div>
-            <div class="mt-3 flex flex-wrap gap-2">
-              <span class="chip chip-green"><span class="size-2 rounded-full bg-plot-available"></span>{{ __('masterplan::index.n_available', ['count' => $c['available']]) }}</span>
-              <span class="chip chip-amber"><span class="size-2 rounded-full bg-plot-booked"></span>{{ __('masterplan::index.n_booked', ['count' => $c['booked']]) }}</span>
-              <span class="chip chip-red"><span class="size-2 rounded-full bg-plot-sold"></span>{{ __('masterplan::index.n_sold', ['count' => $c['sold']]) }}</span>
-            </div>
-            <a href="{{ $map->url() }}" class="btn-dark mt-4 w-full">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-4']) {{ __('masterplan::index.view_map') }}</a>
-          </div>
-        </article>
+        @php($thumb = $map->image_path ? $asset($map->image_path) : \Modules\Site\Site::placeholder('masterplan', 'masterplan', (int) $map->id))
+        <a href="{{ $map->url() }}" class="card lift group flex flex-col overflow-hidden">
+          <span class="relative block aspect-[16/10] overflow-hidden bg-fill">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="500" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif</span>
+          <span class="flex flex-1 flex-col p-5">
+            <span class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ $map->name }}</span>
+            @if ($map->description)<span class="mt-1 flex items-center gap-1.5 text-sm text-muted-fg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4 shrink-0 text-accent-text'])<span class="truncate">{{ $map->description }}</span></span>@endif
+            <span class="mt-4 text-sm text-muted-fg">{{ __('home::index.available_of_total', ['available' => $c['available'], 'total' => $map->plots->count()]) }} · {{ $prices->count() === 1 ? $prices[0] : ($prices->count() > 1 ? trans_choice('masterplan::index.price_tier_count', $prices->count()) : __('listing::card.price_on_request')) }}</span>
+            <span class="mt-2 flex h-1.5 overflow-hidden rounded-full bg-fill" aria-hidden="true"><span class="bg-status-available" style="width: {{ $c['available'] * 100 / $total }}%"></span><span class="bg-status-booked" style="width: {{ $c['booked'] * 100 / $total }}%"></span><span class="bg-status-sold" style="width: {{ $c['sold'] * 100 / $total }}%"></span></span>
+            <span class="mt-2 flex gap-4 text-xs text-muted-fg"><span>{{ __('masterplan::index.n_booked', ['count' => $c['booked']]) }}</span><span>{{ __('masterplan::index.n_sold', ['count' => $c['sold']]) }}</span></span>
+            <span class="link-arrow mt-4">{{ __('home::index.open_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</span>
+          </span>
+        </a>
       @endforeach
     </div>
   @else
-    <p class="card p-16 text-center text-muted-fg">{{ __('masterplan::index.empty') }}</p>
+    <p class="mt-8 rounded-[20px] border border-line bg-white p-12 text-center text-muted-fg">{{ __('masterplan::index.empty') }}</p>
   @endif
 </section>
 @endsection

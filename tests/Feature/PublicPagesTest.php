@@ -80,7 +80,7 @@ class PublicPagesTest extends TestCase
 
     public function test_masterplan_pages_render_plots(): void
     {
-        $this->get('/map')->assertOk()->assertSee('Royal City Phase 1')->assertSee('View Map');
+        $this->get('/map')->assertOk()->assertSee('Royal City Phase 1')->assertSee('Open map');
         $masterplan = Masterplan::query()->first();
         $plot = $masterplan->plots->first();
         $this->get($masterplan->url())
@@ -98,7 +98,7 @@ class PublicPagesTest extends TestCase
 
     public function test_linked_listing_shows_plot_availability(): void
     {
-        $this->get('/plot/corner-plot-block-c')->assertOk()->assertSee('plots available')->assertSee('Project Map');
+        $this->get('/plot/corner-plot-block-c')->assertOk()->assertSee('plots open')->assertSee('Project Map');
         $this->get('/gallery')->assertOk()->assertSee('Masterplans');
     }
 

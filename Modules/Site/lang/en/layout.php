@@ -49,4 +49,6 @@ return [
     'follow_us' => 'Follow us',
     'footer_cta_title' => 'Talk to an advisor before you decide',
     'visit_us' => 'Visit us',
+    'prev' => 'Previous',
+    'next' => 'Next',
 ];

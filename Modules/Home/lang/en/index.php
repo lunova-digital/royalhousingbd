@@ -15,7 +15,7 @@ return [
     'faq_instalments_q' => 'Do you offer instalment plans?',
     'faq_instalments_a' => 'Most plots and flats can be paid for in monthly instalments after a booking amount. The schedule depends on the project; ask us for the current plan.',
     'faq_colours_q' => 'What do the colours on the project map mean?',
-    'faq_colours_a' => 'Green plots are available, amber plots are booked and red plots are sold. The map updates as soon as our team changes a plot\'s status.',
+    'faq_colours_a' => 'Green plots are available, amber plots are booked and grey plots are sold. The map updates as soon as our team changes a plot\'s status.',
     'faq_contact_q' => 'How do I get in touch?',
     'faq_contact_a' => 'WhatsApp is the fastest way. You can also call the hotline, email us, or use the contact form, which opens a WhatsApp chat with your message.',
     'trusted_by' => 'Trusted by',

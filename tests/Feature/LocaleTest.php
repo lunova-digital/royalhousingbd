@@ -67,7 +67,7 @@ class LocaleTest extends TestCase
 
         $this->withUnencryptedCookie('lang', 'bn')->get('/plot/corner-plot-block-c')
             ->assertOk()
-            ->assertSee('এখনই বুক করুন')
+            ->assertSee('হোয়াটসঅ্যাপে জিজ্ঞাসা করুন')
             ->assertSee('Corner plot, Block C');
     }
 

@@ -217,10 +217,13 @@
       </div>
     </dialog>
 
-    {{-- Lightbox for galleries --}}
-    <div data-lightbox hidden class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4">
+    {{-- Lightbox for galleries: arrows, swipe, keyboard, backdrop --}}
+    <div data-lightbox hidden class="fixed inset-0 z-[70] flex touch-pan-y items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="{{ __('site::layout.nav_gallery') }}">
       <button type="button" data-lightbox-close aria-label="{{ __('site::common.close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
-      <img data-lightbox-img src="" alt="" class="max-h-[90svh] max-w-full rounded-2xl object-contain" />
+      <button type="button" data-lightbox-prev aria-label="{{ __('site::layout.prev') }}" class="absolute top-1/2 left-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-left', 'class' => 'size-5'])</button>
+      <button type="button" data-lightbox-next aria-label="{{ __('site::layout.next') }}" class="absolute top-1/2 right-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-5'])</button>
+      <img data-lightbox-img src="" alt="" class="max-h-[84svh] max-w-full rounded-2xl object-contain select-none" draggable="false" />
+      <p class="pointer-events-none absolute inset-x-0 bottom-4 px-16 text-center text-sm text-white/80"><span data-lightbox-caption></span> <span data-lightbox-counter class="text-white/60"></span></p>
     </div>
     @includeIf('consultation::partials.launcher')
     @stack('scripts')

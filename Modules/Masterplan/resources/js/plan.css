@@ -26,15 +26,15 @@
 }
 
 .plan-layout .plan-plot.is-available :is(path, polygon, rect, circle, ellipse, polyline) {
-  fill: #22c55e !important;
+  fill: #16a34a !important;
 }
 
 .plan-layout .plan-plot.is-booked :is(path, polygon, rect, circle, ellipse, polyline) {
-  fill: #f59e0b !important;
+  fill: #d97706 !important;
 }
 
 .plan-layout .plan-plot.is-sold :is(path, polygon, rect, circle, ellipse, polyline) {
-  fill: #ef4444 !important;
+  fill: #94a3b8 !important;
 }
 
 /* A group with no details yet: faded; the builder still lets you pick it. */

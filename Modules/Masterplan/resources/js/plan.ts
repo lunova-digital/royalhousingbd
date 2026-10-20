@@ -118,9 +118,9 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
   const defaultPosition = plan.whatsapp?.project ?? ''
 
   const statusClass: Record<PlotStatus, string> = {
-    available: 'border-success/20 bg-success-50 text-success',
-    booked: 'border-warn/20 bg-warn-50 text-warn',
-    sold: 'border-brand/20 bg-brand-50 text-brand',
+    available: 'border-status-available/30 bg-status-available/10 text-wa-text',
+    booked: 'border-status-booked/30 bg-status-booked/10 text-[#92400e]',
+    sold: 'border-status-sold/40 bg-status-sold/15 text-muted-fg',
   }
 
   const restyle = () => {
@@ -182,10 +182,6 @@ function mount(container: HTMLElement, svg: SVGSVGElement, plan: Plan) {
     if (added) selected.set(plot.id, plot)
     else selected.delete(plot.id)
     render()
-    // Below lg the panel sits under the map; bring a new pick into view.
-    if (added && window.innerWidth < 1024) {
-      panel.details?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
   }
 
   document.querySelector('[data-plot-clear]')?.addEventListener('click', () => {

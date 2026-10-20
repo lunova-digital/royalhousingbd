@@ -7,4 +7,5 @@ return [
     'browse_projects' => 'Browse projects',
     'server_error' => 'Something went wrong',
     'server_error_text' => 'Please try again in a moment.',
+    'need_help' => 'Need a hand? Talk to an advisor.',
 ];

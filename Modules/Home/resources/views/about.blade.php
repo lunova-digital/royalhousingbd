@@ -3,34 +3,40 @@
 @php($asset = fn ($p) => \Modules\Site\Site::asset($p))
 @include('site::partials.page-hero', ['crumbs' => [[__('home::about.eyebrow'), null]], 'title' => $settings['about_title'], 'text' => $settings['about_text'] ?: __('home::about.intro')])
 
-<section class="container-x grid gap-8 py-10 sm:py-14 lg:grid-cols-[1fr_380px] lg:gap-14">
-  <div class="max-w-3xl">
-    <h2 class="font-display text-2xl font-bold sm:text-[26px]">{{ __('home::about.our_story') }}</h2>
-    <div class="prose-light mt-4 grid gap-4 sm:text-lg">
+@if ($stats)
+<section class="container-x pt-8">
+  <dl class="grid grid-cols-2 gap-y-6 divide-x divide-line rounded-[20px] border border-line bg-white py-6 sm:grid-cols-4">
+    @foreach ($stats as $stat)
+      <div class="px-5 text-center sm:px-6"><dt class="font-display text-[28px] leading-none font-bold tracking-[-0.02em] text-fg sm:text-[34px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-2 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
+    @endforeach
+  </dl>
+</section>
+@endif
+
+<section class="container-x grid gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
+  <div>
+    <h2 class="section-title">{{ __('home::about.our_story') }}</h2>
+    <div class="mt-4 grid gap-4 text-[17px] leading-relaxed">
       @foreach (preg_split('/\n\s*\n/', trim($settings['about_story'])) as $paragraph)
         <p>{!! nl2br(e($paragraph)) !!}</p>
       @endforeach
     </div>
-    <h2 class="mt-10 font-display text-2xl font-bold sm:text-[26px]">{{ __('home::about.different_title') }}</h2>
-    <ul class="mt-4 grid gap-3 sm:text-lg">
+  </div>
+  <div>
+    <h2 class="section-title">{{ __('home::about.different_title') }}</h2>
+    <ul class="mt-6 grid gap-5">
       @foreach ([[__('home::about.point_documents'), __('home::about.point_documents_text')], [__('home::about.point_map'), __('home::about.point_map_text')], [__('home::about.point_visits'), __('home::about.point_visits_text')], [__('home::about.point_instalments'), __('home::about.point_instalments_text')]] as [$strong, $text])
-        <li class="flex gap-3"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-brand"></span><span><strong class="font-semibold text-fg">{{ $strong }}</strong> {{ $text }}</span></li>
+        <li class="flex gap-3"><span class="mt-0.5 text-accent-text">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5'])</span><span><strong class="font-semibold text-fg">{{ $strong }}</strong> {{ $text }}</span></li>
       @endforeach
     </ul>
   </div>
-  @if ($stats)
-    <div class="grid h-fit grid-cols-2 gap-3">
-      @foreach ($stats as $i => $stat)
-        <div class="card p-5"><span class="icon-box size-10 rounded-lg">@include('site::partials.icon', ['name' => ['building', 'users', 'award', 'shield-check'][$i % 4], 'class' => 'size-5'])</span><p class="mt-4 font-display text-2xl font-extrabold">{{ $stat['value'] ?? '' }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</p></div>
-      @endforeach
-    </div>
-  @endif
+  </div>
 </section>
 
 @if ($team)
 @php($leaders = array_values(array_filter($team, fn ($m) => ! empty($m['leader']))))
 @php($members = array_values(array_filter($team, fn ($m) => empty($m['leader']))))
-<section id="team" class="container-x pb-10 sm:pb-14">
+<section id="team" class="container-x pb-12 lg:pb-20">
   @include('site::partials.section-heading', ['eyebrow' => __('home::about.our_people'), 'title' => __('home::about.meet_leadership'), 'text' => __('home::about.leadership_text')])
   @if ($leaders)
     <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -38,7 +44,7 @@
         <figure class="card overflow-hidden">
           <div class="relative aspect-[4/5] bg-fill">
             @if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ \Modules\Site\Site::tr($member['name'] ?? '') }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-12'])</span>@endif
-            <span class="badge-sale absolute top-3 left-3">{{ __('home::about.leadership') }}</span>
+            <span class="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-xs font-semibold text-fg">{{ __('home::about.leadership') }}</span>
           </div>
           <figcaption class="p-4"><p class="font-display text-lg font-bold">{{ \Modules\Site\Site::tr($member['name'] ?? '') }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($member['role'] ?? '') }}</p></figcaption>
         </figure>
@@ -60,7 +66,7 @@
 @endif
 
 @if ($partners)
-<section class="container-x pb-10 sm:pb-14">
+<section class="container-x pb-12 lg:pb-20">
   @include('site::partials.section-heading', ['eyebrow' => __('home::about.partners'), 'title' => __('home::about.partners_title'), 'text' => __('home::about.partners_text')])
   <div class="card mt-6 p-3 sm:p-4">
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
@@ -76,14 +82,10 @@
 </section>
 @endif
 
-<section class="container-x">
-  <div class="card p-6 sm:p-8">
-    <h2 class="font-display text-2xl font-bold">{{ __('site::common.contact') }}</h2>
-    <ul class="mt-4 grid gap-2 sm:text-lg">
-      @if ($settings['email'] ?? '')<li>{{ __('site::common.email') }} <a href="mailto:{{ $settings['email'] }}" class="font-semibold text-brand">{{ $settings['email'] }}</a></li>@endif
-      @if ($settings['phone'] ?? '')<li>{{ __('site::common.hotline') }} <a href="tel:{{ $settings['phone'] }}" class="font-semibold text-brand">{{ $settings['phone'] }}</a></li>@endif
-      @if ($settings['address'] ?? '')<li>{{ __('site::common.office') }}: {{ $settings['address'] }}</li>@endif
-    </ul>
+<section class="container-x pb-16 lg:pb-24">
+  <div class="on-dark flex flex-col gap-6 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+    <div><h2 class="font-display text-[28px] leading-tight font-bold tracking-[-0.02em]">{{ __('home::about.cta_title') }}</h2><p class="mt-2 max-w-lg text-white/70">{{ __('home::about.cta_text') }}</p></div>
+    <div class="flex flex-col gap-3 sm:flex-row lg:shrink-0">@include('site::partials.cta', ['kind' => 'wa'])@include('site::partials.cta', ['kind' => 'consult', 'dark' => true])</div>
   </div>
 </section>
 @endsection

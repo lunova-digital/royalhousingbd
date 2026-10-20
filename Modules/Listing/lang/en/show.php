@@ -41,4 +41,11 @@ return [
     'more_info_text' => 'Ask for the document set, a price breakdown or a site visit. We reply on WhatsApp within minutes.',
     'also_like' => 'You may also like',
     'more_type_listings' => 'More :type listings',
+    'price_on_request' => 'Price on request — ask an advisor',
+    'price_on_request_text' => 'Our advisor will share the current price and payment plan on WhatsApp.',
+    'ask_whatsapp' => 'Ask on WhatsApp',
+    'enquire_short' => 'Enquire',
+    'consult_short' => 'Consult',
+    'documents_title' => 'Documents & verification',
+    'documents_text' => 'Deed, mutation and layout approval, shared before you pay.',
 ];

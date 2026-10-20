@@ -21,4 +21,6 @@ return [
     'partners' => 'Partners',
     'partners_title' => 'Who we work with',
     'partners_text' => 'Banks, builders and consultants that help us deliver on time.',
+    'cta_title' => 'Let us help you find the right place',
+    'cta_text' => 'Talk to an advisor about your budget, the documents and a site visit.',
 ];

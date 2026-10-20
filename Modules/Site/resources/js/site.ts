@@ -27,28 +27,53 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-youtube
   })
 }
 
-// Listing gallery: thumbnails swap the main image.
-const gallery = document.querySelector<HTMLElement>('[data-gallery]')
-if (gallery) {
-  const main = gallery.querySelector<HTMLImageElement>('[data-gallery-main]')
-  const thumbs = gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]')
-  for (const thumb of thumbs) {
-    thumb.addEventListener('click', () => {
-      if (!main) return
-      main.src = thumb.dataset.galleryThumb ?? main.src
-      main.dataset.lightboxSrc = main.src
-      for (const other of thumbs) {
-        other.classList.toggle('border-ink-950', other === thumb)
-        other.classList.toggle('border-transparent', other !== thumb)
-      }
+// Listing gallery: a swipeable scroll-snap strip; thumbnails and arrows move it, a counter follows it.
+for (const gallery of document.querySelectorAll<HTMLElement>('[data-gallery]')) {
+  const slides = gallery.querySelector<HTMLElement>('[data-slides]')
+  if (!slides) continue
+  const count = slides.children.length
+  const counter = gallery.querySelector<HTMLElement>('[data-gallery-counter]')
+  const thumbs = Array.from(gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]'))
+  const index = () => Math.round(slides.scrollLeft / Math.max(1, slides.clientWidth))
+  const go = (i: number) => slides.scrollTo({ left: Math.max(0, Math.min(count - 1, i)) * slides.clientWidth, behavior: 'smooth' })
+  const sync = () => {
+    const i = index()
+    if (counter) counter.textContent = digits(`${i + 1} / ${count}`)
+    thumbs.forEach((t, n) => {
+      t.classList.toggle('border-ink-950', n === i)
+      t.classList.toggle('border-transparent', n !== i)
     })
   }
+  slides.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true })
+  thumbs.forEach((t, n) => t.addEventListener('click', () => go(n)))
+  gallery.querySelector('[data-gallery-prev]')?.addEventListener('click', () => go(index() - 1))
+  gallery.querySelector('[data-gallery-next]')?.addEventListener('click', () => go(index() + 1))
+  sync()
 }
 
-// Lightbox: anything with data-lightbox-src opens full size.
+function digits(text: string): string {
+  return document.documentElement.lang === 'bn' ? text.replace(/\d/g, (d) => '০১২৩৪৫৬৭৮৯'[Number(d)]!) : text
+}
+
+// Lightbox: anything with data-lightbox-src opens full size. Items inside one [data-lightbox-group] (or the whole
+// page, if ungrouped) can be paged through with the arrows, the keyboard or a swipe; Esc, the backdrop or ✕ close it.
 const lightbox = document.querySelector<HTMLElement>('[data-lightbox]')
 const lightboxImg = lightbox?.querySelector<HTMLImageElement>('[data-lightbox-img]')
 if (lightbox && lightboxImg) {
+  const counter = lightbox.querySelector<HTMLElement>('[data-lightbox-counter]')
+  const caption = lightbox.querySelector<HTMLElement>('[data-lightbox-caption]')
+  let items: HTMLElement[] = []
+  let at = 0
+  let startX = 0
+  const visible = (el: HTMLElement) => !el.closest('[hidden]')
+  const show = (i: number) => {
+    at = (i + items.length) % items.length
+    const el = items[at]!
+    lightboxImg.src = el.dataset.lightboxSrc ?? ''
+    if (caption) caption.textContent = el.dataset.lightboxCaption ?? ''
+    if (counter) counter.textContent = items.length > 1 ? digits(`${at + 1} / ${items.length}`) : ''
+    for (const nav of lightbox.querySelectorAll<HTMLElement>('[data-lightbox-prev], [data-lightbox-next]')) nav.hidden = items.length < 2
+  }
   const close = () => {
     lightbox.hidden = true
     lightboxImg.src = ''
@@ -58,15 +83,30 @@ if (lightbox && lightboxImg) {
     const target = (event.target as HTMLElement).closest<HTMLElement>('[data-lightbox-src]')
     if (!target) return
     event.preventDefault()
-    lightboxImg.src = target.dataset.lightboxSrc ?? ''
+    const scope = target.closest<HTMLElement>('[data-lightbox-group], [data-gallery]') ?? document.body
+    items = Array.from(scope.querySelectorAll<HTMLElement>('[data-lightbox-src]')).filter((el) => visible(el) && el.dataset.lightboxSrc)
+    const i = items.indexOf(target)
+    if (i < 0) items = [target]
     lightbox.hidden = false
     document.body.style.overflow = 'hidden'
+    show(Math.max(0, i))
   })
   lightbox.addEventListener('click', (event) => {
-    if (event.target === lightbox || (event.target as HTMLElement).closest('[data-lightbox-close]')) close()
+    const el = event.target as HTMLElement
+    if (el === lightbox || el.closest('[data-lightbox-close]')) close()
+    else if (el.closest('[data-lightbox-prev]')) show(at - 1)
+    else if (el.closest('[data-lightbox-next]')) show(at + 1)
+  })
+  lightbox.addEventListener('pointerdown', (event) => (startX = event.clientX))
+  lightbox.addEventListener('pointerup', (event) => {
+    const dx = event.clientX - startX
+    if (Math.abs(dx) > 50 && items.length > 1) show(at + (dx < 0 ? 1 : -1))
   })
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !lightbox.hidden) close()
+    if (lightbox.hidden) return
+    if (event.key === 'Escape') close()
+    else if (event.key === 'ArrowRight') show(at + 1)
+    else if (event.key === 'ArrowLeft') show(at - 1)
   })
 }
 
@@ -85,13 +125,7 @@ if (filters.length) {
         if (visible) shown++
       }
       if (empty) empty.hidden = shown > 0
-      for (const other of filters) {
-        const active = other === button
-        other.classList.toggle('bg-ink-950', active)
-        other.classList.toggle('text-white', active)
-        other.classList.toggle('bg-fill', !active)
-        other.classList.toggle('text-fg', !active)
-      }
+      for (const other of filters) other.toggleAttribute('data-active', other === button)
     })
   }
 }

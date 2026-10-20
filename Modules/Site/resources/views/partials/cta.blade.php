@@ -1,8 +1,8 @@
 {{-- The two calls to action, used everywhere so the site has one WhatsApp button and one consult button.
-     @include('site::partials.cta', ['kind' => 'wa' | 'consult', 'class' => '', 'dark' => false, 'ctaLabel' => null]) --}}
+     @include('site::partials.cta', ['kind' => 'wa' | 'consult', 'class' => '', 'dark' => false, 'waHref' => null (WhatsApp: a pre-filled message link), 'ctaLabel' => null]) --}}
 @if ($kind === 'wa')
   @if ($settings['whatsapp_number'] ?? '')
-    <a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="btn-wa {{ $class ?? '' }}">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5']) {{ $ctaLabel ?? __('site::layout.chat_whatsapp') }}</a>
+    <a href="{{ $waHref ?? $whatsapp_float }}" target="_blank" rel="noreferrer" class="btn-wa {{ $class ?? '' }}">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-5']) {{ $ctaLabel ?? __('site::layout.chat_whatsapp') }}</a>
   @endif
 @elseif (\Modules\Consultation\Availability::enabled() && ! request()->routeIs('consultation.index'))
   @php($fx = $fx ?? null)
