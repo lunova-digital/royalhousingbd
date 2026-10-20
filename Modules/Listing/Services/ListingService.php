@@ -30,7 +30,7 @@ class ListingService
      */
     public function search(array $filter, int $perPage = 12, int $page = 1): LengthAwarePaginator
     {
-        $query = Listing::query()->with(['images', 'features', 'masterplan.plots'])->orderByDesc('id');
+        $query = Listing::query()->with(['images', 'features', 'masterplan.plots:id,masterplan_id,status'])->orderByDesc('id');
         if (! empty($filter['type'])) {
             $query->where('type', $filter['type']);
         }
@@ -89,7 +89,7 @@ class ListingService
 
     public function findPublished(string $type, string $slug): ?Listing
     {
-        return Listing::query()->with(['images', 'features', 'masterplan.plots'])->published()->where('type', $type)->where('slug', $slug)->first();
+        return Listing::query()->with(['images', 'features', 'masterplan.plots:id,masterplan_id,status'])->published()->where('type', $type)->where('slug', $slug)->first();
     }
 
     /** @param  int[]  $featureIds */
@@ -188,7 +188,7 @@ class ListingService
     /** The admin-selected homepage row (FR-HOME-002), in order. */
     public function featured(bool $publishedOnly = true): array
     {
-        return Listing::query()->with(['images', 'features', 'masterplan.plots'])->where('featured', true)
+        return Listing::query()->with(['images', 'features', 'masterplan.plots:id,masterplan_id,status'])->where('featured', true)
             ->when($publishedOnly, fn ($q) => $q->published())
             ->orderBy('featured_order')->get()->all();
     }

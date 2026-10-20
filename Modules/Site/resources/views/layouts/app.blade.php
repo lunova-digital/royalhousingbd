@@ -16,8 +16,10 @@
     <meta name="theme-color" content="#faf8f5" />
     @if ($settings['logo'] ?? '')<link rel="icon" href="{{ \Modules\Site\Site::asset($settings['logo']) }}" />@endif
     <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600|plus-jakarta-sans:700&display=swap" rel="stylesheet" />
-    @if (app()->getLocale() === 'bn')<link href="https://fonts.bunny.net/css?family=hind-siliguri:400,500,600&display=swap" rel="stylesheet" />@endif
+    {{-- Fonts load without blocking the first paint (swap shows the fallback meanwhile) --}}
+    @php($fonts = 'https://fonts.bunny.net/css?family=inter:400,500,600|plus-jakarta-sans:700'.(app()->getLocale() === 'bn' ? '|hind-siliguri:400,500,600' : '').'&display=swap')
+    <link rel="preload" as="style" href="{{ $fonts }}" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="{{ $fonts }}" /></noscript>
     <script>document.documentElement.classList.add('js')</script>
     @vite('resources/css/app.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}

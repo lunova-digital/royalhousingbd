@@ -21,7 +21,10 @@
 @section('content')
 @php($asset = fn ($p) => \Modules\Site\Site::asset($p))
 @php($stats = \Modules\Site\Site::list('hero_stats'))
-@php($heroImg = ($settings['hero_image'] ?? '') ? $asset($settings['hero_image']) : '/images/placeholders/hero.webp')
+@php($heroUpload = ($settings['hero_image'] ?? '') !== '')
+@php($heroImg = $heroUpload ? $asset($settings['hero_image']) : '/images/placeholders/hero.webp')
+@php($heroSet = $heroUpload ? null : '/images/placeholders/hero-800.webp 800w, /images/placeholders/hero.webp 1600w')
+@push('head')<link rel="preload" as="image" href="{{ $heroImg }}" @if ($heroSet) imagesrcset="{{ $heroSet }}" imagesizes="(min-width: 1280px) 1200px, 100vw" @endif fetchpriority="high" />@endpush
 @php($totals = ['available' => 0, 'booked' => 0, 'sold' => 0])
 @foreach ($maps as $map)@php($c = $map->statusCounts())@php($totals = ['available' => $totals['available'] + $c['available'], 'booked' => $totals['booked'] + $c['booked'], 'sold' => $totals['sold'] + $c['sold']])@endforeach
 {{-- Featured first, then the newest, each listing once --}}
@@ -32,7 +35,7 @@
 {{-- 2. Hero --}}
 <section class="container-x pt-4 sm:pt-6">
   <div class="relative isolate flex min-h-[560px] flex-col justify-end overflow-hidden rounded-3xl bg-ink-950 text-white">
-    <img src="{{ $heroImg }}" alt="" width="1600" height="900" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover" />
+    <img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="(min-width: 1280px) 1200px, 100vw" @endif alt="" width="1600" height="900" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover" />
     <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/60 to-ink-950/10"></div>
     <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/70 via-transparent to-transparent"></div>
     <div class="on-dark px-5 pt-14 pb-6 sm:px-10 sm:pb-8 lg:px-14 lg:pt-16 lg:pb-10">

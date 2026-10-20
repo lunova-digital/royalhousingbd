@@ -24,7 +24,7 @@ class HomeController
             'latest' => Listing::query()->with('images')->published()->orderByDesc('id')->limit(8)->get()->all(),
             'ticker' => TickerItem::query()->where('active', true)->orderBy('sort_order')->orderBy('id')->get(),
             'videos' => Video::query()->orderBy('sort_order')->orderBy('id')->get(),
-            'maps' => Masterplan::query()->with('plots')->published()->orderBy('id')->get(),
+            'maps' => Masterplan::query()->with('plots:id,masterplan_id,status')->published()->orderBy('id')->get(),
         ]));
     }
 
