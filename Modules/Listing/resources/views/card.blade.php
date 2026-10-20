@@ -9,7 +9,7 @@
   <div class="relative aspect-[4/3] overflow-hidden rounded-t-[20px] bg-fill">
     @if ($img)<img src="{{ $img }}" alt="" width="800" height="600" @if ($eager ?? false) fetchpriority="high" @else loading="lazy" @endif class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif
     <span class="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-xs font-semibold text-fg">{{ $listing->typeLabel() }}</span>
-    <span class="absolute top-3 right-3 z-10">@include('account::partials.save-button', ['listing' => $listing])</span>
+    <span class="absolute top-3 right-3 z-10 flex gap-2">@include('site::partials.share-button', ['title' => $listing->title, 'text' => $listing->title.' — '.($onRequest ? __('listing::card.price_on_request') : $listing->price).' ('.$listing->location.')', 'url' => $listing->url()])@include('account::partials.save-button', ['listing' => $listing])</span>
   </div>
   <div class="flex flex-1 flex-col p-5">
     <p class="flex items-center gap-1.5 text-sm text-muted-fg"><span class="truncate">{{ $listing->location }}</span>@include('site::partials.icon', ['name' => 'check', 'class' => 'size-3.5 shrink-0 text-accent']) <span class="sr-only">{{ __('listing::card.verified') }}</span></p>

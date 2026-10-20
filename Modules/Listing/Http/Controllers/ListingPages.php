@@ -3,12 +3,15 @@
 namespace Modules\Listing\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Listing\Services\ListingService;
+use Modules\Listing\Support\OgImage;
 use Modules\Listing\Support\Price;
 use Modules\Site\Site;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /** The public listing pages: grids per type (FR-LIST-001/002) and details (FR-LIST-003/004). */
 class ListingPages
@@ -74,6 +77,18 @@ class ListingPages
         ]));
     }
 
+    /** The link-preview image of a listing; falls back to the site's own image if it cannot be generated. */
+    public function og(string $type, string $slug): BinaryFileResponse|RedirectResponse
+    {
+        $listing = $this->listings->findPublished($type, $slug) ?? abort(404);
+        $path = OgImage::path($listing);
+        if ($path === null) {
+            return redirect(Site::asset(Site::settings()['og_image'] ?? '') ?: '/apple-touch-icon.png');
+        }
+
+        return response()->file($path, ['Content-Type' => 'image/jpeg', 'Cache-Control' => 'public, max-age=86400']);
+    }
+
     public function show(string $type, string $slug): View
     {
         $listing = $this->listings->findPublished($type, $slug) ?? abort(404);
@@ -85,7 +100,11 @@ class ListingPages
         return view('listing::show', Site::page([
             'title' => $listing->title,
             'description' => __('listing::show.description', ['type' => $listing->typeLabel(), 'location' => $listing->location, 'price' => $listing->priceLabel()]),
-            'image' => $listing->cover()?->path,
+            // Link previews (Facebook, WhatsApp, X…): title + price, location · size · type, and a 1200x630 image (photo or branded card)
+            'og_title' => $listing->title.' — '.($listing->call_for_price || trim((string) $listing->price) === '' ? __('listing::card.price_on_request') : $listing->price),
+            'og_description' => implode(' · ', array_filter([$listing->location, $listing->sizeLabel(), $listing->typeLabel(), __('site::common.ref', ['ref' => $listing->reference()])])),
+            'image' => OgImage::url($listing),
+            'image_size' => [OgImage::WIDTH, OgImage::HEIGHT],
             'nav' => 'projects',
         ], [
             'listing' => $listing,

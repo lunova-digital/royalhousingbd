@@ -82,6 +82,7 @@
       </div>
       <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         @include('account::partials.save-button', ['listing' => $l, 'variant' => 'detail'])
+        @include('site::partials.share-button', ['title' => $l->title, 'text' => $l->title.' — '.($onRequest ? __('listing::show.price_on_request') : $l->price).' ('.$l->location.')', 'url' => $l->url(), 'variant' => 'detail'])
         @if ($planLive)<a href="{{ $plan->url() }}" class="link-arrow">{{ __('listing::show.view_on_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>@endif
         @if ($l->hasBrochure())<a href="{{ $asset($l->brochure_path) }}" download="{{ $l->brochureFilename() }}" class="link-arrow">{{ __('listing::show.download_brochure') }} <span class="font-normal text-muted-fg">(PDF · {{ \Illuminate\Support\Number::fileSize((int) $l->brochure_size, 1) }})</span> @include('site::partials.icon', ['name' => 'download', 'class' => 'size-4'])</a>@endif
         @if ($settings['phone'] ?? '')<a href="tel:{{ $settings['phone'] }}" class="link-arrow">{{ __('site::common.call_now') }} @include('site::partials.icon', ['name' => 'phone', 'class' => 'size-4'])</a>@endif

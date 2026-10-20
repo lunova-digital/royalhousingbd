@@ -7,13 +7,23 @@
     <title>{{ $title }}</title>
     @if ($description)<meta name="description" content="{{ $description }}" />@endif
     <link rel="canonical" href="{{ $canonical }}" />
+    {{-- Link previews: server-rendered, so crawlers (Facebook, WhatsApp, X, LinkedIn, Telegram) see them without running JS --}}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="{{ $site_name }}" />
-    <meta property="og:title" content="{{ $title }}" />
-    @if ($description)<meta property="og:description" content="{{ $description }}" />@endif
+    <meta property="og:locale" content="{{ app()->getLocale() === 'bn' ? 'bn_BD' : 'en_US' }}" />
+    <meta property="og:title" content="{{ $og_title }}" />
+    @if ($og_description)<meta property="og:description" content="{{ $og_description }}" />@endif
     <meta property="og:url" content="{{ $canonical }}" />
-    @if ($og_image)<meta property="og:image" content="{{ $og_image }}" />@endif
+    @if ($og_image)
+    <meta property="og:image" content="{{ $og_image }}" />
+    <meta property="og:image:secure_url" content="{{ str_replace('http://', 'https://', $og_image) }}" />
+    <meta property="og:image:alt" content="{{ $og_title }}" />
+    @if ($og_image_size)<meta property="og:image:width" content="{{ $og_image_size[0] }}" /><meta property="og:image:height" content="{{ $og_image_size[1] }}" />@endif
+    @endif
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ $og_title }}" />
+    @if ($og_description)<meta name="twitter:description" content="{{ $og_description }}" />@endif
+    @if ($og_image)<meta name="twitter:image" content="{{ $og_image }}" />@endif
     <meta name="theme-color" content="#faf8f5" />
     @if ($settings['logo'] ?? '')<link rel="icon" href="{{ \Modules\Site\Site::asset($settings['logo']) }}" />@else
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -250,6 +260,7 @@
       </div>
     </dialog>
 
+    @include('site::partials.share-popover')
     @unless ($acct)@include('account::partials.auth-dialog')@endunless
 
     {{-- Lightbox for galleries: arrows, swipe, keyboard, backdrop --}}

@@ -1,3 +1,5 @@
+import './share'
+
 // Shared behaviour for every server-rendered public page: mobile nav,
 // click-to-load YouTube embeds, listing galleries, the lightbox, the gallery
 // page filter, and the contact form that composes a WhatsApp message.

@@ -51,4 +51,8 @@ return [
     'visit_us' => 'Visit us',
     'prev' => 'Previous',
     'next' => 'Next',
+    'share' => 'Share',
+    'share_title' => 'Share this property',
+    'share_copy' => 'Copy link',
+    'share_copied' => 'Link copied',
 ];
