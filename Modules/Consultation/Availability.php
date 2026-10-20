@@ -113,6 +113,19 @@ final class Availability
         return $word.' '.Site::digits($t->isoFormat('h:mm'));
     }
 
+    /** Is the consultant inside working hours right now (a working day, between start and end, Bangladesh time)? */
+    public function openNow(): bool
+    {
+        $now = self::now();
+        if (! in_array($now->isoWeekday(), $this->days, true)) {
+            return false;
+        }
+        [$sh, $sm] = array_map('intval', explode(':', $this->start));
+        [$eh, $em] = array_map('intval', explode(':', $this->end));
+
+        return $now >= $now->setTime($sh, $sm) && $now < $now->setTime($eh, $em);
+    }
+
     /** The first slot a visitor may still book. */
     public function earliest(): CarbonImmutable
     {

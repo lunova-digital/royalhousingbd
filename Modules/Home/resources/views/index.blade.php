@@ -98,8 +98,10 @@
       </ol>
     </div>
     <div class="flex flex-col gap-3 lg:w-72">
+      @php($online = \Modules\Consultation\Availability::current()->openNow())
+      <p class="flex items-center justify-center gap-2 text-sm font-medium text-white/85"><span class="relative flex size-2.5"><span class="{{ $online ? 'animate-ping bg-status-available' : '' }} absolute inline-flex size-full rounded-full opacity-60 motion-reduce:animate-none"></span><span class="relative inline-flex size-2.5 rounded-full {{ $online ? 'bg-status-available' : 'bg-status-sold' }}"></span></span>{{ $online ? __('home::index.advisor_online') : __('home::index.advisor_away') }}</p>
+      @include('site::partials.cta', ['kind' => 'consult', 'dark' => true, 'fx' => 'full'])
       @include('site::partials.cta', ['kind' => 'wa'])
-      @include('site::partials.cta', ['kind' => 'consult', 'dark' => true])
       <p class="text-center text-sm text-white/60">{{ __('site::layout.replies_fast') }}</p>
     </div>
   </div>
@@ -162,16 +164,17 @@
   </div>
 </section>
 
-{{-- 8. Videos (FR-HOME-004): only when the admin has added some --}}
+{{-- 8. Videos (FR-HOME-004): only when the admin has added some; centred --}}
 @php($videoIds = $videos->map(fn ($v) => ['id' => $v->youtubeId(), 'title' => $v->title])->filter(fn ($v) => $v['id'])->values())
 @if ($videoIds->count())
 <section class="container-x pb-14 reveal lg:pb-24">
-  @include('site::partials.section-heading', ['title' => __('home::index.videos_title'), 'text' => __('home::index.videos_text')])
-  <div class="snap-row mt-8">
+  @include('site::partials.section-heading', ['center' => true, 'title' => __('home::index.videos_title'), 'text' => __('home::index.videos_text')])
+  @php($single = $videoIds->count() === 1)
+  <div class="mt-8 {{ $single ? 'mx-auto max-w-[880px]' : 'snap-row sm:!grid sm:!grid-cols-2 lg:!grid-cols-3 lg:mx-auto lg:max-w-[1000px]' }}">
     @foreach ($videoIds as $video)
-      <button type="button" data-video="{{ $video['id'] }}" class="group block text-left" aria-label="{{ __('home::index.watch_video') }}: {{ $video['title'] }}">
-        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex size-14 items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 size-6" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
-        @if ($video['title'])<span class="mt-3 block text-[15px] font-semibold text-fg">{{ $video['title'] }}</span>@endif
+      <button type="button" data-video="{{ $video['id'] }}" class="group block w-full text-left" aria-label="{{ __('home::index.watch_video') }}: {{ $video['title'] }}">
+        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex {{ $single ? 'size-20' : 'size-14' }} items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 {{ $single ? 'size-8' : 'size-6' }}" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
+        @if ($video['title'])<span class="mt-3 block {{ $single ? 'text-center text-base' : 'text-[15px]' }} font-semibold text-fg">{{ $video['title'] }}</span>@endif
       </button>
     @endforeach
   </div>

@@ -33,6 +33,9 @@
     @php($typeHrefs = array_column($types, 'href'))
     @php($onType = in_array($path, $typeHrefs, true))
     @php($consultOn = \Modules\Consultation\Availability::enabled())
+    {{-- Admin → Settings → Floating chat button: which options the desktop button offers (the mobile tab bar always has both) --}}
+    @php($floatWa = $whatsapp && ($settings['float_whatsapp'] ?? '1') !== '0')
+    @php($floatConsult = $consultOn && ($settings['float_consult'] ?? '1') !== '0')
 
     @yield('ticker')
 
@@ -63,7 +66,7 @@
               <a href="{{ \Modules\Site\Site::localeUrl($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" rel="nofollow" class="px-3 py-2 transition-colors {{ $code === $locale ? 'bg-ink-950 text-white' : 'text-muted-fg hover:text-fg' }}" @if ($code === $locale) aria-current="true" @endif>{{ $label }}</a>
             @endforeach
           </span>
-          <span class="hidden lg:block">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm'])</span>
+          <span class="hidden lg:block">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm', 'fx' => 'glow'])</span>
         </div>
       </div>
     </header>
@@ -154,7 +157,7 @@
           </a>
         @endforeach
         <button type="button" data-chooser-toggle aria-haspopup="dialog" class="flex flex-col items-center gap-1 pb-2 text-[11px] font-semibold text-fg">
-          <span class="-mt-6 inline-flex size-14 items-center justify-center rounded-full bg-ink-950 text-white shadow-lift ring-4 ring-white">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</span>
+          <span class="consult-glow consult-shine -mt-6 inline-flex size-14 items-center justify-center rounded-full bg-ink-950 text-white ring-4 ring-white">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</span>
           <span>{{ __('site::layout.nav_consult') }}</span>
         </button>
         @foreach ([$tab('/map', 'map', __('site::layout.nav_map'), $nav_active === 'map')] as $t)
@@ -171,7 +174,9 @@
 
     {{-- Desktop: the one floating button --}}
     @if ($whatsapp || $consultOn)
-      <button type="button" data-chooser-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="{{ __('site::layout.chooser_title') }}" class="fixed right-6 bottom-6 z-40 hidden size-14 items-center justify-center rounded-full bg-ink-950 text-white shadow-lift transition-transform duration-200 hover:-translate-y-0.5 lg:inline-flex">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</button>
+      @if ($floatWa || $floatConsult)
+      <button type="button" data-chooser-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="{{ __('site::layout.chooser_title') }}" class="consult-glow consult-shine fixed right-6 bottom-6 z-40 hidden size-14 items-center justify-center rounded-full bg-ink-950 text-white lg:inline-flex">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</button>
+      @endif
 
       {{-- ConsultSheet: WhatsApp or book. Bottom sheet on phones, small card over the button on desktop. --}}
       <dialog data-chooser class="sheet chooser" aria-label="{{ __('site::layout.chooser_title') }}">
@@ -181,8 +186,8 @@
             <button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="-mt-1 -mr-1 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
           </div>
           <div class="mt-5 flex flex-col gap-3">
-            @include('site::partials.cta', ['kind' => 'wa', 'class' => 'w-full'])
-            @include('site::partials.cta', ['kind' => 'consult', 'class' => 'w-full'])
+            @include('site::partials.cta', ['kind' => 'wa', 'class' => 'w-full '.($floatWa ? '' : 'lg:hidden')])
+            @include('site::partials.cta', ['kind' => 'consult', 'class' => 'w-full '.($floatConsult ? '' : 'lg:hidden')])
           </div>
           <p class="mt-4 text-center text-sm text-muted-fg">{{ __('site::layout.replies_fast') }}</p>
         </div>

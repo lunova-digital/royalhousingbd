@@ -25,6 +25,8 @@ class Settings
         'hero_title', 'hero_subtitle', 'hero_image', 'hero_video_url', 'hero_cta_text', 'hero_cta_link',
         'hero_badge', 'hero_stats', 'trust_badges', 'working_hours',
         // About page (JSON lists are edited in the admin About tab)
+        // Floating chat button (desktop): which options it offers. '0' hides one; the header consult button is unaffected.
+        'float_whatsapp', 'float_consult',
         'about_title', 'about_story', 'about_stats', 'team_members', 'partners',
         // Legal pages
         'privacy_text', 'terms_text',
@@ -42,6 +44,8 @@ class Settings
         'hero_badge' => 'Trusted since 2010',
         'hero_stats' => '[{"value":"150+","label":"Projects completed"},{"value":"5000+","label":"Happy families"},{"value":"50+","label":"Locations"}]',
         'trust_badges' => '',
+        'float_whatsapp' => '1',
+        'float_consult' => '1',
         'working_hours' => 'Saturday - Thursday: 9:00 AM - 6:00 PM',
         'about_title' => 'Building Dreams Into Reality',
         'about_story' => "Royal Housing BD was founded with a vision to bring transparency, quality and innovation to property development in Bangladesh.\n\nWe have delivered residential plots and flats to families across Dhaka, and our interactive masterplan lets you pick your plot with confidence.",

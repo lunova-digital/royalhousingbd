@@ -8,6 +8,7 @@ import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { api, ApiError } from '@/lib/api'
@@ -84,6 +85,19 @@ export function SettingsPage() {
                 </Field>
                 {text('working_hours', 'Working hours', { placeholder: 'Saturday - Thursday: 9:00 AM - 6:00 PM' })}
                 {text('map_embed_url', 'Google Maps embed URL (optional)', { placeholder: 'https://www.google.com/maps/embed?pb=…' }, 'From Google Maps → Share → Embed a map → copy the src of the iframe.')}
+              </CardContent>
+            </Card>
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Floating chat button</CardTitle>
+                <CardDescription>The round button at the bottom right of every page on desktop opens a small card with these options. The “Book free consultation” button in the header always stays.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                {([['float_whatsapp', 'Offer WhatsApp'], ['float_consult', 'Offer “Book free consultation”']] as const).map(([key, label]) => (
+                  <label key={key} className="flex items-center gap-3 text-sm">
+                    <Switch checked={(form[key] ?? '1') !== '0'} onCheckedChange={(on) => set(key, on ? '1' : '0')} /> {label}
+                  </label>
+                ))}
               </CardContent>
             </Card>
           </TabsContent>

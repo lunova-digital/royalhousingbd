@@ -6,6 +6,7 @@ use Database\Seeders\DemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Modules\Masterplan\Models\Masterplan;
+use Modules\Settings\Settings;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
@@ -121,5 +122,19 @@ class PublicPagesTest extends TestCase
         $this->get('/projects?fragment=1&location=Uttara')->assertOk()->assertSee('Duplex house')->assertDontSee('Corner plot');
         $this->get('/projects?fragment=1&sort=price_asc')->assertOk()->assertSeeInOrder(['Hilltop eco resort', 'Corner plot', 'Duplex house']);
         $this->get('/projects?fragment=1&sort=price_desc')->assertOk()->assertSeeInOrder(['Duplex house', 'Corner plot', 'Hilltop eco resort']);
+    }
+
+    public function test_floating_button_options_follow_the_admin_toggles(): void
+    {
+        $this->get('/')->assertOk()->assertSee('data-chooser-toggle', false)->assertSee('Book free consultation');
+        Settings::save(['float_whatsapp' => '0']);
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('btn-wa w-full lg:hidden', $html);
+        $this->assertStringNotContainsString('btn-consult w-full lg:hidden', $html);
+        Settings::save(['float_consult' => '0']);
+        // Both off: no floating button on desktop, but the header consult button stays.
+        $html = $this->get('/')->assertOk()->getContent();
+        $this->assertStringNotContainsString('consult-shine fixed right-6', $html);
+        $this->assertStringContainsString('consult-glow btn-sm', $html);
     }
 }

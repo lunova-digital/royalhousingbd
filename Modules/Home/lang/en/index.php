@@ -50,4 +50,7 @@ return [
     'faq_still_text' => 'Ask an advisor on WhatsApp. We usually reply within minutes.',
     'watch_video' => 'Play video',
     'close_video' => 'Close video',
+    'consult_meta' => 'Free · :minutes min',
+    'advisor_online' => 'Advisor online',
+    'advisor_away' => 'Replies when the office opens',
 ];
