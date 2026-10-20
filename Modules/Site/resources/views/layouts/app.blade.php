@@ -20,11 +20,14 @@
     @endif
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.bunny.net" />
-    {{-- Fonts load without blocking the first paint (swap shows the fallback meanwhile) --}}
-    @php($fonts = 'https://fonts.bunny.net/css?family=inter:400,500,600|plus-jakarta-sans:700'.(app()->getLocale() === 'bn' ? '|hind-siliguri:400,500,600' : '').'&display=swap')
-    <link rel="preload" as="style" href="{{ $fonts }}" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="{{ $fonts }}" /></noscript>
+    {{-- Self-hosted fonts (public/fonts): preload the body face and the headline face for the language on screen --}}
+    @if (app()->getLocale() === 'bn')
+    <link rel="preload" href="/fonts/anek-bangla-bengali-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/noto-serif-bengali-bengali-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    @else
+    <link rel="preload" href="/fonts/manrope-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/playfair-display-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    @endif
     <script>document.documentElement.classList.add('js')</script>
     @vite('resources/css/site.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}
@@ -87,7 +90,7 @@
           <div class="max-w-xl">
             <a href="/" class="inline-flex items-center">
               @if ($settings['logo'] ?? '')
-                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-white object-contain p-1" width="40" height="40" loading="lazy" /><span class="ml-2.5 font-display text-lg font-bold tracking-[-0.02em]">{{ $site_name }}</span>
+                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-white object-contain p-1" width="40" height="40" loading="lazy" /><span class="ml-2.5 text-lg font-semibold">{{ $site_name }}</span>
               @else
                 {!! \Modules\Site\Site::logo('logo-full-on-dark', 'h-10 w-auto') !!}
               @endif
@@ -186,7 +189,7 @@
       <dialog data-chooser class="sheet chooser" aria-label="{{ __('site::layout.chooser_title') }}">
         <div class="p-6">
           <div class="flex items-start justify-between gap-4">
-            <div><h2 class="font-display text-xl font-bold tracking-[-0.02em] text-fg">{{ __('site::layout.chooser_title') }}</h2><p class="mt-1 text-sm text-muted-fg">{{ __('site::layout.chooser_text') }}</p></div>
+            <div><h2 class="text-xl text-fg font-semibold">{{ __('site::layout.chooser_title') }}</h2><p class="mt-1 text-sm text-muted-fg">{{ __('site::layout.chooser_text') }}</p></div>
             <button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="-mt-1 -mr-1 inline-flex size-9 shrink-0 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
           </div>
           <div class="mt-5 flex flex-col gap-3">
@@ -201,7 +204,7 @@
     {{-- Mobile menu sheet: what the tab bar has no room for --}}
     <dialog id="menu-sheet" class="sheet" aria-label="{{ __('site::layout.nav_menu') }}">
       <div class="p-6">
-        <div class="flex items-center justify-between"><h2 class="font-display text-xl font-bold tracking-[-0.02em] text-fg">{{ __('site::layout.nav_menu') }}</h2><button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="inline-flex size-9 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button></div>
+        <div class="flex items-center justify-between"><h2 class="text-xl text-fg font-semibold">{{ __('site::layout.nav_menu') }}</h2><button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="inline-flex size-9 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button></div>
         <ul class="mt-4 divide-y divide-line text-[15px] font-medium text-fg">
           <li><button type="button" data-open-dialog="search-dialog" class="flex w-full items-center justify-between py-3.5">{{ __('site::layout.search_title') }} @include('site::partials.icon', ['name' => 'search', 'class' => 'size-5 text-muted-fg'])</button></li>
           @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="flex items-center justify-between py-3.5">{{ $t['label'] }} @include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-4 text-muted-fg'])</a></li>@endforeach
@@ -216,7 +219,7 @@
     {{-- Search overlay: the same type filter + keyword form as before --}}
     <dialog id="search-dialog" class="search-dialog" aria-label="{{ __('site::layout.search_title') }}">
       <div class="p-4 sm:p-6">
-        <div class="mb-3 flex items-center justify-between"><h2 class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('site::layout.search_title') }}</h2><button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="inline-flex size-9 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button></div>
+        <div class="mb-3 flex items-center justify-between"><h2 class="text-lg text-fg font-semibold">{{ __('site::layout.search_title') }}</h2><button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="inline-flex size-9 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button></div>
         @include('site::partials.search-form', ['autofocus' => true])
       </div>
     </dialog>

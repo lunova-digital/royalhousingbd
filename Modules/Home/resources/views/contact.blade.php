@@ -22,7 +22,7 @@
 
   {{-- The message form composes a WhatsApp chat (no enquiries are stored, per SRS §9). The field labels travel with it so the message reads in the visitor's language. --}}
   <form data-whatsapp-form data-whatsapp-number="{{ $settings['whatsapp_number'] ?? '' }}" data-whatsapp-labels="{{ json_encode(['subject' => __('home::contact.subject'), 'name' => __('home::contact.name'), 'phone' => __('home::contact.phone'), 'email' => __('site::common.email')], JSON_UNESCAPED_UNICODE) }}" class="card h-fit p-6 sm:p-8">
-    <h2 class="font-display text-2xl font-bold tracking-[-0.02em] text-fg">{{ __('home::contact.send_message_title') }}</h2>
+    <h2 class="font-display text-2xl text-fg">{{ __('home::contact.send_message_title') }}</h2>
     <p class="mt-1 text-sm text-muted-fg">{{ __('home::contact.send_message_text') }}</p>
     <div class="mt-6 grid gap-4 sm:grid-cols-2">
       <label class="grid gap-1.5 text-sm font-medium text-fg"><span>{{ __('home::contact.full_name') }} *</span><input name="name" required autocomplete="name" class="input h-12" /></label>

@@ -52,7 +52,7 @@ class BanglaContentTest extends TestCase
         $this->assertSame('৳ 35 Lakh / katha', Site::num('৳ 35 Lakh / katha'));
 
         auth()->logout();
-        $this->get('/plot?lang=bn')->assertOk()->assertSee('৳ ৩৫ লাখ / কাঠা')->assertSee('© ২০');
+        $this->get('/plot?lang=bn')->assertOk()->assertSee('৩৫ লাখ / কাঠা')->assertSee('© ২০');
     }
 
     public function test_free_strings_and_settings_translate(): void

@@ -12,8 +12,8 @@
   </div>
   <div class="flex flex-1 flex-col p-5">
     <p class="flex items-center gap-1.5 text-sm text-muted-fg"><span class="truncate">{{ $listing->location }}</span>@include('site::partials.icon', ['name' => 'check', 'class' => 'size-3.5 shrink-0 text-accent']) <span class="sr-only">{{ __('listing::card.verified') }}</span></p>
-    <h3 class="mt-1 truncate font-display text-[17px] font-bold tracking-[-0.02em] text-fg"><a href="{{ $listing->url() }}" class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink-950">{{ $listing->title }}</a></h3>
-    <p class="mt-3 font-display text-2xl leading-none font-bold tracking-[-0.02em] text-fg">{{ $onRequest ? __('listing::card.price_on_request') : $listing->price }}</p>
+    <h3 class="mt-1 truncate text-[17px] text-fg font-semibold"><a href="{{ $listing->url() }}" class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ink-950">{{ $listing->title }}</a></h3>
+    <p class="mt-3 num text-2xl leading-none text-fg">{!! $onRequest ? e(__('listing::card.price_on_request')) : \Modules\Site\Site::price($listing->price) !!}</p>
     @if ($meta)<p class="mt-2 text-sm text-muted-fg">{{ implode(' · ', $meta) }}</p>@endif
     @if ($avail)
       @php($taken = $avail['total'] - $avail['available'])

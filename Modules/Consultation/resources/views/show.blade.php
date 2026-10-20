@@ -29,7 +29,7 @@
   <aside class="grid content-start gap-4">
     @if ($c->isActive())
       <div class="card p-5">
-        <h3 class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('consultation::page.next_title') }}</h3>
+        <h3 class="text-lg text-fg font-semibold">{{ __('consultation::page.next_title') }}</h3>
         <ol class="mt-4 grid gap-3 text-sm">
           @foreach (['next_1', 'next_3'] as $i => $key)
             <li class="flex items-start gap-3"><span class="consult-step mt-0.5">{{ $i + 1 }}</span><span class="pt-0.5">{{ __('consultation::page.'.$key) }}</span></li>

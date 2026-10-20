@@ -36,7 +36,7 @@ class LocaleTest extends TestCase
             ->assertOk()
             ->assertSee('<html lang="bn"', false)
             ->assertPlainCookie('lang', 'bn')
-            ->assertSee('hind-siliguri')
+            ->assertSee('anek-bangla-bengali-400')
             ->assertSee('সচরাচর জিজ্ঞাসা')
             ->assertSee('যাচাইকৃত কাগজপত্র')
             ->assertDontSee('Frequently asked questions');

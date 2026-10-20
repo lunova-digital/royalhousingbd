@@ -23,7 +23,7 @@
         <a href="{{ $map->url() }}" class="card lift group flex flex-col overflow-hidden">
           <span class="relative block aspect-[16/10] overflow-hidden bg-fill">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="500" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif</span>
           <span class="flex flex-1 flex-col p-5">
-            <span class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ $map->name }}</span>
+            <span class="text-lg text-fg font-semibold">{{ $map->name }}</span>
             @if ($map->description)<span class="mt-1 flex items-center gap-1.5 text-sm text-muted-fg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4 shrink-0 text-accent-text'])<span class="truncate">{{ $map->description }}</span></span>@endif
             <span class="mt-4 text-sm text-muted-fg">{{ __('home::index.available_of_total', ['available' => $c['available'], 'total' => $map->plots->count()]) }} · {{ $prices->count() === 1 ? \Modules\Site\Site::num($prices[0]) : ($prices->count() > 1 ? trans_choice('masterplan::index.price_tier_count', $prices->count()) : __('listing::card.price_on_request')) }}</span>
             <span class="mt-2 flex h-1.5 overflow-hidden rounded-full bg-fill" aria-hidden="true"><span class="bg-status-available" style="width: {{ $c['available'] * 100 / $total }}%"></span><span class="bg-status-booked" style="width: {{ $c['booked'] * 100 / $total }}%"></span><span class="bg-status-sold" style="width: {{ $c['sold'] * 100 / $total }}%"></span></span>

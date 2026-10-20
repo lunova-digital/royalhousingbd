@@ -4,7 +4,7 @@
   @include('site::partials.breadcrumb', ['items' => $crumbs ?? []])
   <div class="mt-4 max-w-3xl">
     @if ($chip ?? '')<p class="eyebrow">{{ $chip }}</p>@endif
-    <h1 class="{{ ($chip ?? '') ? 'mt-2' : '' }} font-display text-[32px] leading-[1.1] font-bold tracking-[-0.02em] text-fg lg:text-[40px]">{{ $title }}</h1>
+    <h1 class="{{ ($chip ?? '') ? 'mt-2' : '' }} font-display text-[32px] leading-[1.1] text-fg lg:text-[40px]">{{ $title }}</h1>
     @if ($text ?? '')<p class="mt-3 text-base text-muted-fg sm:text-lg">{{ $text }}</p>@endif
   </div>
 </section>

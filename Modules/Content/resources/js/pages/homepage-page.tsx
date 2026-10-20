@@ -81,7 +81,7 @@ function HeroTab() {
         </CardHeader>
         <CardContent className="grid gap-4">
           <Field id="hero_badge" label="Badge" hint="Small pill above the headline, e.g. Trusted since 2010."><Input id="hero_badge" value={form.hero_badge ?? ''} onChange={(e) => set('hero_badge', e.target.value)} /></Field>
-          <Field id="hero_title" label="Headline" hint="The second half is highlighted in red."><Input id="hero_title" value={form.hero_title ?? ''} onChange={(e) => set('hero_title', e.target.value)} /></Field>
+          <Field id="hero_title" label="Headline" hint="Put one word between *asterisks* to set it in italic serif, e.g. Find your *perfect* plot."><Input id="hero_title" value={form.hero_title ?? ''} onChange={(e) => set('hero_title', e.target.value)} /></Field>
           <Field id="hero_subtitle" label="Sub-headline"><Textarea id="hero_subtitle" rows={2} value={form.hero_subtitle ?? ''} onChange={(e) => set('hero_subtitle', e.target.value)} /></Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field id="hero_cta_text" label="Button text"><Input id="hero_cta_text" value={form.hero_cta_text ?? ''} onChange={(e) => set('hero_cta_text', e.target.value)} /></Field>

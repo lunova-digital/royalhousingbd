@@ -37,7 +37,7 @@ class Settings
 
     public const DEFAULTS = [
         'site_name' => 'Royal Housing BD',
-        'hero_title' => 'Find your next property, plot or flat',
+        'hero_title' => 'Find your *perfect* plot, flat or home',
         'hero_subtitle' => 'Browse listings and explore our project masterplans. Contact us on WhatsApp to book a visit.',
         'hero_cta_text' => 'Browse listings',
         'hero_cta_link' => '/projects',

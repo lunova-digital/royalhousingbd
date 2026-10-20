@@ -40,7 +40,7 @@
     <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/70 via-transparent to-transparent"></div>
     <div class="on-dark px-5 pt-14 pb-6 sm:px-10 sm:pb-8 lg:px-14 lg:pt-16 lg:pb-10">
       @if ($settings['hero_badge'] ?? '')<p class="eyebrow !text-accent-soft">{{ $settings['hero_badge'] }}</p>@endif
-      <h1 class="mt-3 max-w-2xl font-display text-[32px] leading-[1.1] font-bold tracking-[-0.02em] text-balance sm:text-[40px] lg:text-5xl">{{ $settings['hero_title'] }}</h1>
+      <h1 class="mt-3 max-w-2xl font-display text-[36px] leading-[1.1] text-balance sm:text-[46px] lg:text-[56px]">{!! \Modules\Site\Site::emphasis($settings['hero_title']) !!}</h1>
       @if ($settings['hero_subtitle'] ?? '')<p class="mt-4 max-w-xl text-base text-white/80 sm:text-lg">{{ $settings['hero_subtitle'] }}</p>@endif
       <div class="mt-7 flex flex-col gap-3 sm:flex-row">
         @include('site::partials.cta', ['kind' => 'wa'])
@@ -52,7 +52,7 @@
       @if ($stats)
         <dl class="mt-7 grid grid-cols-3 divide-x divide-white/20 sm:flex">
           @foreach ($stats as $stat)
-            <div class="px-3 first:pl-0 sm:px-8"><dt class="font-display text-xl leading-none font-bold tracking-[-0.02em] sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
+            <div class="px-3 first:pl-0 sm:px-8"><dt class="num text-xl leading-none sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
           @endforeach
         </dl>
       @endif
@@ -90,7 +90,7 @@
   <div class="on-dark grid gap-8 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-14 lg:p-14">
     <div>
       <p class="eyebrow !text-accent-soft">{{ __('home::index.band_eyebrow') }}</p>
-      <h2 class="mt-3 max-w-xl font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-balance sm:text-[32px]">{{ __('home::index.band_title') }}</h2>
+      <h2 class="mt-3 max-w-xl font-display text-[28px] leading-tight text-balance sm:text-[32px]">{{ __('home::index.band_title') }}</h2>
       <ol class="mt-8 grid gap-4 sm:grid-cols-3">
         @foreach (['step_budget', 'step_match', 'step_visit'] as $n => $step)
           <li class="flex items-start gap-3 text-[15px] text-white/85"><span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-semibold text-accent-soft">{{ $n + 1 }}</span><span class="pt-0.5">{{ __('home::index.'.$step) }}</span></li>
@@ -139,7 +139,7 @@
       <a href="{{ $map->url() }}" class="card lift group flex gap-4 p-3 sm:gap-5 sm:p-4">
         <span class="block size-24 shrink-0 overflow-hidden rounded-2xl bg-fill sm:size-32">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="600" loading="lazy" class="size-full object-cover" />@endif</span>
         <span class="flex min-w-0 flex-1 flex-col justify-center">
-          <span class="truncate font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ $map->name }}</span>
+          <span class="truncate text-lg text-fg font-semibold">{{ $map->name }}</span>
           <span class="mt-0.5 text-sm text-muted-fg">{{ __('home::index.available_of_total', ['available' => $c['available'], 'total' => $map->plots->count()]) }}</span>
           <span class="mt-3 flex h-1.5 w-full overflow-hidden rounded-full bg-fill" aria-hidden="true">
             <span class="bg-status-available" style="width: {{ $c['available'] * 100 / $total }}%"></span><span class="bg-status-booked" style="width: {{ $c['booked'] * 100 / $total }}%"></span><span class="bg-status-sold" style="width: {{ $c['sold'] * 100 / $total }}%"></span>
@@ -158,7 +158,7 @@
     @include('site::partials.section-heading', ['title' => __('home::index.why_title', ['site' => $site_name]), 'text' => __('home::index.why_text')])
     <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       @foreach ([['file-check', 'value_docs'], ['layers', 'value_infra'], ['clock', 'value_handover'], ['users', 'value_advisors']] as [$icon, $k])
-        <div><span class="text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-7'])</span><h3 class="mt-4 font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('home::index.'.$k) }}</h3><p class="mt-1.5 text-[15px] text-muted-fg">{{ __('home::index.'.$k.'_text') }}</p></div>
+        <div><span class="text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-7'])</span><h3 class="mt-4 text-lg text-fg font-semibold">{{ __('home::index.'.$k) }}</h3><p class="mt-1.5 text-[15px] text-muted-fg">{{ __('home::index.'.$k.'_text') }}</p></div>
       @endforeach
     </div>
   </div>
@@ -192,7 +192,7 @@
       <h2 class="section-title">{{ __('home::index.faq') }}</h2>
       <p class="mt-2 text-base text-muted-fg">{{ __('home::index.faq_text') }}</p>
       <div class="mt-8 rounded-[20px] border border-line bg-white p-5">
-        <p class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('home::index.faq_still') }}</p>
+        <p class="text-lg text-fg font-semibold">{{ __('home::index.faq_still') }}</p>
         <p class="mt-1 text-[15px] text-muted-fg">{{ __('home::index.faq_still_text') }}</p>
         <div class="mt-4">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'btn-sm'])</div>
       </div>

@@ -2,6 +2,7 @@
 
 namespace Modules\Site;
 
+use Illuminate\Support\HtmlString;
 use Modules\Content\Services\Translations;
 use Modules\Content\Services\TranslationSources;
 use Modules\Listing\Models\Listing;
@@ -190,6 +191,18 @@ class Site
         $svg = $cache[$name] ??= (is_file($f = public_path("images/brand/{$name}.svg")) ? (string) file_get_contents($f) : '');
 
         return $svg === '' ? '' : preg_replace('/<svg\b/', '<svg class="'.e($class).'" role="img"', $svg, 1);
+    }
+
+    /** An amount with its ৳ sign set smaller and lighter than the number (escaped). */
+    public static function price(?string $text): HtmlString
+    {
+        return new HtmlString(str_replace('৳', '<span class="cur">৳</span>', e((string) $text)));
+    }
+
+    /** The hero headline: wrap ONE word in *asterisks* to set it in italic serif (escaped). */
+    public static function emphasis(?string $text): HtmlString
+    {
+        return new HtmlString(preg_replace('/\*([^*]+)\*/u', '<em class="font-medium italic">$1</em>', e((string) $text), 1));
     }
 
     /** Turn a stored relative path ("uploads/…/x.jpg") into its URL. */

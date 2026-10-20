@@ -5,7 +5,7 @@
   @include('site::partials.breadcrumb', ['items' => [[__('site::common.project_map'), '/map'], [$m->name, null]]])
   <div class="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
     <div>
-      <h1 class="font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[34px]">{{ $m->name }}</h1>
+      <h1 class="font-display text-[28px] leading-tight text-fg lg:text-[34px]">{{ $m->name }}</h1>
       @if ($m->description)<p class="mt-1.5 flex items-center gap-1.5 text-sm text-muted-fg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4 text-accent-text']){{ $m->description }}</p>@endif
     </div>
     {{-- Legend (FR-MAP-005); each chip also filters the map (FR-MAP-007) --}}
@@ -39,19 +39,19 @@
       <div>
         <div data-plot-empty class="card hidden p-8 text-center lg:block">
           <span class="mx-auto inline-flex size-14 items-center justify-center rounded-full bg-fill text-ink-950">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-6'])</span>
-          <h3 class="mt-4 font-display text-lg font-bold">{{ __('masterplan::show.select_plot') }}</h3>
+          <h3 class="mt-4 text-lg font-semibold">{{ __('masterplan::show.select_plot') }}</h3>
           <p class="mt-1 text-sm text-muted-fg">{{ __('masterplan::show.select_plot_hint') }}</p>
         </div>
         <div data-plot-details hidden class="plot-sheet">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="font-display text-xl font-bold tracking-[-0.02em] text-fg" data-plot-count></h3>
+            <h3 class="text-xl text-fg font-semibold" data-plot-count></h3>
             <button type="button" data-plot-clear class="inline-flex h-10 items-center gap-1.5 rounded-full bg-fill px-4 text-sm font-semibold text-fg hover:bg-line">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-3.5']) {{ __('masterplan::show.clear_selection') }}</button>
           </div>
           <ul data-plot-list class="mt-4 grid max-h-[32svh] gap-2.5 overflow-y-auto overscroll-contain lg:max-h-[45svh]"></ul>
           <template data-plot-item>
             <li class="rounded-xl border border-line p-3.5 text-sm">
               <div class="flex items-center justify-between gap-3">
-                <span class="font-display text-base font-bold">{{ __('site::common.plot') }} <span data-item-number></span></span>
+                <span class="text-base font-semibold">{{ __('site::common.plot') }} <span data-item-number></span></span>
                 <span class="flex items-center gap-2">
                   <span data-item-status class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold"></span>
                   <button type="button" data-item-remove class="inline-flex size-9 items-center justify-center rounded-full bg-fill hover:bg-line">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-3.5'])</button>
@@ -59,7 +59,7 @@
               </div>
               <dl class="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1.5">
                 <div><dt class="text-xs text-muted-fg">{{ __('masterplan::show.plot_size') }}</dt><dd class="font-semibold" data-item-size></dd></div>
-                <div><dt class="text-xs text-muted-fg">{{ __('site::common.price') }}</dt><dd class="font-display font-extrabold" data-item-price></dd></div>
+                <div><dt class="text-xs text-muted-fg">{{ __('site::common.price') }}</dt><dd class="font-display" data-item-price></dd></div>
                 <div class="col-span-2"><dt class="text-xs text-muted-fg">{{ __('site::common.location') }}</dt><dd class="font-semibold" data-item-position></dd></div>
               </dl>
             </li>

@@ -13,7 +13,7 @@
   <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
     <div>
       @include('site::partials.breadcrumb', ['items' => $label ? [[__('site::common.projects'), '/projects'], [$heading, null]] : [[__('site::common.projects'), null]]])
-      <h1 class="mt-2 font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[32px]">{{ $heading }}</h1>
+      <h1 class="mt-2 font-display text-[28px] leading-tight text-fg lg:text-[32px]">{{ $heading }}</h1>
     </div>
   </div>
 </section>
@@ -41,7 +41,7 @@
     <aside data-sheet class="filter-sheet" aria-label="{{ __('listing::index.filters') }}">
       <div class="sheet-grip lg:hidden" data-sheet-grip aria-hidden="true"><span></span></div>
       <div class="flex items-center justify-between px-5 pt-1 pb-2 lg:px-0 lg:pt-0">
-        <h2 class="font-display text-lg font-bold tracking-[-0.02em] text-fg" data-sheet-title>{{ __('listing::index.filters') }}</h2>
+        <h2 class="text-lg text-fg font-semibold" data-sheet-title>{{ __('listing::index.filters') }}</h2>
         <button type="button" data-clear-all hidden class="hidden text-sm font-medium text-muted-fg hover:text-fg lg:inline">{{ __('listing::index.clear_all') }}</button>
         <button type="button" data-close-sheet aria-label="{{ __('listing::index.close_filters') }}" class="inline-flex size-10 items-center justify-center rounded-full text-muted-fg hover:bg-fill lg:hidden">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
       </div>

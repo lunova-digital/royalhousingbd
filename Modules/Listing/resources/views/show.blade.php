@@ -50,12 +50,12 @@
 
     <div class="min-w-0">
       <p class="flex items-center gap-1.5 text-sm text-muted-fg"><span>{{ $l->location }}</span>@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-accent']) <span>{{ __('site::common.verified') }}</span> · <span>{{ __('site::common.ref', ['ref' => $l->reference()]) }}</span></p>
-      <h1 class="mt-2 font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[34px]">{{ $l->title }}</h1>
+      <h1 class="mt-2 font-display text-[28px] leading-tight text-fg lg:text-[34px]">{{ $l->title }}</h1>
 
       {{-- Price block --}}
       <div class="mt-5 rounded-[20px] border border-line bg-white p-5">
         <p class="text-sm text-muted-fg">{{ __('site::common.price') }}</p>
-        <p class="mt-1 font-display text-[32px] leading-none font-bold tracking-[-0.02em] text-fg">{{ $onRequest ? __('listing::show.price_on_request') : $l->price }}</p>
+        <p class="mt-1 price-display text-[32px] text-fg leading-[1.1]">{!! $onRequest ? e(__('listing::show.price_on_request')) : \Modules\Site\Site::price($l->price) !!}</p>
         @if ($onRequest)<p class="mt-2 text-sm text-muted-fg">{{ __('listing::show.price_on_request_text') }}</p>@endif
         @if ($avail)
           @php($taken = $avail['total'] - $avail['available'])
@@ -128,7 +128,7 @@
   {{-- Documents & verification --}}
   <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
     <div class="card p-6">
-      <h2 class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('listing::show.documents_title') }}</h2>
+      <h2 class="text-lg text-fg font-semibold">{{ __('listing::show.documents_title') }}</h2>
       <ul class="mt-4 space-y-4 text-[15px]">
         @foreach ([['shield-check', __('listing::show.verified_papers'), __('listing::show.legal_documents_note')], ['file-check', __('listing::show.full_document_set'), __('listing::show.documents_text')], ['wallet', __('listing::show.easy_payment'), __('listing::show.instalments_available')]] as [$icon, $heading, $text])
           <li class="flex gap-3"><span class="mt-0.5 text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span><span><span class="block font-semibold text-fg">{{ $heading }}</span><span class="block text-muted-fg">{{ $text }}</span></span></li>

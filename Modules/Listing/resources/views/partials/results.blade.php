@@ -13,7 +13,7 @@
   @else
     <div class="card card-in mt-4 flex flex-col items-center px-6 py-12 text-center sm:py-16">
       <span class="inline-flex size-14 items-center justify-center rounded-full bg-fill text-ink-950">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-6'])</span>
-      <h2 class="mt-5 max-w-md font-display text-xl font-bold tracking-[-0.02em] text-fg">{{ __('listing::index.empty_title') }}</h2>
+      <h2 class="mt-5 max-w-md text-xl text-fg font-semibold">{{ __('listing::index.empty_title') }}</h2>
       <p class="mt-2 max-w-md text-[15px] text-muted-fg">{{ __('listing::index.empty_text') }}</p>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row">@include('site::partials.cta', ['kind' => 'wa'])@include('site::partials.cta', ['kind' => 'consult'])</div>
       <a href="{{ $path === '/projects' ? '/projects' : $path }}" data-clear-filters class="link-arrow mt-5">{{ __('listing::index.clear_filters') }}</a>

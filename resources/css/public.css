@@ -1,12 +1,30 @@
 /* The public site's theme, components and motion ("Ivory & Ink"). Imported by site.css (public pages) and app.css (admin). */
 
+/* ---- Type: Playfair Display + Manrope (Noto Serif Bengali + Anek Bangla in বাং). Self-hosted from public/fonts (OFL),
+   only the weights used, Latin + Bengali subsets; the browser fetches a file only when its glyphs appear on the page.
+   The *Fallback faces carry size/ascent metrics so text barely moves when the real font swaps in (CLS ≈ 0). ---- */
+@font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/playfair-display-latin-500-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/playfair-display-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 500; font-display: swap; src: url('/fonts/playfair-display-latin-500-italic.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/manrope-latin-400-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/manrope-latin-500-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/manrope-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Noto Serif Bengali'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/noto-serif-bengali-bengali-500-normal.woff2') format('woff2'); unicode-range: U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC; }
+@font-face { font-family: 'Noto Serif Bengali'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/noto-serif-bengali-bengali-600-normal.woff2') format('woff2'); unicode-range: U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC; }
+@font-face { font-family: 'Anek Bangla'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/anek-bangla-bengali-400-normal.woff2') format('woff2'); unicode-range: U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC; }
+@font-face { font-family: 'Anek Bangla'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/anek-bangla-bengali-500-normal.woff2') format('woff2'); unicode-range: U+0964-0965, U+0980-09FE, U+200C-200D, U+20B9, U+25CC; }
+/* Metric-matched fallbacks (measured from the font files against Arial / Times New Roman metrics) */
+@font-face { font-family: 'Manrope Fallback'; src: local('Arial'), local('Liberation Sans'), local('Helvetica'); size-adjust: 106.2%; ascent-override: 100.4%; descent-override: 28.2%; line-gap-override: 0%; }
+@font-face { font-family: 'Playfair Fallback'; src: local('Times New Roman'), local('Liberation Serif'), local('Times'); size-adjust: 114.4%; ascent-override: 94.6%; descent-override: 21.9%; line-gap-override: 0%; }
+
 /* Public-site theme: "Ivory & Ink". Warm ivory page, white bordered cards, near-black ink for
    headings / dark bands / primary buttons, one brass accent. Brand red is the logo mark only;
    WhatsApp green is the WhatsApp button only; status colours are availability only.
    Everything below is the single place to retune the palette. */
 @theme {
-  --font-display: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Type tokens: change the faces here and nowhere else */
+  --font-display: 'Playfair Display', 'Playfair Fallback', 'Times New Roman', Georgia, serif;
+  --font-body: 'Manrope', 'Manrope Fallback', ui-sans-serif, system-ui, sans-serif;
 
   --color-page: #faf8f5; /* --bg: page background */
   --color-surface: #ffffff; /* cards */
@@ -56,18 +74,28 @@
    layout only loads it for that locale. Bengali conjuncts need more leading and no
    negative tracking, so the heading utilities' letter-spacing is reset too. */
 html:lang(bn) {
-  --font-display: 'Hind Siliguri', 'Noto Sans Bengali', 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Hind Siliguri', 'Noto Sans Bengali', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Noto Serif Bengali', 'Playfair Display', 'Playfair Fallback', serif;
+  --font-body: 'Anek Bangla', 'Manrope', 'Manrope Fallback', ui-sans-serif, system-ui, sans-serif;
 }
-html:lang(bn) :is(h1, h2, h3, .font-display) { letter-spacing: 0; }
-html:lang(bn) :is(h1, h2, h3) { line-height: 1.3; }
-html:lang(bn) :is(.pill-tag, .pill-tag-light, .eyebrow) { letter-spacing: 0.04em; text-transform: none; }
-html:lang(bn) :is(h1, h2, h3, .font-display) { font-weight: 600; }
+/* Bengali conjuncts need height and must never be tracked or upper-cased */
+html:lang(bn) body { line-height: 1.75; }
+html:lang(bn) :is(h1, h2, h3, .font-display) { letter-spacing: 0; line-height: 1.3; font-weight: 600; }
+/* Single-line truncated Bengali (card titles) is clipped by tight lines */
+html:lang(bn) .truncate { line-height: 1.6; }
+html:lang(bn) :is(.eyebrow, .pill-tag, .pill-tag-light, .btn-wa, .btn-consult, .btn, label, button, .num) { letter-spacing: 0; text-transform: none; }
+
+/* Type scale (one place): body 16/1.65, muted 14, eyebrow 12 */
+body { font-family: var(--font-body); font-size: 16px; line-height: 1.65; }
+.type-muted { font-size: 14px; }
 
 @layer components {
-  .font-display { font-family: var(--font-display); }
+  /* Serif headings: 600, tight at display sizes. Small headings, card titles, prices and stats use Manrope instead. */
+  .font-display { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+  .num { font-family: var(--font-body); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .price-display { font-family: var(--font-display); font-weight: 600; font-variant-numeric: lining-nums tabular-nums; }
+  .cur { font-size: 0.8em; font-weight: 500; opacity: 0.75; margin-right: 0.08em; }
   .container-x { @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6; }
-  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.12em] text-accent-text; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.14em] text-accent-text; font-family: var(--font-body); }
   .accent { @apply text-accent-text; }
   .card { @apply rounded-[20px] border border-line bg-white; }
   .tile { @apply rounded-xl bg-fill; }
@@ -97,7 +125,7 @@ html:lang(bn) :is(h1, h2, h3, .font-display) { font-weight: 600; }
   .link-muted { @apply text-sm text-white/65 transition-colors hover:text-white; }
   .availability-bar { @apply bg-status-booked; }
   .prose-light { @apply leading-relaxed text-ink-800; }
-  .prose-light h2 { @apply mt-8 mb-3 font-display text-xl font-bold text-fg; }
+  .prose-light h2 { @apply mt-8 mb-3 font-body text-xl font-semibold text-fg; }
 
   /* Free consultation: the booking dialog and widget */
   .consult-dialog { @apply m-auto max-h-[calc(100svh-1.5rem)] w-[min(100%-1.5rem,44rem)] overflow-y-auto rounded-3xl border border-line bg-white p-0 text-fg shadow-2xl; }
@@ -134,7 +162,7 @@ details[open] .faq-minus { display: block; }
 /* ---- Public chrome & homepage (Ivory & Ink) ---- */
 @layer components {
   /* Three buttons, sitewide: WhatsApp, consult, ghost link. */
-  .btn-wa, .btn-consult { @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-[15px] font-semibold transition-colors duration-200; }
+  .btn-wa, .btn-consult { @apply inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-6 text-[15px] font-semibold tracking-[0.01em] transition-colors duration-200; }
   .btn-wa { @apply bg-wa-solid text-white hover:bg-wa-text; }
   .btn-consult { @apply bg-ink-950 text-white hover:bg-ink-800; }
   .on-dark .btn-consult, .btn-consult.on-dark { @apply ring-1 ring-white/30 hover:bg-white/10; }
@@ -144,7 +172,7 @@ details[open] .faq-minus { display: block; }
   .link-arrow:hover svg { transform: translateX(2px); }
 
   .section { @apply py-14 lg:py-24; }
-  .section-title { @apply font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-fg lg:text-[32px]; }
+  .section-title { @apply font-display text-[28px] leading-[1.2] text-fg lg:text-[36px]; font-weight: 600; letter-spacing: -0.01em; }
   .lift { @apply transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift; }
   .nav-link { @apply inline-flex h-10 items-center gap-1 rounded-full px-3.5 text-sm font-medium text-text transition-colors duration-150 hover:bg-fill hover:text-fg; }
   .nav-link[aria-current='page'] { @apply text-fg; box-shadow: inset 0 -2px 0 var(--color-accent); border-radius: 0; }
