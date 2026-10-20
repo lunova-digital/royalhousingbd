@@ -230,7 +230,9 @@ html.js .reveal.in { opacity: 1; transform: none; }
 .consult-grad { background-color: #0f172a; background-image: linear-gradient(115deg, #0f172a 0%, #0f172a 28%, #7a5a22 58%, #b45309 78%, #7a5a22 100%); background-size: 300% 100%; animation: hot-shift 6s ease-in-out infinite; }
 .consult-glow { animation: hot-breathe 2.4s ease-in-out infinite; }
 .consult-grad.consult-glow { animation: hot-shift 6s ease-in-out infinite, hot-breathe 2.4s ease-in-out infinite; }
-.consult-shine { position: relative; overflow: hidden; isolation: isolate; }
+/* position:relative only when the element is not already fixed/absolute (the floating button is fixed) */
+.consult-shine { overflow: hidden; isolation: isolate; }
+.consult-shine:not(.fixed, .absolute, .sticky) { position: relative; }
 .consult-shine::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 40%; pointer-events: none; transform: translateX(-160%) skewX(-20deg); background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent); animation: hot-shine 5s ease-in-out infinite; }
 .consult-wiggle svg:first-child, .consult-wiggle > span > svg:first-child { transform-origin: 50% 70%; animation: hot-wiggle 4s ease-in-out infinite; }
 .consult-glow, .consult-shine { transition: transform 0.18s ease-out; }
