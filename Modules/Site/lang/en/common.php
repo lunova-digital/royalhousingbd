@@ -44,4 +44,6 @@ return [
     'whatsapp_float_message' => 'Hello, I found you on :site and I\'d like to know more.',
     'all' => 'All',
     'home' => 'Home',
+    'listing_count' => ':count listing|:count listings',
+    'price_on_request' => 'Price on request',
 ];

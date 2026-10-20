@@ -1,250 +1,213 @@
 @extends('site::layouts.app')
+
+{{-- FR-HOME-003: one announcement at a time, above the header; hidden when there are none --}}
+@if ($ticker->count())
+@section('ticker')
+<div data-ticker class="relative bg-ink-950 text-white" role="region" aria-label="{{ __('site::layout.dismiss') }}">
+  <div class="container-x relative flex h-9 items-center justify-center px-10 text-[13px] font-medium">
+    <div class="relative h-full w-full">
+      @foreach ($ticker as $i => $item)
+        <div class="ticker-item" @if ($i === 0) data-on @endif data-ticker-item>
+          @if ($item->link)<a href="{{ $item->link }}" class="truncate underline-offset-4 hover:underline">{{ $item->text }}</a>@else<span class="truncate">{{ $item->text }}</span>@endif
+        </div>
+      @endforeach
+    </div>
+    <button type="button" data-ticker-dismiss aria-label="{{ __('site::layout.dismiss') }}" class="absolute top-1/2 right-3 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white sm:right-6">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-4'])</button>
+  </div>
+</div>
+@endsection
+@endif
+
 @section('content')
 @php($asset = fn ($p) => \Modules\Site\Site::asset($p))
 @php($stats = \Modules\Site\Site::list('hero_stats'))
-@php($whatsapp = $settings['whatsapp_number'] ?? '')
-@php($phone = $settings['phone'] ?? '')
-@php($hero = $featured[0] ?? $latest[0] ?? null)
+@php($heroImg = ($settings['hero_image'] ?? '') ? $asset($settings['hero_image']) : '/images/placeholders/hero.webp')
 @php($totals = ['available' => 0, 'booked' => 0, 'sold' => 0])
 @foreach ($maps as $map)@php($c = $map->statusCounts())@php($totals = ['available' => $totals['available'] + $c['available'], 'booked' => $totals['booked'] + $c['booked'], 'sold' => $totals['sold'] + $c['sold']])@endforeach
+{{-- Featured first, then the newest, each listing once --}}
+@php($all = collect($featured)->concat($latest)->unique('id')->values())
+@php($counts = \Modules\Site\Site::typeCounts())
+@php($cta = [($settings['hero_cta_text'] ?? '') ?: __('site::common.view_all'), ($settings['hero_cta_link'] ?? '') ?: '/projects'])
 
-{{-- FR-HOME-003: announcement ticker --}}
-@if ($ticker->count())
-<div class="border-b border-brand/10 bg-brand-50">
-  <div class="ticker container-x overflow-hidden py-2 text-sm font-medium text-fg">
-    <div class="ticker-track flex w-max gap-12 whitespace-nowrap">
-      @for ($pass = 0; $pass < 2; $pass++)
-        @foreach ($ticker as $item)
-          @if ($item->link)<a href="{{ $item->link }}" class="inline-flex items-center gap-2 hover:text-brand"><span class="size-1.5 rounded-full bg-brand"></span>{{ $item->text }}</a>
-          @else<span class="inline-flex items-center gap-2"><span class="size-1.5 rounded-full bg-brand"></span>{{ $item->text }}</span>@endif
-        @endforeach
-      @endfor
-    </div>
-  </div>
-</div>
-@endif
-
-{{-- FR-HOME-001: hero — dark panel + two pastel tiles --}}
+{{-- 2. Hero --}}
 <section class="container-x pt-4 sm:pt-6">
-  <div class="grid gap-4 lg:grid-cols-[1fr_320px] lg:gap-5">
-    <div class="dark-panel relative overflow-hidden">
-      @if ($settings['hero_image'] ?? '')<img src="{{ $asset($settings['hero_image']) }}" alt="" class="absolute inset-0 size-full object-cover opacity-20" />@endif
-      <div class="relative grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:p-12">
-        <div>
-          @if ($settings['hero_badge'] ?? '')<span class="pill-tag"><span class="size-1.5 rounded-full bg-brand"></span>{{ $settings['hero_badge'] }}</span>@endif
-          <h1 class="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-balance sm:text-5xl xl:text-[52px]">{{ $settings['hero_title'] }}</h1>
-          @if ($settings['hero_subtitle'] ?? '')<p class="mt-4 max-w-md text-base text-white/70 sm:text-lg">{{ $settings['hero_subtitle'] }}</p>@endif
-          @if ($stats)
-            <dl class="mt-7 grid grid-cols-3 gap-3 sm:flex sm:gap-0 sm:divide-x sm:divide-white/15">
-              @foreach ($stats as $stat)
-                <div class="sm:px-5 sm:first:pl-0"><dt class="font-display text-xl font-extrabold leading-none sm:text-[26px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/55 sm:text-[11px]">{{ $stat['label'] ?? '' }}</dd></div>
-              @endforeach
-            </dl>
-          @endif
-          <div class="mt-8 flex flex-wrap gap-3">
-            @if ($settings['hero_cta_text'] ?? '')<a href="{{ $settings['hero_cta_link'] ?: '/projects' }}" class="btn-light h-12 pr-2 pl-6 text-base">{{ $settings['hero_cta_text'] }} <span class="btn-arrow">@include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</span></a>@endif
-            <a href="/map" class="btn-ghost h-12 px-6 text-base">{{ __('home::index.browse_project_map') }}</a>
-          </div>
-        </div>
-
-        {{-- Spotlight card: the first featured listing --}}
-        @if ($hero)
-          @php($cover = $hero->cover())
-          @php($avail = $hero->availability())
-          <a href="{{ $hero->url() }}" class="group mx-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white p-2.5 text-fg shadow-2xl shadow-black/40">
-            <div class="relative aspect-square overflow-hidden rounded-xl bg-fill">
-              @if ($cover)<img src="{{ $asset($cover->thumb_path ?: $cover->path) }}" alt="" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@endif
-              <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold shadow-sm">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-3.5 text-success']) {{ $avail ? trans_choice('site::common.plots_available', $avail['available']) : __('home::index.featured_type', ['type' => $hero->typeLabel()]) }}</span>
-            </div>
-            <div class="mt-2.5 flex items-center justify-between gap-3 rounded-xl bg-ink-950 p-4 text-white">
-              <span class="min-w-0"><span class="block truncate font-semibold">{{ $hero->title }}</span><span class="mt-1 block font-display text-xl font-extrabold">{{ $hero->priceLabel() }}</span></span>
-              <span class="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand">@include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-5'])</span>
-            </div>
-          </a>
-        @endif
+  <div class="relative isolate flex min-h-[560px] flex-col justify-end overflow-hidden rounded-3xl bg-ink-950 text-white">
+    <img src="{{ $heroImg }}" alt="" width="1600" height="900" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover" />
+    <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/60 to-ink-950/10"></div>
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/70 via-transparent to-transparent"></div>
+    <div class="on-dark px-5 pt-14 pb-6 sm:px-10 sm:pb-8 lg:px-14 lg:pt-16 lg:pb-10">
+      @if ($settings['hero_badge'] ?? '')<p class="eyebrow !text-accent-soft">{{ $settings['hero_badge'] }}</p>@endif
+      <h1 class="mt-3 max-w-2xl font-display text-[32px] leading-[1.1] font-bold tracking-[-0.02em] text-balance sm:text-[40px] lg:text-5xl">{{ $settings['hero_title'] }}</h1>
+      @if ($settings['hero_subtitle'] ?? '')<p class="mt-4 max-w-xl text-base text-white/80 sm:text-lg">{{ $settings['hero_subtitle'] }}</p>@endif
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+        @include('site::partials.cta', ['kind' => 'wa'])
+        @include('site::partials.cta', ['kind' => 'consult', 'dark' => true])
       </div>
-    </div>
-
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:gap-5">
-      <a href="/projects" class="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-[#ffd6de] to-[#ffeef2] p-6 text-fg">
-        <span class="absolute top-6 right-6 inline-flex size-16 items-center justify-center rounded-2xl bg-brand text-white shadow-lg shadow-brand/30">@include('site::partials.icon', ['name' => 'shield-check', 'class' => 'size-7'])</span>
-        <span class="pr-20"><span class="block font-display text-xl font-extrabold leading-tight">{{ __('home::index.legal_assurance') }}</span><span class="mt-1 block text-sm text-fg/70">{{ __('home::index.legal_assurance_text') }}</span></span>
-        <span class="btn-light mt-8 h-10 w-fit px-4 text-sm">{{ __('home::index.view_listings') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-3.5'])</span>
-      </a>
-      <a href="/map" class="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-[#d7e6ff] to-[#edf3ff] p-6 text-fg">
-        <span class="absolute top-6 right-6 inline-flex size-16 items-center justify-center rounded-2xl bg-info text-white shadow-lg shadow-info/30">@include('site::partials.icon', ['name' => 'map', 'class' => 'size-7'])</span>
-        <span class="pr-20"><span class="block font-display text-xl font-extrabold leading-tight">{{ __('home::index.interactive_map') }}</span><span class="mt-1 block text-sm text-fg/70">{{ __('home::index.interactive_map_text') }}</span></span>
-        <span class="btn-light mt-8 h-10 w-fit px-4 text-sm">{{ __('home::index.explore_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-3.5'])</span>
-      </a>
-    </div>
-  </div>
-</section>
-
-{{-- Live availability band --}}
-@if ($maps->count())
-<section class="container-x mt-6 sm:mt-8">
-  <div class="sale-band flex flex-col gap-6 p-5 sm:p-6 lg:flex-row lg:items-center lg:gap-10">
-    <div class="flex items-center gap-4">
-      <span class="inline-flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand text-white">@include('site::partials.icon', ['name' => 'bolt', 'class' => 'size-6'])</span>
-      <span><span class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">{{ __('site::common.selling_fast') }} · {{ trans_choice('site::common.project_count', $maps->count()) }}</span><span class="block font-display text-2xl font-bold">{{ __('home::index.plots_now') }}</span></span>
-    </div>
-    <p class="max-w-sm text-sm text-white/70">{{ __('home::index.plots_now_text') }}</p>
-    <div class="flex flex-wrap items-center gap-3 lg:ml-auto">
-      <span class="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">{{ __('home::index.right_now') }}</span>
-      @foreach ([['available', __('home::index.open')], ['booked', __('site::common.booked')], ['sold', __('site::common.sold')]] as [$key, $label])
-        <span class="flex min-w-16 flex-col items-center rounded-xl bg-white/10 px-3 py-2"><span class="font-display text-xl font-extrabold leading-none">{{ $totals[$key] }}</span><span class="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/60">{{ $label }}</span></span>
-      @endforeach
-      <a href="/map" class="btn-light ml-1 h-11 px-5">{{ __('home::index.view_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>
-    </div>
-  </div>
-</section>
-@endif
-
-{{-- FR-HOME-002: featured listings --}}
-@if (count($featured))
-<section class="container-x mt-12 sm:mt-16">
-  @include('site::partials.section-heading', ['eyebrow' => __('home::index.featured_projects'), 'title' => __('home::index.featured_title'), 'text' => __('home::index.featured_text'), 'action' => [__('site::common.view_all'), '/projects']])
-  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    @foreach (array_slice($featured, 0, 8) as $listing)@include('listing::card', ['listing' => $listing])@endforeach
-  </div>
-</section>
-@endif
-
-{{-- Project maps as a tile grid --}}
-@if ($maps->count())
-<section class="container-x mt-12 sm:mt-16">
-  @include('site::partials.section-heading', ['eyebrow' => __('home::index.buy_with_confidence'), 'title' => __('home::index.maps_title'), 'text' => __('home::index.maps_text'), 'action' => [__('home::index.browse_all_maps'), '/map']])
-  <div class="card mt-6 p-3 sm:p-4">
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-      @foreach ($maps as $map)
-        @php($c = $map->statusCounts())
-        <a href="{{ $map->url() }}" class="tile flex min-h-24 flex-col items-center justify-center gap-1.5 p-4 text-center transition-colors hover:bg-brand-50">
-          <span class="font-display text-sm font-bold text-fg">{{ $map->name }}</span>
-          <span class="text-xs font-semibold text-success">{{ __('home::index.available_of_total', ['available' => $c['available'], 'total' => $map->plots->count()]) }}</span>
-        </a>
-      @endforeach
-    </div>
-  </div>
-</section>
-@endif
-
-{{-- Newest listings --}}
-@if (count($latest))
-<section class="container-x mt-12 sm:mt-16">
-  @include('site::partials.section-heading', ['eyebrow' => __('home::index.just_listed'), 'title' => __('home::index.new_arrivals'), 'text' => __('home::index.new_arrivals_text'), 'action' => [__('site::common.view_all'), '/projects']])
-  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    @foreach ($latest as $listing)@include('listing::card', ['listing' => $listing])@endforeach
-  </div>
-</section>
-@endif
-
-{{-- Trust strip --}}
-<section class="container-x mt-10 sm:mt-12">
-  <div class="card grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
-    @foreach ([['pin', __('site::common.prime_locations')], ['shield-check', __('site::common.legal_documents')], ['refresh', __('home::index.flexible_payment')], ['wallet', __('site::common.book_over_whatsapp')]] as [$icon, $label])
-      <div class="flex items-center gap-4 px-6 py-5"><span class="icon-box">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span><span class="font-semibold">{{ $label }}</span></div>
-    @endforeach
-  </div>
-</section>
-
-{{-- Investor CTA --}}
-<section class="container-x mt-10 sm:mt-12">
-  <div class="flex flex-col gap-6 rounded-3xl bg-fill p-6 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-    <div>
-      <span class="pill-tag-light">@include('site::partials.icon', ['name' => 'star', 'class' => 'size-3.5']) {{ __('home::index.for_investors') }}</span>
-      <h2 class="mt-4 font-display text-2xl font-bold sm:text-[26px]">{{ __('home::index.free_site_visit') }}</h2>
-      <p class="mt-2 max-w-lg text-sm text-muted-fg sm:text-base">{{ __('home::index.free_site_visit_text') }}</p>
-    </div>
-    <a href="/contact" class="btn-dark h-12 px-6 text-base">{{ __('site::common.schedule_a_visit') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>
-  </div>
-</section>
-
-{{-- Dark contact band --}}
-<section class="container-x mt-6">
-  <div class="dark-panel flex flex-col gap-8 p-6 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:p-12">
-    <div class="max-w-xl">
-      <span class="pill-tag">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-3.5']) {{ __('home::index.get_in_touch') }}</span>
-      <h2 class="mt-4 font-display text-2xl font-bold sm:text-3xl">{{ __('home::index.get_in_touch_title') }}</h2>
-      <p class="mt-3 text-sm text-white/65 sm:text-base">{{ __('home::index.get_in_touch_text') }}</p>
-    </div>
-    <div class="flex flex-col gap-3 sm:flex-row">
-      @if ($whatsapp)<a href="{{ $whatsapp_float }}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3 text-fg">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-6'])<span><span class="block text-[10px] font-semibold uppercase tracking-wider text-muted-fg">{{ __('site::common.chat_on') }}</span><span class="block font-bold">{{ __('site::common.whatsapp') }}</span></span></a>@endif
-      @if ($phone)<a href="tel:{{ $phone }}" class="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-white">@include('site::partials.icon', ['name' => 'phone', 'class' => 'size-6'])<span><span class="block text-[10px] font-semibold uppercase tracking-wider text-white/50">{{ __('site::common.call_us') }}</span><span class="block font-bold">{{ $phone }}</span></span></a>@endif
-    </div>
-  </div>
-</section>
-
-{{-- FR-HOME-004: YouTube showcase --}}
-@if ($videos->count())
-<section class="container-x mt-12 sm:mt-16">
-  @include('site::partials.section-heading', ['eyebrow' => __('home::index.videos'), 'title' => __('home::index.videos_title'), 'text' => __('home::index.videos_text')])
-  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    @foreach ($videos as $video)
-      @if ($id = $video->youtubeId())
-        <figure>
-          @include('site::partials.youtube', ['id' => $id])
-          @if ($video->title)<figcaption class="mt-2 text-sm font-medium text-fg">{{ $video->title }}</figcaption>@endif
-        </figure>
+      <div class="mt-8 max-w-2xl" aria-label="{{ __('home::index.hero_search_label') }}">
+        @include('site::partials.search-form', ['pill' => true])
+      </div>
+      @if ($stats)
+        <dl class="mt-7 grid grid-cols-3 divide-x divide-white/20 sm:flex">
+          @foreach ($stats as $stat)
+            <div class="px-3 first:pl-0 sm:px-8"><dt class="font-display text-xl leading-none font-bold tracking-[-0.02em] sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ $stat['label'] ?? '' }}</dd></div>
+          @endforeach
+        </dl>
       @endif
+    </div>
+  </div>
+</section>
+
+{{-- 3. Category grid --}}
+@php($typeTiles = collect($types)->take(5))
+<section class="container-x section reveal">
+  @include('site::partials.section-heading', ['title' => __('home::index.categories_title'), 'text' => __('home::index.categories_text')])
+  <ul class="mt-8 grid grid-cols-3 gap-x-3 gap-y-6 lg:grid-cols-6 lg:gap-5">
+    @foreach ($typeTiles as $t)
+      @php($key = \Modules\Site\Site::typeKey($t['key']))
+      <li><a href="{{ $t['href'] }}" class="group block text-center">
+        <span class="lift relative block aspect-square overflow-hidden rounded-[20px] border border-line bg-fill">
+          @if (file_exists(public_path("images/placeholders/category/{$key}.webp")))<img src="/images/placeholders/category/{{ $key }}.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@else<span class="flex size-full items-center justify-center text-muted-fg">@include('site::partials.icon', ['name' => 'building', 'class' => 'size-8'])</span>@endif
+        </span>
+        <span class="mt-3 block text-[15px] leading-tight font-semibold text-fg">{{ $t['label'] }}</span>
+        <span class="mt-0.5 block text-[13px] text-muted-fg">{{ trans_choice('site::common.listing_count', $counts[$t['key']] ?? 0) }}</span>
+      </a></li>
+    @endforeach
+    <li><a href="/map" class="group block text-center">
+      <span class="lift relative block aspect-square overflow-hidden rounded-[20px] border border-line bg-fill">
+        @if (file_exists(public_path('images/placeholders/category/map.webp')))<img src="/images/placeholders/category/map.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@endif
+      </span>
+      <span class="mt-3 block text-[15px] leading-tight font-semibold text-fg">{{ __('site::common.project_map') }}</span>
+      <span class="mt-0.5 block text-[13px] text-muted-fg">{{ trans_choice('site::common.project_count', $maps->count()) }}</span>
+    </a></li>
+  </ul>
+</section>
+
+{{-- 4. Consultation band --}}
+<section class="container-x reveal">
+  <div class="on-dark grid gap-8 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-14 lg:p-14">
+    <div>
+      <p class="eyebrow !text-accent-soft">{{ __('home::index.band_eyebrow') }}</p>
+      <h2 class="mt-3 max-w-xl font-display text-[28px] leading-tight font-bold tracking-[-0.02em] text-balance sm:text-[32px]">{{ __('home::index.band_title') }}</h2>
+      <ol class="mt-8 grid gap-4 sm:grid-cols-3">
+        @foreach (['step_budget', 'step_match', 'step_visit'] as $n => $step)
+          <li class="flex items-start gap-3 text-[15px] text-white/85"><span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-semibold text-accent-soft">{{ $n + 1 }}</span><span class="pt-0.5">{{ __('home::index.'.$step) }}</span></li>
+        @endforeach
+      </ol>
+    </div>
+    <div class="flex flex-col gap-3 lg:w-72">
+      @include('site::partials.cta', ['kind' => 'wa'])
+      @include('site::partials.cta', ['kind' => 'consult', 'dark' => true])
+      <p class="text-center text-sm text-white/60">{{ __('site::layout.replies_fast') }}</p>
+    </div>
+  </div>
+</section>
+
+{{-- 5. Available now: featured + newest in one grid, filtered by type --}}
+@if ($all->count())
+@php($tabTypes = collect($types)->filter(fn ($t) => $all->contains('type', $t['key']))->values())
+<section class="container-x section reveal" data-tabs-listings>
+  @include('site::partials.section-heading', ['title' => __('home::index.available_title'), 'text' => __('home::index.available_text'), 'action' => $cta])
+  <div class="scroll-row mt-6 flex gap-2 overflow-x-auto pb-1" role="tablist">
+    <button type="button" role="tab" data-tab-chip="all" aria-selected="true" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ __('site::common.all') }}</button>
+    @foreach ($tabTypes as $t)<button type="button" role="tab" data-tab-chip="{{ $t['key'] }}" aria-selected="false" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ $t['label'] }}</button>@endforeach
+  </div>
+  <div class="snap-row mt-6" data-tab-grid>
+    @foreach ($all->take(12) as $listing)<div data-tab-card="{{ $listing->type }}">@include('listing::card', ['listing' => $listing])</div>@endforeach
+  </div>
+</section>
+@endif
+
+{{-- 6. Project maps & live availability --}}
+@if ($maps->count())
+<section class="container-x pb-14 reveal lg:pb-24">
+  @include('site::partials.section-heading', ['title' => __('home::index.maps_title'), 'text' => __('home::index.maps_text'), 'action' => [__('home::index.browse_all_maps'), '/map']])
+  <ul class="mt-6 flex flex-wrap gap-2" aria-label="{{ __('home::index.chips_label') }}">
+    @foreach ([['available', __('home::index.chip_open'), 'bg-status-available'], ['booked', __('site::common.booked'), 'bg-status-booked'], ['sold', __('site::common.sold'), 'bg-status-sold']] as [$key, $label, $dot])
+      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$key] }}</span> {{ $label }}</li>
+    @endforeach
+  </ul>
+  <div class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+    @foreach ($maps->take(4) as $map)
+      @php($c = $map->statusCounts())
+      @php($total = max(1, $map->plots->count()))
+      @php($thumb = $map->image_path ? $asset($map->image_path) : \Modules\Site\Site::placeholder('masterplan', 'masterplan', (int) $map->id))
+      <a href="{{ $map->url() }}" class="card lift group flex gap-4 p-3 sm:gap-5 sm:p-4">
+        <span class="block size-24 shrink-0 overflow-hidden rounded-2xl bg-fill sm:size-32">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="600" loading="lazy" class="size-full object-cover" />@endif</span>
+        <span class="flex min-w-0 flex-1 flex-col justify-center">
+          <span class="truncate font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ $map->name }}</span>
+          <span class="mt-0.5 text-sm text-muted-fg">{{ __('home::index.available_of_total', ['available' => $c['available'], 'total' => $map->plots->count()]) }}</span>
+          <span class="mt-3 flex h-1.5 w-full overflow-hidden rounded-full bg-fill" aria-hidden="true">
+            <span class="bg-status-available" style="width: {{ $c['available'] * 100 / $total }}%"></span><span class="bg-status-booked" style="width: {{ $c['booked'] * 100 / $total }}%"></span><span class="bg-status-sold" style="width: {{ $c['sold'] * 100 / $total }}%"></span>
+          </span>
+          <span class="link-arrow mt-3">{{ __('home::index.open_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</span>
+        </span>
+      </a>
     @endforeach
   </div>
 </section>
 @endif
 
-{{-- Why choose us --}}
-<section class="container-x mt-12 sm:mt-16">
-  <div class="card relative overflow-hidden p-6 sm:p-10 lg:p-12">
-    <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand via-brand/60 to-ink-950"></span>
-    <span class="pill-tag-light"><span class="size-1.5 rounded-full bg-brand"></span>{{ __('home::index.why_us') }}</span>
-    <h2 class="mt-5 max-w-3xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl">{{ __('home::index.why_us_title') }}</h2>
-    <p class="mt-4 max-w-3xl text-base leading-relaxed text-muted-fg sm:text-lg">{!! __('home::index.why_us_text', ['site' => e($site_name), 'cta' => '<strong class="font-semibold text-fg">'.__('home::index.why_us_cta').'</strong>']) !!}</p>
-    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      @foreach ([
-        ['shield-check', __('home::index.value_legal'), __('home::index.value_legal_text')],
-        ['award', __('home::index.value_quality'), __('home::index.value_quality_text')],
-        ['clock', __('home::index.value_delivery'), __('home::index.value_delivery_text')],
-        ['users', __('home::index.value_team'), __('home::index.value_team_text')],
-        ['pin', __('site::common.prime_locations'), __('home::index.value_locations_text')],
-        ['handshake', __('home::index.value_partnership'), __('home::index.value_partnership_text')],
-      ] as [$icon, $heading, $text])
-        <div class="flex gap-4 rounded-2xl border border-line p-5"><span class="icon-box">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span><span><span class="block font-semibold">{{ $heading }}</span><span class="mt-1 block text-sm text-muted-fg">{{ $text }}</span></span></div>
+{{-- 7. Why --}}
+<section class="container-x pb-14 reveal lg:pb-24">
+  <div class="border-t border-line pt-14 lg:pt-20">
+    @include('site::partials.section-heading', ['title' => __('home::index.why_title', ['site' => $site_name]), 'text' => __('home::index.why_text')])
+    <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      @foreach ([['file-check', 'value_docs'], ['layers', 'value_infra'], ['clock', 'value_handover'], ['users', 'value_advisors']] as [$icon, $k])
+        <div><span class="text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-7'])</span><h3 class="mt-4 font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('home::index.'.$k) }}</h3><p class="mt-1.5 text-[15px] text-muted-fg">{{ __('home::index.'.$k.'_text') }}</p></div>
       @endforeach
-    </div>
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a href="/projects" class="btn-dark">{{ __('home::index.browse_all_projects') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>
-      <a href="/map" class="btn-outline">{{ __('site::common.project_map') }}</a>
-      <a href="/gallery" class="btn-outline">{{ __('site::common.gallery') }}</a>
-      <a href="/contact" class="btn-outline">{{ __('site::common.contact_us') }}</a>
     </div>
   </div>
 </section>
 
-{{-- FAQ --}}
-<section class="container-x mt-12 sm:mt-16">
-  @include('site::partials.section-heading', ['center' => true, 'title' => __('home::index.faq'), 'text' => __('home::index.faq_text')])
-  <div class="mx-auto mt-8 grid max-w-3xl gap-3">
-    @foreach ([
-      [__('home::index.faq_book_q'), __('home::index.faq_book_a')],
-      [__('home::index.faq_documents_q'), __('home::index.faq_documents_a')],
-      [__('home::index.faq_visit_q'), __('home::index.faq_visit_a')],
-      [__('home::index.faq_instalments_q'), __('home::index.faq_instalments_a')],
-      [__('home::index.faq_colours_q'), __('home::index.faq_colours_a')],
-      [__('home::index.faq_contact_q'), __('home::index.faq_contact_a')],
-    ] as [$q, $a])
-      <details class="card group px-5 py-4 sm:px-6">
-        <summary class="flex cursor-pointer items-center justify-between gap-4 font-semibold text-fg">{{ $q }}<span class="faq-icon inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-fill">@include('site::partials.icon', ['name' => 'plus', 'class' => 'size-4'])</span></summary>
-        <p class="mt-3 text-sm leading-relaxed text-muted-fg sm:text-base">{{ $a }}</p>
-      </details>
+{{-- 8. Videos (FR-HOME-004): only when the admin has added some --}}
+@php($videoIds = $videos->map(fn ($v) => ['id' => $v->youtubeId(), 'title' => $v->title])->filter(fn ($v) => $v['id'])->values())
+@if ($videoIds->count())
+<section class="container-x pb-14 reveal lg:pb-24">
+  @include('site::partials.section-heading', ['title' => __('home::index.videos_title'), 'text' => __('home::index.videos_text')])
+  <div class="snap-row mt-8">
+    @foreach ($videoIds as $video)
+      <button type="button" data-video="{{ $video['id'] }}" class="group block text-left" aria-label="{{ __('home::index.watch_video') }}: {{ $video['title'] }}">
+        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex size-14 items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 size-6" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
+        @if ($video['title'])<span class="mt-3 block text-[15px] font-semibold text-fg">{{ $video['title'] }}</span>@endif
+      </button>
     @endforeach
   </div>
-  @php($badges = array_values(array_filter(array_map('trim', explode(',', $settings['trust_badges'] ?? '')))))
-  @if ($badges)
-    <div class="mx-auto mt-10 max-w-3xl text-center">
-      <p class="text-sm text-faint-fg">{{ __('home::index.trusted_by') }}</p>
-      <div class="mt-3 flex flex-wrap justify-center gap-2">
-        @foreach ($badges as $badge)<span class="tile px-4 py-2 font-display text-sm font-bold text-fg">{{ $badge }}</span>@endforeach
+  <dialog data-video-dialog class="video-dialog" aria-label="{{ __('home::index.watch_video') }}">
+    <button type="button" data-dialog-close aria-label="{{ __('home::index.close_video') }}" class="mb-2 ml-auto flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
+    <div data-video-slot class="aspect-video w-full overflow-hidden rounded-2xl bg-black"></div>
+  </dialog>
+</section>
+@endif
+
+{{-- 9. FAQ --}}
+<section id="faq" class="container-x pb-14 reveal lg:pb-24">
+  <div class="grid gap-10 border-t border-line pt-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:pt-20">
+    <div>
+      <h2 class="section-title">{{ __('home::index.faq') }}</h2>
+      <p class="mt-2 text-base text-muted-fg">{{ __('home::index.faq_text') }}</p>
+      <div class="mt-8 rounded-[20px] border border-line bg-white p-5">
+        <p class="font-display text-lg font-bold tracking-[-0.02em] text-fg">{{ __('home::index.faq_still') }}</p>
+        <p class="mt-1 text-[15px] text-muted-fg">{{ __('home::index.faq_still_text') }}</p>
+        <div class="mt-4">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'btn-sm'])</div>
       </div>
+      @php($badges = array_values(array_filter(array_map('trim', explode(',', $settings['trust_badges'] ?? '')))))
+      @if ($badges)<p class="mt-6 text-sm text-muted-fg">{{ __('home::index.trusted_by') }}: <span class="font-medium text-fg">{{ implode(' · ', $badges) }}</span></p>@endif
     </div>
-  @endif
+    <div class="divide-y divide-line border-y border-line">
+      @foreach ([
+        [__('home::index.faq_book_q'), __('home::index.faq_book_a')],
+        [__('home::index.faq_documents_q'), __('home::index.faq_documents_a')],
+        [__('home::index.faq_visit_q'), __('home::index.faq_visit_a')],
+        [__('home::index.faq_instalments_q'), __('home::index.faq_instalments_a')],
+        [__('home::index.faq_colours_q'), __('home::index.faq_colours_a')],
+        [__('home::index.faq_contact_q'), __('home::index.faq_contact_a')],
+      ] as [$q, $a])
+        <details class="group">
+          <summary class="flex cursor-pointer items-center justify-between gap-6 py-5 text-[17px] font-semibold text-fg">{{ $q }}<span class="shrink-0 text-muted-fg"><span class="faq-plus">@include('site::partials.icon', ['name' => 'plus', 'class' => 'size-5'])</span><span class="faq-minus">@include('site::partials.icon', ['name' => 'minus', 'class' => 'size-5'])</span></span></summary>
+          <p class="pb-5 text-base leading-relaxed text-muted-fg">{{ $a }}</p>
+        </details>
+      @endforeach
+    </div>
+  </div>
 </section>
 @endsection

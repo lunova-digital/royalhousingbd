@@ -2,6 +2,7 @@
 
 namespace Modules\Site;
 
+use Modules\Listing\Models\Listing;
 use Modules\Listing\Models\ListingType;
 use Modules\Settings\Settings;
 use Modules\Site\Http\Middleware\SetLocale;
@@ -92,6 +93,34 @@ class Site
             'nav_active' => $meta['nav'] ?? '',
             'whatsapp_float' => self::whatsapp($s, __('site::common.whatsapp_float_message', ['site' => $siteName])),
         ];
+    }
+
+    /** Published listings per type slug, for the homepage category tiles. */
+    public static function typeCounts(): array
+    {
+        return Listing::query()->published()->selectRaw('type, count(*) as total')->groupBy('type')->pluck('total', 'type')->all();
+    }
+
+    /**
+     * A bundled stand-in photo for a record with no upload: public/images/placeholders/{group}/{name}-{n}.webp,
+     * rotating through the n that exist by $seed so neighbouring cards differ. '' when none are bundled.
+     */
+    public static function placeholder(string $group, string $name, int $seed = 0): string
+    {
+        $dir = public_path("images/placeholders/{$group}");
+        $files = glob("{$dir}/{$name}-*.webp") ?: glob("{$dir}/default-*.webp") ?: [];
+        if (! $files) {
+            return '';
+        }
+        sort($files);
+
+        return '/images/placeholders/'.$group.'/'.basename($files[$seed % count($files)]);
+    }
+
+    /** The placeholder folder name for a listing type slug (five-star-hotel → hotel). */
+    public static function typeKey(string $slug): string
+    {
+        return $slug === 'five-star-hotel' ? 'hotel' : $slug;
     }
 
     /** Turn a stored relative path ("uploads/…/x.jpg") into its URL. */

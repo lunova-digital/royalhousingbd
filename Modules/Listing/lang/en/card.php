@@ -2,8 +2,11 @@
 
 return [
     'whatsapp_message' => 'Hello, I would like to book ":title" (Ref: :ref).',
-    'beds_baths' => ':beds bed · :baths bath',
-    'taken' => ':count taken',
-    'book_on_whatsapp' => 'Book on WhatsApp',
     'details' => 'Details',
+    'price_on_request' => 'Price on request',
+    'enquire' => 'Enquire',
+    'booked_of' => ':taken of :total booked',
+    'verified' => 'Verified',
+    'bed' => ':count bed',
+    'bath' => ':count bath',
 ];

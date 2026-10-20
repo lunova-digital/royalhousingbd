@@ -36,9 +36,9 @@ class LocaleTest extends TestCase
             ->assertOk()
             ->assertSee('<html lang="bn"', false)
             ->assertPlainCookie('lang', 'bn')
-            ->assertSee('noto-sans-bengali')
+            ->assertSee('hind-siliguri')
             ->assertSee('সচরাচর জিজ্ঞাসা')
-            ->assertSee('100% যাচাইকৃত কাগজপত্র')
+            ->assertSee('যাচাইকৃত কাগজপত্র')
             ->assertDontSee('Frequently asked questions');
     }
 
@@ -61,7 +61,7 @@ class LocaleTest extends TestCase
             ->assertOk()
             ->assertSee('এলাকা অনুযায়ী দেখুন')
             ->assertSee('ফিল্টার')
-            ->assertSee('হোয়াটসঅ্যাপে বুক করুন')
+            ->assertSee('জিজ্ঞাসা করুন')
             ->assertSee('Corner plot, Block C')
             ->assertDontSee('Browse by location');
 

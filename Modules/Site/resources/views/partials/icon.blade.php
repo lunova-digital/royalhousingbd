@@ -47,7 +47,9 @@ $icons = [
   'shield-check' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
   'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
   'external' => '<path d="M7 17 17 7M8 7h9v9"/>',
+  'minus' => '<path d="M5 12h14"/>',
+  'message-circle' => '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>',
   'layers' => '<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5M2 17l10 5 10-5"/>',
 ];
 @endphp
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{{ $class ?? 'size-5' }}" aria-hidden="true">{!! $icons[$name] ?? '' !!}</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="{{ $class ?? 'size-5' }}" aria-hidden="true">{!! $icons[$name] ?? '' !!}</svg>

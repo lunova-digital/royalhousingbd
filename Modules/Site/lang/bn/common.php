@@ -44,4 +44,6 @@ return [
     'whatsapp_float_message' => 'হ্যালো, আমি :site-এ আপনাদের খোঁজ পেয়েছি, আরও বিস্তারিত জানতে চাই।',
     'all' => 'সব',
     'home' => 'হোম',
+    'listing_count' => ':count টি লিস্টিং|:count টি লিস্টিং',
+    'price_on_request' => 'দাম জানতে যোগাযোগ করুন',
 ];
