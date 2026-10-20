@@ -145,6 +145,17 @@ class Widget {
     this.goTo(this.step + 1)
   }
 
+  // A button can hand the booking a note (the plots picked on the map): it fills the message box unless the visitor wrote their own.
+  private autoNote = ''
+  setNote(note: string) {
+    const box = q<HTMLTextAreaElement>(this.form, '[name="message"]')
+    if (!box || note === '') return
+    if (box.value.trim() === '' || box.value === this.autoNote) {
+      box.value = note
+      this.autoNote = note
+    }
+  }
+
   setListing(id: string) {
     q<HTMLInputElement>(this.form, '[data-consult-listing]')!.value = id
   }
@@ -264,6 +275,7 @@ for (const opener of document.querySelectorAll<HTMLElement>('[data-consult-open]
       return
     }
     if (opener.dataset.consultListing) dialogWidget.setListing(opener.dataset.consultListing)
+    if (opener.dataset.consultNote) dialogWidget.setNote(opener.dataset.consultNote)
     dialog.showModal()
     document.body.style.overflow = 'hidden'
     void dialogWidget.load()

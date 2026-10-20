@@ -48,7 +48,7 @@
     @yield('ticker')
 
     <header class="sticky top-0 z-40 border-b border-line bg-white">
-      <div class="container-x flex h-16 items-center gap-4 lg:h-[72px] lg:gap-8">
+      <div class="container-x flex h-16 items-center gap-4 lg:h-[72px] lg:gap-4 xl:gap-8">
         @include('site::partials.brand', ['href' => '/'])
 
         <nav class="hidden items-center gap-1 lg:flex" aria-label="{{ __('site::layout.main_nav') }}">
@@ -74,7 +74,7 @@
               <a href="{{ \Modules\Site\Site::localeUrl($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" rel="nofollow" class="px-3 py-2 transition-colors {{ $code === $locale ? 'bg-ink-950 text-white' : 'text-muted-fg hover:text-fg' }}" @if ($code === $locale) aria-current="true" @endif>{{ $label }}</a>
             @endforeach
           </span>
-          <span class="hidden lg:block">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm', 'fx' => 'glow'])</span>
+          <span class="hidden lg:block">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm', 'fx' => 'glow', 'ctaShort' => __('site::layout.nav_consult')])</span>
         </div>
       </div>
     </header>

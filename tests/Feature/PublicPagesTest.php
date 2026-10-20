@@ -91,7 +91,7 @@ class PublicPagesTest extends TestCase
             ->assertSee('"status":"available"', false)
             // The WhatsApp message is composed in the browser from the selection.
             ->assertSee('"whatsapp":{"number":"8801700000000"', false)
-            ->assertSee('"messageMany":', false)
+            ->assertSee('msgMany', false)
             ->assertSee('template data-plot-item', false)
             ->assertSee('.svg', false);
     }
@@ -136,5 +136,14 @@ class PublicPagesTest extends TestCase
         $html = $this->get('/')->assertOk()->getContent();
         $this->assertStringNotContainsString('consult-shine fixed right-6', $html);
         $this->assertStringContainsString('consult-glow btn-sm', $html);
+    }
+
+    public function test_project_switcher_gets_the_plan_as_json(): void
+    {
+        $masterplan = Masterplan::query()->first();
+        $json = $this->getJson($masterplan->url().'?json=1')->assertOk()->assertJsonPath('slug', $masterplan->slug)->assertJsonPath('counts.available', $masterplan->statusCounts()['available'])->json();
+        $this->assertSame($masterplan->plots->count(), count($json['plots']));
+        $this->assertArrayHasKey('sizeRaw', $json['plots'][0]);
+        $this->get($masterplan->url())->assertOk()->assertSee('data-plan-project', false)->assertSee('data-plot-consult', false)->assertSee('data-grip', false);
     }
 }

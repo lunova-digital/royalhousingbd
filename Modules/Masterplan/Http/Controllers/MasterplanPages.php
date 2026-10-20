@@ -3,6 +3,8 @@
 namespace Modules\Masterplan\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Modules\Masterplan\Models\Masterplan;
 use Modules\Masterplan\Models\Plot;
 use Modules\Site\Site;
@@ -21,25 +23,15 @@ class MasterplanPages
         ], ['masterplans' => $masterplans]));
     }
 
-    public function show(string $slug): View
+    /** The map page, or (?json=1) just the plan, so the project switcher can swap maps without a reload. */
+    public function show(Request $request, string $slug): View|JsonResponse
     {
         $masterplan = Masterplan::query()->with('plots')->published()->where('slug', $slug)->first() ?? abort(404);
-        $settings = Site::settings();
+        $plan = $this->plan($masterplan);
 
-        // What the map script consumes: each detailed plot, keyed to its SVG
-        // group (FR-MAP-004). The WhatsApp message is composed in the browser
-        // from the visitor's selection, so the page ships the number and the
-        // message templates rather than a link per plot (FR-MAP-008).
-        $plots = $masterplan->plots->map(fn (Plot $plot) => [
-            'id' => $plot->id,
-            'key' => $plot->svg_key,
-            'number' => $plot->number,
-            'size' => Site::num((string) $plot->size),
-            'price' => Site::num((string) $plot->price),
-            'position' => $plot->position,
-            'status' => $plot->status,
-            'ref' => $plot->reference(),
-        ]);
+        if ($request->boolean('json')) {
+            return response()->json($plan);
+        }
 
         return view('masterplan::show', Site::page([
             'title' => __('masterplan::show.title', ['name' => $masterplan->name]),
@@ -49,32 +41,66 @@ class MasterplanPages
         ], [
             'masterplan' => $masterplan,
             'counts' => $masterplan->statusCounts(),
-            'plan' => [
-                'layout' => Site::asset($masterplan->image_path),
-                'width' => $masterplan->image_width,
-                'height' => $masterplan->image_height,
-                'plots' => $plots,
-                'whatsapp' => [
-                    'number' => preg_replace('/\D+/', '', (string) ($settings['whatsapp_number'] ?? '')),
-                    'project' => $masterplan->name,
-                    'url' => Site::baseUrl().$masterplan->url(),
-                ],
-                // The side panel's own words, in the visitor's language. The
-                // message templates keep their :placeholders for the script.
-                'labels' => [
-                    'available' => __('site::common.available'),
-                    'booked' => __('site::common.booked'),
-                    'sold' => __('site::common.sold'),
-                    'plot' => __('site::common.plot'),
-                    'callForPrice' => __('site::common.call_for_price'),
-                    'loadError' => __('masterplan::show.load_error'),
-                    'selected' => __('masterplan::show.n_selected'),
-                    'removePlot' => __('masterplan::show.remove_plot'),
-                    'messageOne' => __('masterplan::show.whatsapp_message'),
-                    'messageMany' => __('masterplan::show.whatsapp_message_many'),
-                    'messagePlot' => __('masterplan::show.whatsapp_message_plot'),
-                ],
-            ],
+            'plan' => $plan,
+            'projects' => Masterplan::query()->published()->orderBy('id')->get(['id', 'name', 'slug'])->map(fn (Masterplan $m) => ['name' => $m->name, 'slug' => $m->slug, 'url' => $m->url()])->all(),
+            // The words the map script needs, in the visitor's language. Message templates keep their :placeholders.
+            'mapLabels' => $this->labels(),
         ]));
+    }
+
+    /**
+     * What the map script consumes: the layout, and each detailed plot keyed to its SVG group (FR-MAP-004).
+     * Numbers and sizes arrive ready to display (বাং digits and units); `raw` / `sizeRaw` are the stored values.
+     * The WhatsApp message is composed in the browser from the visitor's selection (FR-MAP-008).
+     */
+    private function plan(Masterplan $masterplan): array
+    {
+        $settings = Site::settings();
+
+        return [
+            'slug' => $masterplan->slug,
+            'name' => $masterplan->name,
+            'description' => (string) $masterplan->description,
+            'url' => $masterplan->url(),
+            'layout' => Site::asset($masterplan->image_path),
+            'width' => $masterplan->image_width,
+            'height' => $masterplan->image_height,
+            'counts' => $masterplan->statusCounts(),
+            'plots' => $masterplan->plots->map(fn (Plot $plot) => [
+                'id' => $plot->id,
+                'key' => $plot->svg_key,
+                'number' => Site::digits((string) $plot->number),
+                'raw' => (string) $plot->number,
+                'size' => Site::num((string) $plot->size),
+                'sizeRaw' => (string) $plot->size,
+                'price' => Site::num((string) $plot->price),
+                'position' => $plot->position,
+                'status' => $plot->status,
+                'ref' => $plot->reference(),
+            ])->all(),
+            'whatsapp' => [
+                'number' => preg_replace('/\D+/', '', (string) ($settings['whatsapp_number'] ?? '')),
+                'project' => $masterplan->name,
+                'url' => Site::baseUrl().$masterplan->url(),
+            ],
+        ];
+    }
+
+    private function labels(): array
+    {
+        $t = fn (string $key) => __('masterplan::show.'.$key);
+
+        return [
+            'available' => __('site::common.available'), 'booked' => __('site::common.booked'), 'sold' => __('site::common.sold'),
+            'plot' => __('site::common.plot'), 'callForPrice' => __('listing::card.price_on_request'),
+            'loadError' => $t('load_error'), 'selected' => $t('n_selected'), 'selectedTotal' => $t('n_selected_total'),
+            'removePlot' => $t('remove_plot'), 'plotLabel' => $t('plot_label'), 'plotAria' => $t('plot_aria'),
+            'findNone' => $t('find_none'), 'askSimilar' => $t('ask_similar'), 'book' => __('site::common.book_now'),
+            'msgOne' => $t('msg_one'), 'msgMany' => $t('msg_many'), 'msgSimilar' => $t('msg_similar'), 'msgSimilarMany' => $t('msg_similar_many'),
+            'msgEach' => $t('msg_each'), 'msgItem' => $t('msg_item'), 'msgItemStatus' => $t('msg_item_status'),
+            'msgItemNoSize' => $t('msg_item_nosize'), 'msgItemStatusNoSize' => $t('msg_item_status_nosize'),
+            'msgMap' => $t('msg_map'), 'notePlots' => $t('note_plots'),
+            'fullScreen' => $t('full_screen'), 'exitFullScreen' => $t('exit_full_screen'),
+        ];
     }
 }

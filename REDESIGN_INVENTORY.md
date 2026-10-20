@@ -124,3 +124,24 @@ Same rule: nothing removed, only merged or moved. *After* is where it lives now.
 | Privacy / Terms | Admin text, 720px article, empty state |
 | Consultation page + dialog | Details → Day → Time → Confirm with progress; same slot feed, booking POST, success screen (.ics was already removed), booking reference page |
 | 404 / 500 | Back to home, browse projects, both CTAs |
+
+---
+
+# Plot map rebuild (Part B)
+
+## How the map was rendered before
+- **Source:** each published `Masterplan` stores an uploaded **SVG** (`image_path`, validated by `LayoutSvg`); every
+  `<g class="plan-plot">` is one plot. A `Plot` row (number, size, price, position, status, reference) is matched to its
+  group by `svg_key` (`data-plot` or `id`). Plot data reaches the page as JSON in `<script id="plan-data">`.
+- **Rendering:** Leaflet in `CRS.Simple` with the SVG as an `svgOverlay` (`plan-map.ts`, `plan.ts`), shown at max 75vh inside a
+  padded card; the details panel was a normal block next to / under the map. Taps were Leaflet `click` events.
+- **Why it felt bad:** the landscape plan was shrunk to ~16px plots on phones; Leaflet's drag and `click` raced; plot
+  numbers were 12 drawing units (a few px on screen); the panel scrolled the page.
+- The admin plot builder still uses `plan-map.ts` (Leaflet) and is untouched.
+
+## After
+Own renderer on the `panzoom` library (inertia, pinch, wheel/trackpad at cursor, double-tap): inline SVG in a transformed
+layer, portrait phones rotate the whole drawing 90° (text counter-rotated), tap = pointer moved < 6px and < 300ms,
+details in a three-snap bottom sheet (phones) / sticky 380px side panel (desktop). All previous behaviour kept:
+multi-select, status colours + legend filter, plot details, "ask about them together" (WhatsApp, now also the consultation
+booking), zoom +/−/reset, per-project maps (now switchable without a reload).
