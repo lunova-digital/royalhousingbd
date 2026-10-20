@@ -343,3 +343,31 @@ window.rhToast = (text: string) => {
   window.setTimeout(() => el.remove(), 2600)
 }
 export {}
+
+// The floating chat button's idle nudge: every ~8s a "Talk to an advisor" bubble slides out for 3s, at most 3 times a session.
+const fab = document.querySelector<HTMLElement>('[data-fab]')
+if (fab && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const KEY = 'rh-fab-nudges'
+  let shown = 0
+  try {
+    shown = Number(sessionStorage.getItem(KEY) ?? 0)
+  } catch {
+    /* private mode: nudge freely, but only 3 times per page view */
+  }
+  const tick = () => {
+    if (shown >= 3) return
+    const busy = fab.getAttribute('aria-expanded') === 'true' || document.querySelector('dialog[open]')
+    if (!busy) {
+      shown++
+      try {
+        sessionStorage.setItem(KEY, String(shown))
+      } catch {
+        /* ignore */
+      }
+      fab.classList.add('is-nudging')
+      window.setTimeout(() => fab.classList.remove('is-nudging'), 3000)
+    }
+    window.setTimeout(tick, 8000)
+  }
+  window.setTimeout(tick, 8000)
+}

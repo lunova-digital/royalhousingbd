@@ -190,7 +190,11 @@
           </a>
         @endforeach
         <button type="button" data-chooser-toggle aria-haspopup="dialog" class="flex flex-col items-center gap-1 pb-2 text-[11px] font-semibold text-fg">
-          <span class="consult-glow consult-shine -mt-6 inline-flex size-14 items-center justify-center rounded-full bg-ink-950 text-white ring-4 ring-white">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</span>
+          <span class="fab fab-sm -mt-6 inline-flex size-14 items-center justify-center rounded-full ring-4 ring-white">
+            <span class="fab-aura" aria-hidden="true"></span>
+            <span class="fab-wave" style="--d: 0s" aria-hidden="true"></span><span class="fab-wave" style="--d: 1.1s" aria-hidden="true"></span>
+            <span class="fab-face">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6']) <span class="fab-tap" aria-hidden="true"></span></span>
+          </span>
           <span>{{ __('site::layout.nav_consult') }}</span>
         </button>
         @foreach ([$tab('/map', 'map', __('site::layout.nav_map'), $nav_active === 'map')] as $t)
@@ -208,7 +212,12 @@
     {{-- Desktop: the one floating button --}}
     @if ($whatsapp || $consultOn)
       @if ($floatWa || $floatConsult)
-      <button type="button" data-chooser-toggle aria-haspopup="dialog" aria-expanded="false" aria-label="{{ __('site::layout.chooser_title') }}" class="consult-glow consult-shine fixed right-6 bottom-6 z-40 hidden size-14 items-center justify-center rounded-full bg-ink-950 text-white lg:inline-flex">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6'])</button>
+      <button type="button" data-chooser-toggle data-fab aria-haspopup="dialog" aria-expanded="false" aria-label="{{ __('site::layout.chooser_title') }}" class="fab fixed right-6 bottom-6 z-40 hidden lg:block">
+        <span class="fab-aura" aria-hidden="true"></span>
+        <span class="fab-wave" style="--d: 0s" aria-hidden="true"></span><span class="fab-wave" style="--d: 0.93s" aria-hidden="true"></span><span class="fab-wave" style="--d: 1.86s" aria-hidden="true"></span>
+        <span class="fab-face">@include('site::partials.icon', ['name' => 'message-circle', 'class' => 'size-6']) <span class="fab-tap" aria-hidden="true"></span></span>
+        <span class="fab-bubble" aria-hidden="true">{{ __('site::layout.chooser_title') }}</span>
+      </button>
       @endif
 
       {{-- ConsultSheet: WhatsApp or book. Bottom sheet on phones, small card over the button on desktop. --}}

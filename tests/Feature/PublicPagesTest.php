@@ -134,7 +134,7 @@ class PublicPagesTest extends TestCase
         Settings::save(['float_consult' => '0']);
         // Both off: no floating button on desktop, but the header consult button stays.
         $html = $this->get('/')->assertOk()->getContent();
-        $this->assertStringNotContainsString('consult-shine fixed right-6', $html);
+        $this->assertStringNotContainsString('data-fab', $html);
         $this->assertStringContainsString('consult-glow btn-sm', $html);
     }
 
