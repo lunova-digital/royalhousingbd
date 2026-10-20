@@ -323,3 +323,21 @@ if (reveals.length && 'IntersectionObserver' in window) {
 } else {
   for (const el of reveals) el.classList.add('in')
 }
+
+// A small, polite toast ("Saved", "Link copied"): window.rhToast(text)
+declare global {
+  interface Window {
+    rhToast?: (text: string) => void
+  }
+}
+window.rhToast = (text: string) => {
+  const region = document.querySelector<HTMLElement>('[data-toast-region]')
+  if (!region || !text) return
+  const el = document.createElement('div')
+  el.className = 'toast-pill'
+  el.textContent = text
+  region.replaceChildren(el)
+  window.setTimeout(() => el.classList.add('is-leaving'), 2200)
+  window.setTimeout(() => el.remove(), 2600)
+}
+export {}

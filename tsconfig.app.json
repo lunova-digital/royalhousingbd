@@ -34,6 +34,9 @@
       "@auth/*": [
         "./Modules/Auth/resources/*"
       ],
+      "@account/*": [
+        "./Modules/Account/resources/*"
+      ],
       "@dashboard/*": [
         "./Modules/Dashboard/resources/*"
       ],

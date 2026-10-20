@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Modules\Account\Models\Member;
 
 return [
 
@@ -42,6 +43,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // Public site accounts (Modules\Account): a separate guard, table and password broker, so a member can never use the admin.
+        'member' => [
+            'driver' => 'session',
+            'provider' => 'members',
+        ],
     ],
 
     /*
@@ -65,6 +71,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+        'members' => [
+            'driver' => 'eloquent',
+            'model' => Member::class,
         ],
 
         // 'users' => [
@@ -96,6 +106,12 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'members' => [
+            'provider' => 'members',
+            'table' => 'member_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

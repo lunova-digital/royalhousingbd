@@ -21,21 +21,21 @@ class AuthTest extends TestCase
 
     public function test_guests_are_sent_to_the_login_page(): void
     {
-        $this->get('/admin/listings/1')->assertRedirect('/login');
-        $this->get('/login')->assertOk()->assertSee('Admin sign in');
+        $this->get('/admin/listings/1')->assertRedirect('/admin/login');
+        $this->get('/admin/login')->assertOk()->assertSee('Admin sign in');
     }
 
     public function test_login_logout_and_bad_credentials(): void
     {
-        $this->from('/login')->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong'])
-            ->assertRedirect('/login')->assertSessionHasErrors('email');
+        $this->from('/admin/login')->post('/admin/login', ['email' => 'admin@example.com', 'password' => 'wrong'])
+            ->assertRedirect('/admin/login')->assertSessionHasErrors('email');
         $this->assertGuest();
 
-        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'password'])->assertRedirect('/admin');
+        $this->post('/admin/login', ['email' => 'admin@example.com', 'password' => 'password'])->assertRedirect('/admin');
         $this->assertAuthenticatedAs($this->admin);
-        $this->get('/login')->assertRedirect('/admin');
+        $this->get('/admin/login')->assertRedirect('/admin');
 
-        $this->post('/logout')->assertRedirect('/login');
+        $this->post('/logout')->assertRedirect('/admin/login');
         $this->assertGuest();
     }
 
@@ -61,8 +61,8 @@ class AuthTest extends TestCase
     public function test_login_is_rate_limited(): void
     {
         for ($i = 0; $i < 10; $i++) {
-            $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong'])->assertRedirect();
+            $this->post('/admin/login', ['email' => 'admin@example.com', 'password' => 'wrong'])->assertRedirect();
         }
-        $this->post('/login', ['email' => 'admin@example.com', 'password' => 'wrong'])->assertStatus(429);
+        $this->post('/admin/login', ['email' => 'admin@example.com', 'password' => 'wrong'])->assertStatus(429);
     }
 }

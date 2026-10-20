@@ -2,6 +2,7 @@
 <html lang="{{ app()->getLocale() }}" class="bg-page">
   <head>
     <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{{ $title }}</title>
     @if ($description)<meta name="description" content="{{ $description }}" />@endif
@@ -31,9 +32,10 @@
     <script>document.documentElement.classList.add('js')</script>
     @vite('resources/css/site.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}
+    {{ Modules::vite('account', 'resources/js/account.ts') }}
     @stack('head')
   </head>
-  <body class="min-h-svh bg-page font-body text-base text-text antialiased pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+  <body data-member="{{ $acct ? '1' : '0' }}" class="min-h-svh bg-page font-body text-base text-text antialiased pb-[calc(4rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
     @php($path = '/'.ltrim(request()->path(), '/'))
     @php($whatsapp = $settings['whatsapp_number'] ?? '')
     @php($phone = $settings['phone'] ?? '')
@@ -68,6 +70,12 @@
 
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
           <button type="button" data-open-dialog="search-dialog" aria-label="{{ __('site::layout.search_open') }}" class="inline-flex size-10 items-center justify-center rounded-full text-fg transition-colors hover:bg-fill">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-5'])</button>
+          {{-- Account: a guest gets the auth sheet; a member gets their menu (phones use the Menu sheet instead) --}}
+          @if ($acct)
+            @include('account::partials.user-menu')
+          @else
+            <button type="button" data-auth-open="login" aria-label="{{ __('account::auth.header_login') }}" class="hidden size-10 items-center justify-center rounded-full text-fg transition-colors hover:bg-fill lg:inline-flex">@include('site::partials.icon', ['name' => 'user-circle', 'class' => 'size-[22px]'])</button>
+          @endif
           {{-- Language toggle: `?lang=` is remembered by the SetLocale middleware --}}
           <span class="flex items-center overflow-hidden rounded-full border border-line text-xs font-semibold leading-none" role="group" aria-label="{{ __('site::layout.language') }}">
             @foreach (\Modules\Site\Site::LOCALES as $code => $label)
@@ -213,7 +221,17 @@
     <dialog id="menu-sheet" class="sheet" aria-label="{{ __('site::layout.nav_menu') }}">
       <div class="p-6">
         <div class="flex items-center justify-between"><h2 class="text-xl text-fg font-semibold">{{ __('site::layout.nav_menu') }}</h2><button type="button" data-dialog-close aria-label="{{ __('site::layout.close') }}" class="inline-flex size-9 items-center justify-center rounded-full text-muted-fg hover:bg-fill">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button></div>
-        <ul class="mt-4 divide-y divide-line text-[15px] font-medium text-fg">
+        @if ($acct)
+          <div class="mt-4 flex items-center gap-3 rounded-2xl bg-fill p-3">@include('account::partials.avatar', ['member' => $acct, 'size' => 44])<div class="min-w-0"><p class="truncate font-semibold text-fg">{{ $acct->displayName() }}</p><p class="truncate text-sm text-muted-fg">{{ $acct->email ?: \Modules\Account\Support\Identifier::local($acct->phone) }}</p></div></div>
+          <ul class="mt-2 divide-y divide-line text-[15px] font-medium text-fg">
+            <li><a href="/account/saved" class="flex items-center justify-between py-3.5">{{ __('account::auth.menu_saved') }} @include('site::partials.icon', ['name' => 'heart', 'class' => 'size-5 text-muted-fg'])</a></li>
+            <li><a href="/account/profile" class="flex items-center justify-between py-3.5">{{ __('account::auth.menu_profile') }} @include('site::partials.icon', ['name' => 'user', 'class' => 'size-5 text-muted-fg'])</a></li>
+            <li><form method="post" action="/logout">@csrf<button type="submit" class="flex w-full items-center justify-between py-3.5 text-left">{{ __('account::auth.menu_logout') }} @include('site::partials.icon', ['name' => 'log-out', 'class' => 'size-5 text-muted-fg'])</button></form></li>
+          </ul>
+        @else
+          <div class="mt-4 grid grid-cols-2 gap-3"><button type="button" data-auth-open="login" class="btn-consult btn-sm">{{ __('account::auth.menu_login') }}</button><button type="button" data-auth-open="register" class="btn-wa btn-sm !bg-white !text-fg ring-1 ring-line hover:!bg-fill">{{ __('account::auth.menu_signup') }}</button></div>
+        @endif
+        <ul class="mt-2 divide-y divide-line text-[15px] font-medium text-fg">
           <li><button type="button" data-open-dialog="search-dialog" class="flex w-full items-center justify-between py-3.5">{{ __('site::layout.search_title') }} @include('site::partials.icon', ['name' => 'search', 'class' => 'size-5 text-muted-fg'])</button></li>
           @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="flex items-center justify-between py-3.5">{{ $t['label'] }} @include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-4 text-muted-fg'])</a></li>@endforeach
           @foreach ([['/gallery', __('site::layout.nav_gallery')], ['/about', __('site::layout.nav_about')], ['/contact', __('site::layout.contact')], ['/privacy', __('site::layout.privacy_policy')], ['/terms', __('site::layout.terms_of_service')]] as [$href, $label])
@@ -232,6 +250,8 @@
       </div>
     </dialog>
 
+    @unless ($acct)@include('account::partials.auth-dialog')@endunless
+
     {{-- Lightbox for galleries: arrows, swipe, keyboard, backdrop --}}
     <div data-lightbox hidden class="fixed inset-0 z-[70] flex touch-pan-y items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="{{ __('site::layout.nav_gallery') }}">
       <button type="button" data-lightbox-close aria-label="{{ __('site::common.close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
@@ -241,6 +261,9 @@
       <p class="pointer-events-none absolute inset-x-0 bottom-4 px-16 text-center text-sm text-white/80"><span data-lightbox-caption></span> <span data-lightbox-counter class="text-white/60"></span></p>
     </div>
     @includeIf('consultation::partials.launcher')
+    <div hidden data-account-labels data-working="{{ __('account::auth.working') }}" data-error="{{ __('account::auth.generic_error') }}" data-too-many="{{ __('account::auth.too_many_short') }}"
+         data-save-prompt="{{ __('account::auth.save_prompt') }}" data-added="{{ __('account::saved.added') }}" data-removed="{{ __('account::saved.removed') }}" data-photo-saved="{{ __('account::profile.photo_saved') }}"></div>
+    <div data-toast-region aria-live="polite" class="pointer-events-none fixed inset-x-0 bottom-24 z-[95] flex justify-center px-4 lg:bottom-8"></div>
     @stack('scripts')
   </body>
 </html>

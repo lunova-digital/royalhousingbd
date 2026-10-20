@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.17",
+        "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",
         "protibimbok/laramod": "^0.1.1",
         "protibimbok/laramod-admin": "dev-master"

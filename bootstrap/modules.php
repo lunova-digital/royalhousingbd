@@ -1,6 +1,7 @@
 <?php
 
 use Laramod\Admin\AdminModule;
+use Modules\Account\AccountModule;
 use Modules\Auth\AuthModule;
 use Modules\Consultation\ConsultationModule;
 use Modules\Content\ContentModule;
@@ -18,6 +19,7 @@ return [
     SettingsModule::class,
     MediaModule::class,
     AuthModule::class,
+    AccountModule::class,
     DashboardModule::class,
     ListingModule::class,
     MasterplanModule::class,

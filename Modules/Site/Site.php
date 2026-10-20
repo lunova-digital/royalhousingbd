@@ -2,6 +2,7 @@
 
 namespace Modules\Site;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Modules\Content\Services\Translations;
 use Modules\Content\Services\TranslationSources;
@@ -102,6 +103,8 @@ class Site
             'nav' => self::NAV,
             'types' => self::types(),
             'services' => Service::footer(),
+            // `acct`, not `member`: a page's own @foreach ($team as $member) leaks into the layout's scope
+            'acct' => Auth::guard('member')->user(),
             'nav_active' => $meta['nav'] ?? '',
             'whatsapp_float' => self::whatsapp($s, __('site::common.whatsapp_float_message', ['site' => $siteName])),
         ];

@@ -37,13 +37,16 @@ class AuthController
         return redirect()->intended(route('admin'));
     }
 
+    /** Signs out whoever is signed in: the admin goes back to the admin door, a public member to the home page. */
     public function logout(Request $request): RedirectResponse
     {
-        Auth::logout();
+        $wasAdmin = Auth::guard('web')->check();
+        Auth::guard('web')->logout();
+        Auth::guard('member')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return $wasAdmin ? redirect()->route('login') : redirect('/');
     }
 
     public function password(Request $request): JsonResponse
