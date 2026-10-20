@@ -21,7 +21,7 @@
         @php($prices = $map->plots->pluck('price')->filter()->unique()->values())
         @php($thumb = $map->image_path ? $asset($map->image_path) : \Modules\Site\Site::placeholder('masterplan', 'masterplan', (int) $map->id))
         <a href="{{ $map->url() }}" class="card lift group flex flex-col overflow-hidden">
-          <span class="relative block aspect-[16/10] overflow-hidden bg-fill">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="500" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />@endif</span>
+          <span class="relative block aspect-[16/10] overflow-hidden bg-fill">@if ($thumb)<img src="{{ $thumb }}" alt="" width="800" height="500" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />@endif</span>
           <span class="flex flex-1 flex-col p-5">
             <span class="text-lg text-fg font-semibold">{{ $map->name }}</span>
             @if ($map->description)<span class="mt-1 flex items-center gap-1.5 text-sm text-muted-fg">@include('site::partials.icon', ['name' => 'pin', 'class' => 'size-4 shrink-0 text-accent-text'])<span class="truncate">{{ $map->description }}</span></span>@endif

@@ -3,7 +3,7 @@
 <section class="container-x flex justify-center pt-8 pb-16 lg:pt-14 lg:pb-24">
   <div class="w-full max-w-[460px] rounded-[24px] border border-line bg-white p-6 sm:p-9">
     @if ($step === 'identifier')
-      <h1 class="font-display text-[34px] leading-tight text-fg">{{ __('account::auth.forgot_title') }}</h1>
+      <h1 class="font-display text-[40px] leading-[1.1] text-fg">{{ __('account::auth.forgot_title') }}</h1>
       <p class="mt-2 text-[15px] text-muted-fg">{{ __('account::auth.send_code_hint') }}</p>
       @if (session('status'))<p class="mt-4 rounded-xl bg-fill px-3 py-2 text-sm text-fg" role="status">{{ session('status') }}</p>@endif
       <form method="post" action="/forgot-password" class="mt-6 grid gap-4">
@@ -12,7 +12,7 @@
         <button type="submit" class="btn-consult h-12 w-full">{{ __('account::auth.send_reset') }}</button>
       </form>
     @elseif ($step === 'code')
-      <h1 class="font-display text-[34px] leading-tight text-fg">{{ __('account::auth.code_title') }}</h1>
+      <h1 class="font-display text-[40px] leading-[1.1] text-fg">{{ __('account::auth.code_title') }}</h1>
       <p class="mt-2 text-[15px] text-muted-fg">{{ __('account::auth.code_intro') }}</p>
       @if (session('status'))<p class="mt-4 rounded-xl bg-fill px-3 py-2 text-sm text-fg" role="status">{{ session('status') }}</p>@endif
       <form method="post" action="/forgot-password/code" class="mt-6 grid gap-4">
@@ -24,7 +24,7 @@
         <button type="submit" class="btn-consult h-12 w-full">{{ __('account::auth.reset_password') }}</button>
       </form>
     @else
-      <h1 class="font-display text-[34px] leading-tight text-fg">{{ __('account::auth.reset_title') }}</h1>
+      <h1 class="font-display text-[40px] leading-[1.1] text-fg">{{ __('account::auth.reset_title') }}</h1>
       <form method="post" action="/reset-password" class="mt-6 grid gap-4">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}" />

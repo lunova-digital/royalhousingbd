@@ -50,7 +50,7 @@
 
       {{-- North arrow: turns with the map --}}
       <div class="plan-compass" data-compass title="{{ __('masterplan::show.compass_label') }}" aria-hidden="true">
-        <svg viewBox="0 0 40 40" class="size-10" data-compass-arrow><circle cx="20" cy="20" r="19" fill="#fff" stroke="#E9E4DC"/><path d="M20 6 L25.5 22 L20 19 L14.5 22 Z" fill="#0F172A"/><path d="M20 34 L25.5 22 L20 19 L14.5 22 Z" fill="#CBD5E1"/></svg>
+        <svg viewBox="0 0 40 40" class="size-10" data-compass-arrow><circle cx="20" cy="20" r="19" fill="#fff" style="stroke: var(--line)"/><path d="M20 6 L25.5 22 L20 19 L14.5 22 Z" style="fill: var(--primary)"/><path d="M20 34 L25.5 22 L20 19 L14.5 22 Z" fill="#CBD5E1"/></svg>
         <span>{{ __('masterplan::show.compass_n') }}</span>
       </div>
 
@@ -71,7 +71,7 @@
 
       <div class="plan-empty" data-empty>
         <span class="plan-hand" aria-hidden="true">@include('site::partials.icon', ['name' => 'cursor', 'class' => 'size-7'])</span>
-        <h2 class="font-display text-[22px] leading-tight text-fg">{{ __('masterplan::show.select_plot') }}</h2>
+        <h2 class="text-[20px] leading-tight font-semibold text-fg">{{ __('masterplan::show.select_plot') }}</h2>
         <p class="mt-2 text-[15px] text-muted-fg">{{ __('masterplan::show.select_plot_hint') }}</p>
       </div>
 

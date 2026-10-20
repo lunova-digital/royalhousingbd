@@ -13,7 +13,7 @@
   <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
     <div>
       @include('site::partials.breadcrumb', ['items' => $label ? [[__('site::common.projects'), '/projects'], [$heading, null]] : [[__('site::common.projects'), null]]])
-      <h1 class="mt-2 font-display text-[28px] leading-tight text-fg lg:text-[32px]">{{ $heading }}</h1>
+      <h1 class="mt-2 font-display text-[32px] leading-[1.12] text-fg lg:text-[44px]">{{ $heading }}</h1>
     </div>
   </div>
 </section>

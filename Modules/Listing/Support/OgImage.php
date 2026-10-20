@@ -82,7 +82,7 @@ final class OgImage
         $title = $esc(mb_strimwidth((string) $listing->getRawOriginal('title'), 0, 90, '…'));
         $price = $listing->call_for_price || trim((string) $listing->getRawOriginal('price')) === '' ? 'Price on request' : (string) $listing->getRawOriginal('price');
         $meta = $esc(trim($listing->getRawOriginal('location').'  ·  '.$listing->typeLabel(), ' ·'));
-        $serif = preg_match('/\p{Bengali}/u', $title) ? 'Noto Serif Bengali SemiBold' : 'Playfair Display SemiBold';
+        $serif = preg_match('/\p{Bengali}/u', $title) ? 'Noto Serif Bengali SemiBold' : 'Cormorant Garamond Light SemiBold';
 
         $make = function (string $name, string $markup, int $width) use ($tmp, $env) {
             $out = "{$tmp}/{$name}.png";
@@ -90,7 +90,7 @@ final class OgImage
 
             return $r->successful() ? $out : null;
         };
-        $titleImg = $make('title', '<span foreground="#FFFFFF" font_family="'.$serif.'" size="61440">'.$title.'</span>', 980);
+        $titleImg = $make('title', '<span foreground="#FFFFFF" font_family="'.$serif.'" size="75776">'.$title.'</span>', 980);
         $priceImg = $make('price', '<span foreground="#C9A96E" font_family="Manrope ExtraLight SemiBold" size="40960">'.$esc($price).'</span>', 980);
         $metaImg = $make('meta', '<span foreground="#CFE0D8" font_family="Manrope ExtraLight SemiBold" size="26624">'.$meta.'</span>', 980);
         $brandImg = $make('brand', '<span foreground="#FFFFFF" font_family="Manrope ExtraLight SemiBold" size="28672">ROYAL HOUSING</span> <span foreground="#C9A96E" font_family="Manrope ExtraLight SemiBold" size="20480">BD</span>', 600);

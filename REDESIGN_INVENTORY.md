@@ -145,3 +145,24 @@ layer, portrait phones rotate the whole drawing 90° (text counter-rotated), tap
 details in a three-snap bottom sheet (phones) / sticky 380px side panel (desktop). All previous behaviour kept:
 multi-select, status colours + legend filter, plot details, "ask about them together" (WhatsApp, now also the consultation
 booking), zoom +/−/reset, per-project maps (now switchable without a reload).
+
+---
+
+# Phase 3 — accounts, saved properties, sharing, services, premium theme & motion
+
+## What existed before
+- **Auth:** only the single-admin login (`Modules/Auth`, session guard `web`, `users` table, Blade page at `/login`). No Breeze,
+  Fortify, Sanctum or Socialite. The admin (laramod-admin) is a React SPA under `/admin` on a JSON API; the public site is Blade.
+- **No SSR concern:** public pages are server-rendered Blade, so Open Graph tags are in the initial HTML.
+- **Floating button:** the desktop FAB + admin toggles (`float_whatsapp`, `float_consult`) from Phase 2.
+
+## What was added
+| Area | Where |
+|---|---|
+| Other services (Car, Solar, Lift) | `Modules/Service` (model, admin CRUD under Site → Other services, `/services/{slug}`, footer column) |
+| Accounts | `Modules/Account`: `members` table + `member` guard + `members` password broker (separate from the admin); admin door moved to `/admin/login` |
+| Google | Socialite, `config/services.php`, `.env.example` |
+| Saved + profile | `saved_listings`, `/account/saved`, `/account/profile`, avatar cropper, admin "Saves" column |
+| Share | `site::partials.share-*`, `share.ts`, `/og/{type}/{slug}.jpg`, OG/Twitter meta in the layout |
+| FAB | `.fab*` in `public.css`, nudge in `site.ts` |
+| Theme / fonts / motion | tokens + 3 themes in `public.css`, `Settings → SEO & Brand → Site colours`, Cormorant Garamond, `motion.ts` (lazy) |

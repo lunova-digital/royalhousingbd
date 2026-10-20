@@ -13,7 +13,7 @@
     @if ($hero)<img src="{{ $hero }}" alt="" width="1600" height="900" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover" />@endif
     <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/55 to-ink-950/10"></div>
     <div class="on-dark px-6 pt-16 pb-8 sm:px-10 lg:px-14 lg:pb-12">
-      <p class="eyebrow !text-accent-soft">{{ __('service::service.other_services') }}</p>
+      <p class="eyebrow !text-accent">{{ __('service::service.other_services') }}</p>
       <h1 class="font-display mt-3 max-w-2xl text-[38px] leading-[1.08] sm:text-[48px] lg:text-[56px]">{{ $s->text('title') }}</h1>
       @if ($s->text('summary'))<p class="mt-4 max-w-xl text-base text-white/80 sm:text-lg">{{ $s->text('summary') }}</p>@endif
       <div class="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -49,7 +49,7 @@
 <section class="container-x pt-12 lg:pt-20">
   <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-lightbox-group>
     @foreach ($gallery as $i => $img)
-      <button type="button" data-lightbox-src="{{ $asset($img) }}" data-lightbox-caption="{{ $s->text('title') }}" class="group aspect-[4/3] cursor-zoom-in overflow-hidden rounded-2xl border border-line bg-fill" aria-label="{{ $s->text('title') }} {{ $i + 1 }}"><img src="{{ $asset($img) }}" alt="" width="800" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></button>
+      <button type="button" data-lightbox-src="{{ $asset($img) }}" data-lightbox-caption="{{ $s->text('title') }}" class="group aspect-[4/3] cursor-zoom-in overflow-hidden rounded-2xl border border-line bg-fill" aria-label="{{ $s->text('title') }} {{ $i + 1 }}"><img src="{{ $asset($img) }}" alt="" width="800" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" /></button>
     @endforeach
   </div>
 </section>
@@ -57,7 +57,7 @@
 
 <section class="container-x pt-14 pb-16 lg:pt-20 lg:pb-24">
   <div class="on-dark flex flex-col gap-6 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-    <div><h2 class="font-display text-[28px] leading-tight sm:text-[34px]">{{ __('service::service.cta_title', ['service' => $s->text('title')]) }}</h2><p class="mt-2 max-w-lg text-white/70">{{ __('service::service.cta_text') }}</p></div>
+    <div><h2 class="font-display text-[32px] leading-[1.12] sm:text-[34px]">{{ __('service::service.cta_title', ['service' => $s->text('title')]) }}</h2><p class="mt-2 max-w-lg text-white/70">{{ __('service::service.cta_text') }}</p></div>
     <div class="flex flex-col gap-3 sm:flex-row lg:shrink-0">
       @include('site::partials.cta', ['kind' => 'wa', 'waHref' => $whatsapp])
       @if (\Modules\Consultation\Availability::enabled())<button type="button" data-consult-open data-consult-note="{{ $consultNote }}" class="btn-consult on-dark" aria-haspopup="dialog">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-5']) {{ __('site::layout.book_consultation') }}</button>@endif

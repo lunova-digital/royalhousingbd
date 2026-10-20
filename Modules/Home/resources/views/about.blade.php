@@ -7,7 +7,7 @@
 <section class="container-x pt-8">
   <dl class="grid grid-cols-2 gap-y-6 divide-x divide-line rounded-[20px] border border-line bg-white py-6 sm:grid-cols-4">
     @foreach ($stats as $stat)
-      <div class="px-5 text-center sm:px-6"><dt class="num text-[28px] leading-none text-fg sm:text-[34px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-2 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
+      <div class="px-5 text-center sm:px-6"><dt data-count-up class="num text-[28px] leading-none text-fg sm:text-[34px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-2 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
     @endforeach
   </dl>
 </section>
@@ -84,7 +84,7 @@
 
 <section class="container-x pb-16 lg:pb-24">
   <div class="on-dark flex flex-col gap-6 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-    <div><h2 class="font-display text-[28px] leading-tight">{{ __('home::about.cta_title') }}</h2><p class="mt-2 max-w-lg text-white/70">{{ __('home::about.cta_text') }}</p></div>
+    <div><h2 class="font-display text-[32px] leading-[1.12]">{{ __('home::about.cta_title') }}</h2><p class="mt-2 max-w-lg text-white/70">{{ __('home::about.cta_text') }}</p></div>
     <div class="flex flex-col gap-3 sm:flex-row lg:shrink-0">@include('site::partials.cta', ['kind' => 'wa'])@include('site::partials.cta', ['kind' => 'consult', 'dark' => true])</div>
   </div>
 </section>

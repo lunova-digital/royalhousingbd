@@ -27,6 +27,8 @@ class Settings
         // About page (JSON lists are edited in the admin About tab)
         // Floating chat button (desktop): which options it offers. '0' hides one; the header consult button is unaffected.
         'float_whatsapp', 'float_consult',
+        // The site's colour theme (emerald | onyx | navy); ?theme=… previews the others for the client.
+        'theme_default',
         'about_title', 'about_story', 'about_stats', 'team_members', 'partners',
         // Legal pages
         'privacy_text', 'terms_text',
@@ -44,6 +46,7 @@ class Settings
         'hero_badge' => 'Trusted since 2010',
         'hero_stats' => '[{"value":"150+","label":"Projects completed"},{"value":"5000+","label":"Happy families"},{"value":"50+","label":"Locations"}]',
         'trust_badges' => '',
+        'theme_default' => 'emerald',
         'float_whatsapp' => '1',
         'float_consult' => '1',
         'working_hours' => 'Saturday - Thursday: 9:00 AM - 6:00 PM',

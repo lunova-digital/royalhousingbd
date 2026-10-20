@@ -13,7 +13,7 @@
     <div class="absolute -left-[9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
 
     <div class="{{ ($inline ?? false) ? '' : 'pr-10' }}">
-      <h2 class="font-display text-2xl">{{ __('consultation::widget.heading') }}</h2>
+      <h2 class="font-display text-[32px]">{{ __('consultation::widget.heading') }}</h2>
       <p class="mt-1 text-sm text-muted-fg">{{ $a->note !== '' ? $a->note : __('consultation::widget.intro') }}</p>
     </div>
 
@@ -79,7 +79,7 @@
 
   <div data-consult-success hidden class="py-4 text-center">
     <span class="mx-auto flex size-16 items-center justify-center rounded-full bg-fill text-accent-text">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-8'])</span>
-    <h2 class="mt-5 font-display text-2xl">{{ __('consultation::widget.success_title') }}</h2>
+    <h2 class="mt-5 font-display text-[32px]">{{ __('consultation::widget.success_title') }}</h2>
     <p data-consult-when class="mt-2 text-base font-semibold"></p>
     <p class="mt-1 text-sm text-muted-fg">{{ __('consultation::widget.success_text') }}</p>
     <p class="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-fg">{{ __('consultation::widget.reference') }} <span data-consult-ref class="ml-1 rounded-md bg-fill px-2 py-1 font-mono text-sm tracking-normal text-fg"></span></p>

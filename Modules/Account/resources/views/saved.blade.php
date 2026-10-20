@@ -23,7 +23,7 @@
 
   <div data-saved-empty class="mt-8 flex flex-col items-center rounded-[20px] border border-line bg-white px-6 py-14 text-center" @if ($total) hidden @endif>
     <span class="inline-flex size-16 items-center justify-center rounded-full bg-fill text-accent-text">@include('site::partials.icon', ['name' => 'heart', 'class' => 'size-7'])</span>
-    <h2 class="font-display mt-5 text-[28px] leading-tight text-fg">{{ __('account::saved.empty_title') }}</h2>
+    <h2 class="font-display mt-5 text-[32px] leading-[1.12] text-fg">{{ __('account::saved.empty_title') }}</h2>
     <p class="mt-2 max-w-md text-[15px] text-muted-fg">{{ __('account::saved.empty_text') }}</p>
     <div class="mt-6 flex flex-col gap-3 sm:flex-row"><a href="/projects" class="btn-consult">{{ __('account::saved.browse') }}</a>@include('site::partials.cta', ['kind' => 'wa'])</div>
     <div class="mt-3">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm'])</div>

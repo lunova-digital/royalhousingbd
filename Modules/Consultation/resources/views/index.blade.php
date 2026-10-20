@@ -7,7 +7,7 @@
     @if ($availability->enabled)
       @include('consultation::partials.widget', ['availability' => $availability, 'inline' => true])
     @else
-      <h2 class="font-display text-2xl text-fg">{{ __('consultation::widget.heading') }}</h2>
+      <h2 class="font-display text-[32px] text-fg">{{ __('consultation::widget.heading') }}</h2>
       <p class="mt-2 text-sm text-muted-fg">{{ __('consultation::widget.no_days') }}</p>
       <div class="mt-5">@include('site::partials.cta', ['kind' => 'wa'])</div>
     @endif

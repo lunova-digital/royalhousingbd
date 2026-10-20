@@ -33,14 +33,14 @@
 @php($cta = [($settings['hero_cta_text'] ?? '') ?: __('site::common.view_all'), ($settings['hero_cta_link'] ?? '') ?: '/projects'])
 
 {{-- 2. Hero --}}
-<section class="container-x pt-4 sm:pt-6">
-  <div class="relative isolate flex min-h-[560px] flex-col justify-end overflow-hidden rounded-3xl bg-ink-950 text-white">
-    <img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="(min-width: 1280px) 1200px, 100vw" @endif alt="" width="1600" height="900" fetchpriority="high" class="absolute inset-0 -z-20 size-full object-cover" />
+<section class="container-x hero-glow pt-4 sm:pt-6">
+  <div data-hero class="relative isolate flex min-h-[560px] flex-col justify-end overflow-hidden rounded-3xl bg-ink-950 text-white">
+    <div class="hero-par absolute -inset-x-0 -top-6 -bottom-16 -z-20"><img src="{{ $heroImg }}" @if ($heroSet) srcset="{{ $heroSet }}" sizes="(min-width: 1280px) 1200px, 100vw" @endif alt="" width="1600" height="900" fetchpriority="high" class="hero-bg size-full object-cover" /></div>
     <div class="absolute inset-0 -z-10 bg-gradient-to-r from-ink-950/90 via-ink-950/60 to-ink-950/10"></div>
     <div class="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950/70 via-transparent to-transparent"></div>
     <div class="on-dark px-5 pt-14 pb-6 sm:px-10 sm:pb-8 lg:px-14 lg:pt-16 lg:pb-10">
-      @if ($settings['hero_badge'] ?? '')<p class="eyebrow !text-accent-soft">{{ $settings['hero_badge'] }}</p>@endif
-      <h1 class="mt-3 max-w-2xl font-display text-[36px] leading-[1.1] text-balance sm:text-[46px] lg:text-[56px]">{!! \Modules\Site\Site::emphasis($settings['hero_title']) !!}</h1>
+      @if ($settings['hero_badge'] ?? '')<p class="eyebrow !text-accent">{{ $settings['hero_badge'] }}</p>@endif
+      <h1 class="mt-3 max-w-2xl font-display text-[38px] leading-[1.06] text-balance sm:text-[50px] lg:text-[60px]">{!! \Modules\Site\Site::emphasis($settings['hero_title']) !!}</h1>
       @if ($settings['hero_subtitle'] ?? '')<p class="mt-4 max-w-xl text-base text-white/80 sm:text-lg">{{ $settings['hero_subtitle'] }}</p>@endif
       <div class="mt-7 flex flex-col gap-3 sm:flex-row">
         @include('site::partials.cta', ['kind' => 'wa'])
@@ -52,7 +52,7 @@
       @if ($stats)
         <dl class="mt-7 grid grid-cols-3 divide-x divide-white/20 sm:flex">
           @foreach ($stats as $stat)
-            <div class="px-3 first:pl-0 sm:px-8"><dt class="num text-xl leading-none sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
+            <div class="px-3 first:pl-0 sm:px-8"><dt data-count-up class="num text-xl leading-none sm:text-[28px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-1.5 text-[13px] text-white/70">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
           @endforeach
         </dl>
       @endif
@@ -64,12 +64,12 @@
 @php($typeTiles = collect($types)->take(5))
 <section class="container-x section reveal">
   @include('site::partials.section-heading', ['title' => __('home::index.categories_title'), 'text' => __('home::index.categories_text')])
-  <ul class="mt-8 grid grid-cols-3 gap-x-3 gap-y-6 lg:grid-cols-6 lg:gap-5">
+  <ul data-stagger class="mt-8 grid grid-cols-3 gap-x-3 gap-y-6 lg:grid-cols-6 lg:gap-5">
     @foreach ($typeTiles as $t)
       @php($key = \Modules\Site\Site::typeKey($t['key']))
       <li><a href="{{ $t['href'] }}" class="group block text-center">
         <span class="lift relative block aspect-square overflow-hidden rounded-[20px] border border-line bg-fill">
-          @if (file_exists(public_path("images/placeholders/category/{$key}.webp")))<img src="/images/placeholders/category/{{ $key }}.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@else<span class="flex size-full items-center justify-center text-muted-fg">@include('site::partials.icon', ['name' => 'building', 'class' => 'size-8'])</span>@endif
+          @if (file_exists(public_path("images/placeholders/category/{$key}.webp")))<img src="/images/placeholders/category/{{ $key }}.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />@else<span class="flex size-full items-center justify-center text-muted-fg">@include('site::partials.icon', ['name' => 'building', 'class' => 'size-8'])</span>@endif
         </span>
         <span class="mt-3 block text-[15px] leading-tight font-semibold text-fg">{{ $t['label'] }}</span>
         <span class="mt-0.5 block text-[13px] text-muted-fg">{{ trans_choice('site::common.listing_count', $counts[$t['key']] ?? 0) }}</span>
@@ -77,7 +77,7 @@
     @endforeach
     <li><a href="/map" class="group block text-center">
       <span class="lift relative block aspect-square overflow-hidden rounded-[20px] border border-line bg-fill">
-        @if (file_exists(public_path('images/placeholders/category/map.webp')))<img src="/images/placeholders/category/map.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-105" />@endif
+        @if (file_exists(public_path('images/placeholders/category/map.webp')))<img src="/images/placeholders/category/map.webp" alt="" width="600" height="600" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" />@endif
       </span>
       <span class="mt-3 block text-[15px] leading-tight font-semibold text-fg">{{ __('site::common.project_map') }}</span>
       <span class="mt-0.5 block text-[13px] text-muted-fg">{{ trans_choice('site::common.project_count', $maps->count()) }}</span>
@@ -89,11 +89,11 @@
 <section class="container-x reveal">
   <div class="on-dark grid gap-8 rounded-[28px] bg-ink-950 p-6 text-white sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-14 lg:p-14">
     <div>
-      <p class="eyebrow !text-accent-soft">{{ __('home::index.band_eyebrow') }}</p>
-      <h2 class="mt-3 max-w-xl font-display text-[28px] leading-tight text-balance sm:text-[32px]">{{ __('home::index.band_title') }}</h2>
+      <p class="eyebrow !text-accent">{{ __('home::index.band_eyebrow') }}</p>
+      <h2 class="mt-3 max-w-xl font-display text-[32px] leading-[1.12] text-balance sm:text-[40px]">{{ __('home::index.band_title') }}</h2>
       <ol class="mt-8 grid gap-4 sm:grid-cols-3">
         @foreach (['step_budget', 'step_match', 'step_visit'] as $n => $step)
-          <li class="flex items-start gap-3 text-[15px] text-white/85"><span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-semibold text-accent-soft">{{ $n + 1 }}</span><span class="pt-0.5">{{ __('home::index.'.$step) }}</span></li>
+          <li class="flex items-start gap-3 text-[15px] text-white/85"><span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-white/25 text-xs font-semibold text-accent">{{ $n + 1 }}</span><span class="pt-0.5">{{ __('home::index.'.$step) }}</span></li>
         @endforeach
       </ol>
     </div>
@@ -116,7 +116,7 @@
     <button type="button" role="tab" data-tab-chip="all" aria-selected="true" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ __('site::common.all') }}</button>
     @foreach ($tabTypes as $t)<button type="button" role="tab" data-tab-chip="{{ $t['key'] }}" aria-selected="false" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ $t['label'] }}</button>@endforeach
   </div>
-  <div class="snap-row mt-6" data-tab-grid>
+  <div class="snap-row mt-6" data-tab-grid data-stagger>
     @foreach ($all->take(12) as $listing)<div data-tab-card="{{ $listing->type }}">@include('listing::card', ['listing' => $listing])</div>@endforeach
   </div>
 </section>
@@ -131,7 +131,7 @@
       <li class="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$key] }}</span> {{ $label }}</li>
     @endforeach
   </ul>
-  <div class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+  <div data-stagger class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
     @foreach ($maps->take(4) as $map)
       @php($c = $map->statusCounts())
       @php($total = max(1, $map->plots->count()))
@@ -156,7 +156,7 @@
 <section class="container-x pb-14 reveal lg:pb-24">
   <div class="border-t border-line pt-14 lg:pt-20">
     @include('site::partials.section-heading', ['title' => __('home::index.why_title', ['site' => $site_name]), 'text' => __('home::index.why_text')])
-    <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <div data-stagger class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       @foreach ([['file-check', 'value_docs'], ['layers', 'value_infra'], ['clock', 'value_handover'], ['users', 'value_advisors']] as [$icon, $k])
         <div><span class="text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-7'])</span><h3 class="mt-4 text-lg text-fg font-semibold">{{ __('home::index.'.$k) }}</h3><p class="mt-1.5 text-[15px] text-muted-fg">{{ __('home::index.'.$k.'_text') }}</p></div>
       @endforeach
@@ -173,7 +173,7 @@
   <div class="mt-8 {{ $single ? 'mx-auto max-w-[880px]' : 'snap-row sm:!grid sm:!grid-cols-2 lg:!grid-cols-3 lg:mx-auto lg:max-w-[1000px]' }}">
     @foreach ($videoIds as $video)
       <button type="button" data-video="{{ $video['id'] }}" class="group block w-full text-left" aria-label="{{ __('home::index.watch_video') }}: {{ $video['title'] }}">
-        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex {{ $single ? 'size-20' : 'size-14' }} items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 {{ $single ? 'size-8' : 'size-6' }}" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
+        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex {{ $single ? 'size-20' : 'size-14' }} items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 {{ $single ? 'size-8' : 'size-6' }}" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
         @if ($video['title'])<span class="mt-3 block {{ $single ? 'text-center text-base' : 'text-[15px]' }} font-semibold text-fg">{{ $video['title'] }}</span>@endif
       </button>
     @endforeach

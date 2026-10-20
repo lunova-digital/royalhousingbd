@@ -50,7 +50,7 @@
 
     <div class="min-w-0">
       <p class="flex items-center gap-1.5 text-sm text-muted-fg"><span>{{ $l->location }}</span>@include('site::partials.icon', ['name' => 'check', 'class' => 'size-4 text-accent']) <span>{{ __('site::common.verified') }}</span> · <span>{{ __('site::common.ref', ['ref' => $l->reference()]) }}</span></p>
-      <h1 class="mt-2 font-display text-[28px] leading-tight text-fg lg:text-[34px]">{{ $l->title }}</h1>
+      <h1 class="mt-2 font-display text-[36px] leading-[1.1] text-fg lg:text-[46px]">{{ $l->title }}</h1>
 
       {{-- Price block --}}
       <div class="mt-5 rounded-[20px] border border-line bg-white p-5">

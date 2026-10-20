@@ -115,6 +115,20 @@ export function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="seo">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Site colours</CardTitle>
+                <CardDescription>The look of the whole public site. To preview a theme without changing it, add <code>?theme=emerald</code>, <code>?theme=onyx</code> or <code>?theme=navy</code> to any page address (<code>?theme=default</code> goes back).</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-3">
+                {([['emerald', 'Emerald & Champagne', 'Deep emerald with champagne accents (recommended)'], ['onyx', 'Onyx & Gold', 'Near-black with gold accents'], ['navy', 'Midnight & Rose-gold', 'Midnight blue with rose-gold accents']] as const).map(([key, name, hint]) => (
+                  <label key={key} className="flex cursor-pointer items-start gap-3 text-sm">
+                    <input type="radio" name="theme_default" className="mt-1" checked={(form.theme_default ?? 'emerald') === key} onChange={() => set('theme_default', key)} />
+                    <span><span className="font-medium">{name}</span><span className="text-muted-foreground block">{hint}</span></span>
+                  </label>
+                ))}
+              </CardContent>
+            </Card>
             <div className="grid gap-6">
               <Card>
                 <CardHeader><CardTitle>Brand</CardTitle></CardHeader>

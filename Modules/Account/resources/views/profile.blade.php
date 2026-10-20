@@ -7,7 +7,7 @@
     @if (session('status'))<p class="rounded-xl bg-fill px-4 py-3 text-sm font-medium text-fg" role="status">{{ session('status') }}</p>@endif
 
     <div class="card p-6 sm:p-8">
-      <h2 class="font-display text-[26px] leading-tight text-fg">{{ __('account::profile.photo') }}</h2>
+      <h2 class="font-display text-[30px] leading-[1.12] text-fg">{{ __('account::profile.photo') }}</h2>
       <div class="mt-5 flex items-center gap-5">
         <span data-avatar-preview class="inline-flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-line">@include('account::partials.avatar', ['member' => $member, 'size' => 96])</span>
         <div class="flex flex-wrap gap-2">
@@ -19,7 +19,7 @@
 
     <form method="post" action="/account/profile" class="card grid gap-4 p-6 sm:p-8">
       @csrf @method('PUT')
-      <h2 class="font-display text-[26px] leading-tight text-fg">{{ __('account::profile.details') }}</h2>
+      <h2 class="font-display text-[30px] leading-[1.12] text-fg">{{ __('account::profile.details') }}</h2>
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="grid gap-1.5 text-sm font-medium text-fg"><span>{{ __('account::profile.name') }}</span><input name="name" value="{{ old('name', $member->name) }}" autocomplete="name" class="input h-12" />@error('name')<span class="text-[13px] font-normal text-brand-600" role="alert">{{ $message }}</span>@enderror</label>
         <label class="grid gap-1.5 text-sm font-medium text-fg"><span>{{ __('account::profile.email') }}</span><input name="email" type="email" value="{{ old('email', $member->email) }}" autocomplete="email" class="input h-12" />@error('email')<span class="text-[13px] font-normal text-brand-600" role="alert">{{ $message }}</span>@enderror</label>
@@ -33,7 +33,7 @@
   <div class="grid content-start gap-6">
     <form method="post" action="/account/profile/password" class="card grid gap-4 p-6 sm:p-8">
       @csrf @method('PUT')
-      <h2 class="font-display text-[26px] leading-tight text-fg">{{ $member->hasPassword() ? __('account::profile.change_password') : __('account::profile.set_password') }}</h2>
+      <h2 class="font-display text-[30px] leading-[1.12] text-fg">{{ $member->hasPassword() ? __('account::profile.change_password') : __('account::profile.set_password') }}</h2>
       @unless ($member->hasPassword())<p class="text-[15px] text-muted-fg">{{ __('account::profile.set_password_text') }}</p>@endunless
       @if ($member->hasPassword())
         <label class="grid gap-1.5 text-sm font-medium text-fg"><span>{{ __('account::profile.current_password') }}</span><input name="current_password" type="password" autocomplete="current-password" class="input h-12" />@error('current_password')<span class="text-[13px] font-normal text-brand-600" role="alert">{{ $message }}</span>@enderror</label>
@@ -52,7 +52,7 @@
 {{-- Frame the photo: drag to position, slide to zoom; the server makes the 256px WebP --}}
 <dialog data-crop-dialog class="auth-dialog" aria-label="{{ __('account::profile.crop_title') }}">
   <div class="p-6 sm:p-8">
-    <h2 class="font-display text-[26px] leading-tight text-fg">{{ __('account::profile.crop_title') }}</h2>
+    <h2 class="font-display text-[30px] leading-[1.12] text-fg">{{ __('account::profile.crop_title') }}</h2>
     <p class="mt-1 text-sm text-muted-fg">{{ __('account::profile.crop_hint') }}</p>
     <div data-crop-stage class="relative mx-auto mt-5 size-[280px] cursor-grab touch-none overflow-hidden rounded-full bg-fill ring-1 ring-line active:cursor-grabbing"><img data-crop-img alt="" class="absolute top-0 left-0 max-w-none origin-top-left select-none" draggable="false" /></div>
     <label class="mx-auto mt-5 flex max-w-[280px] items-center gap-3 text-sm text-muted-fg"><span>{{ __('account::profile.zoom') }}</span><input data-crop-zoom type="range" class="w-full accent-ink-950" /></label>

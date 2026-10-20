@@ -307,24 +307,38 @@ if (videoDialog) {
   videoDialog.addEventListener('close', () => slot.replaceChildren())
 }
 
-// Fade-up on section enter, once.
-const reveals = document.querySelectorAll<HTMLElement>('.reveal')
-if (reveals.length && 'IntersectionObserver' in window) {
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in')
-          io.unobserve(entry.target)
-        }
-      }
-    },
-    { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
-  )
-  for (const el of reveals) io.observe(el)
-} else {
-  for (const el of reveals) el.classList.add('in')
+// Motion: reveals, staggers, count-ups, parallax and springs live in motion.ts, loaded after first paint and never for
+// visitors who prefer reduced motion. If it is slow or fails, everything is shown after 3.5s (the CSS hides reveals only
+// while html.js is set and motion has not taken over).
+const showAll = () => {
+  for (const el of document.querySelectorAll<HTMLElement>('.reveal, [data-stagger]')) el.classList.add('in')
 }
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) showAll()
+else {
+  const start = () => import('./motion').catch(showAll)
+  const idle = (window as { requestIdleCallback?: (f: () => void, o: { timeout: number }) => void }).requestIdleCallback
+  if (idle) idle(() => void start(), { timeout: 1200 })
+  else setTimeout(() => void start(), 200)
+  window.setTimeout(() => {
+    for (const el of document.querySelectorAll<HTMLElement>('.reveal:not(.in), [data-stagger]:not(.in)')) el.classList.add('in')
+  }, 3500)
+}
+
+// Page transitions: the page slides in (CSS) and fades out for ~180ms when an internal link is followed.
+document.addEventListener('click', (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const a = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href]')
+  if (!a || a.target || a.hasAttribute('download') || a.hasAttribute('data-no-transition') || a.origin !== location.origin) return
+  if (a.pathname === location.pathname && a.search === location.search) return
+  if (a.pathname.startsWith('/admin') || a.pathname.startsWith('/auth/') || a.pathname.startsWith('/og/')) return
+  event.preventDefault()
+  document.documentElement.classList.add('is-leaving')
+  window.setTimeout(() => (location.href = a.href), 180)
+})
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) document.documentElement.classList.remove('is-leaving')
+})
 
 // A small, polite toast ("Saved", "Link copied"): window.rhToast(text)
 declare global {

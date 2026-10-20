@@ -51,21 +51,21 @@ svg.plan .plan-plot.is-available :is(path, polygon, rect, circle, ellipse, polyl
 svg.plan .plan-plot.is-booked :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { fill: #d97706 !important; }
 svg.plan .plan-plot.is-sold :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { fill: url(#plan-hatch) !important; }
 svg.plan .plan-plot.is-empty :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { fill: #f1eee7 !important; }
-svg.plan .plan-plot text { fill: #fff !important; font-weight: 700; font-size: calc(var(--fs, 12) * 1px * var(--ls, 1)); paint-order: stroke; stroke: rgb(15 23 42 / 0.35); stroke-width: 0.6px; }
-svg.plan .plan-plot.is-sold text { fill: #0f172a !important; stroke: rgb(255 255 255 / 0.75); }
+svg.plan .plan-plot text { fill: #fff !important; font-weight: 700; font-size: calc(var(--fs, 12) * 1px * var(--ls, 1)); paint-order: stroke; stroke: rgb(var(--primary-rgb) / 0.35); stroke-width: 0.6px; }
+svg.plan .plan-plot.is-sold text { fill: var(--color-ink-950) !important; stroke: rgb(255 255 255 / 0.75); }
 svg.plan .plan-plot.is-empty text { fill: #94a3b8 !important; stroke: none; }
 svg.plan .plan-plot.is-dimmed { opacity: 0.25; }
-svg.plan .plan-plot.is-selected :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { stroke: #0f172a !important; stroke-width: 2.5px !important; vector-effect: non-scaling-stroke; stroke-dasharray: none; }
-svg.plan .plan-plot.is-selected { filter: drop-shadow(0 2px 3px rgb(15 23 42 / 0.4)); }
-svg.plan .plan-plot:focus-visible :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { stroke: #0f172a !important; stroke-width: 2px !important; vector-effect: non-scaling-stroke; stroke-dasharray: 4 2; }
+svg.plan .plan-plot.is-selected :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { stroke: var(--color-ink-950) !important; stroke-width: 2.5px !important; vector-effect: non-scaling-stroke; stroke-dasharray: none; }
+svg.plan .plan-plot.is-selected { filter: drop-shadow(0 2px 3px rgb(var(--primary-rgb) / 0.4)); }
+svg.plan .plan-plot:focus-visible :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { stroke: var(--color-ink-950) !important; stroke-width: 2px !important; vector-effect: non-scaling-stroke; stroke-dasharray: 4 2; }
 @media (hover: hover) { svg.plan .plan-plot:not(.is-dimmed):not(.is-empty):hover :is(path, polygon, rect, circle, ellipse, polyline):not(.plan-hit) { filter: brightness(1.1); } }
 /* Labels too small to read are dropped; colour alone carries the status */
 .plan-app[data-labels-hidden] svg.plan .plan-plot text { display: none; }
 .plan-app[data-roads-hidden] svg.plan text:not(.plan-plot text) { display: none; }
 
-.plan-badge-check circle { fill: #0f172a; stroke: #fff; stroke-width: 1.6; }
+.plan-badge-check circle { fill: var(--color-ink-950); stroke: #fff; stroke-width: 1.6; }
 .plan-badge-check path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.plan-pulse { fill: none; stroke: #0f172a; stroke-width: 2.5px; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; animation: plan-pulse 0.65s ease-out forwards; }
+.plan-pulse { fill: none; stroke: var(--color-ink-950); stroke-width: 2.5px; vector-effect: non-scaling-stroke; transform-box: fill-box; transform-origin: center; animation: plan-pulse 0.65s ease-out forwards; }
 @keyframes plan-pulse { from { opacity: 0.7; transform: scale(1); } to { opacity: 0; transform: scale(1.9); } }
 
 /* First paint: plots fade in with a short stagger (under 400ms) */
@@ -78,19 +78,19 @@ svg.plan .plan-plot:focus-visible :is(path, polygon, rect, circle, ellipse, poly
 .plan-error { position: absolute; inset: 0; display: grid; place-items: center; padding: 2rem; text-align: center; color: var(--color-muted-fg); z-index: 6; }
 .plan-ctl { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; background: #fff; color: var(--color-fg); transition: background-color 0.15s; }
 .plan-ctl:hover { background: var(--color-fill); }
-.plan-controls { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-line); border-radius: 18px; background: #fff; box-shadow: 0 6px 20px rgb(15 23 42 / 0.12); }
+.plan-controls { position: absolute; top: 12px; right: 12px; z-index: 10; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-line); border-radius: 18px; background: #fff; box-shadow: 0 6px 20px rgb(var(--primary-rgb) / 0.12); }
 .plan-controls .plan-ctl + .plan-ctl { border-top: 1px solid var(--color-line); }
 .plan-find { position: absolute; top: 12px; left: 12px; z-index: 10; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; max-width: calc(100% - 84px); }
-.plan-find-toggle { border: 1px solid var(--color-line); border-radius: 9999px; box-shadow: 0 6px 20px rgb(15 23 42 / 0.12); }
-.plan-find-input, .plan-find-go { display: none; height: 44px; border-radius: 9999px; box-shadow: 0 6px 20px rgb(15 23 42 / 0.12); }
+.plan-find-toggle { border: 1px solid var(--color-line); border-radius: 9999px; box-shadow: 0 6px 20px rgb(var(--primary-rgb) / 0.12); }
+.plan-find-input, .plan-find-go { display: none; height: 44px; border-radius: 9999px; box-shadow: 0 6px 20px rgb(var(--primary-rgb) / 0.12); }
 .plan-find-input { width: 8.5rem; padding: 0 1rem; border: 1px solid var(--color-line); background: #fff; font-size: 15px; outline: none; }
 .plan-find-input:focus { border-color: var(--color-ink-950); }
 .plan-find-go { padding: 0 1.1rem; background: var(--color-ink-950); color: #fff; font-weight: 600; font-size: 14px; }
 .plan-find[data-open] .plan-find-input, .plan-find[data-open] .plan-find-go { display: block; }
-.plan-find-msg { width: 100%; border-radius: 12px; background: #fff; padding: 0.4rem 0.75rem; font-size: 13px; color: var(--color-muted-fg); box-shadow: 0 6px 20px rgb(15 23 42 / 0.12); }
+.plan-find-msg { width: 100%; border-radius: 12px; background: #fff; padding: 0.4rem 0.75rem; font-size: 13px; color: var(--color-muted-fg); box-shadow: 0 6px 20px rgb(var(--primary-rgb) / 0.12); }
 .plan-compass { position: absolute; left: 12px; bottom: 12px; z-index: 10; display: flex; align-items: center; gap: 0.25rem; font-size: 12px; font-weight: 700; color: var(--color-fg); pointer-events: none; }
-.plan-compass svg { transition: transform 0.3s ease; filter: drop-shadow(0 3px 8px rgb(15 23 42 / 0.15)); }
-.plan-coach { position: absolute; left: 50%; bottom: 16px; z-index: 12; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; border-radius: 9999px; background: rgb(15 23 42 / 0.88); color: #fff; padding: 0.55rem 1rem; font-size: 13px; font-weight: 600; pointer-events: none; animation: sheet-up 0.3s ease-out; }
+.plan-compass svg { transition: transform 0.3s ease; filter: drop-shadow(0 3px 8px rgb(var(--primary-rgb) / 0.15)); }
+.plan-coach { position: absolute; left: 50%; bottom: 16px; z-index: 12; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; border-radius: 9999px; background: rgb(var(--primary-rgb) / 0.88); color: #fff; padding: 0.55rem 1rem; font-size: 13px; font-weight: 600; pointer-events: none; animation: sheet-up 0.3s ease-out; }
 .plan-coach[hidden] { display: none; }
 
 /* ---- The panel: sticky card on desktop ---- */
@@ -129,7 +129,7 @@ svg.plan .plan-plot:focus-visible :is(path, polygon, rect, circle, ellipse, poly
 
 /* ---- The panel: three-snap bottom sheet on phones ---- */
 @media (max-width: 1023.98px) {
-  .plan-panel { position: fixed; inset: auto 0 0 0; z-index: 90; height: 88dvh; display: flex; flex-direction: column; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 32px rgb(15 23 42 / 0.2); transform: translateY(calc(100% + 12px)); transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom: env(safe-area-inset-bottom, 0px); will-change: transform; }
+  .plan-panel { position: fixed; inset: auto 0 0 0; z-index: 90; height: 88dvh; display: flex; flex-direction: column; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 32px rgb(var(--primary-rgb) / 0.2); transform: translateY(calc(100% + 12px)); transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); padding-bottom: env(safe-area-inset-bottom, 0px); will-change: transform; }
   .plan-panel[data-dragging] { transition: none; }
   .plan-panel[data-state='empty'] { visibility: hidden; }
   .plan-grip { display: flex; flex: none; width: 100%; height: 26px; align-items: center; justify-content: center; cursor: grab; touch-action: none; }

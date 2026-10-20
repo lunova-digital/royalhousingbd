@@ -209,10 +209,24 @@ class Site
         return new HtmlString(str_replace('৳', '<span class="cur">৳</span>', e((string) $text)));
     }
 
-    /** The hero headline: wrap ONE word in *asterisks* to set it in italic serif (escaped). */
+    /**
+     * The hero headline, escaped and split into words that slide up from a mask (pure CSS, so there is no flash and no JS
+     * is needed). Wrap ONE word in *asterisks* to set it in italic serif.
+     */
     public static function emphasis(?string $text): HtmlString
     {
-        return new HtmlString(preg_replace('/\*([^*]+)\*/u', '<em class="font-medium italic">$1</em>', e((string) $text), 1));
+        $words = preg_split('/\s+/u', trim(e((string) $text)), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $italic = false;
+        $out = [];
+        foreach ($words as $i => $word) {
+            if (! $italic && preg_match('/^(\W*)\*(.+)\*(\W*)$/u', $word, $m)) {
+                $word = $m[1].'<em class="font-semibold italic">'.$m[2].'</em>'.$m[3];
+                $italic = true;
+            }
+            $out[] = '<span class="hw"><span class="hwi" style="--i:'.$i.'">'.$word.'</span></span>';
+        }
+
+        return new HtmlString(implode(' ', $out));
     }
 
     /** The ids of the listings the signed-in member saved (empty for guests), read once per request. */

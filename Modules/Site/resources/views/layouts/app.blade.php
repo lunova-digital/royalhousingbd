@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ app()->getLocale() }}" class="bg-page">
+<html lang="{{ app()->getLocale() }}" class="bg-page" data-theme="{{ $settings['theme_default'] ?? 'emerald' }}">
   <head>
     <meta charset="UTF-8" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="{{ $og_title }}" />
     @if ($og_description)<meta name="twitter:description" content="{{ $og_description }}" />@endif
     @if ($og_image)<meta name="twitter:image" content="{{ $og_image }}" />@endif
-    <meta name="theme-color" content="#faf8f5" />
+    <meta name="theme-color" content="#f7f4ee" />
     @if ($settings['logo'] ?? '')<link rel="icon" href="{{ \Modules\Site\Site::asset($settings['logo']) }}" />@else
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -37,9 +37,9 @@
     <link rel="preload" href="/fonts/noto-serif-bengali-bengali-600-normal.woff2" as="font" type="font/woff2" crossorigin />
     @else
     <link rel="preload" href="/fonts/manrope-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/playfair-display-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
     @endif
-    <script>document.documentElement.classList.add('js')</script>
+    <script>document.documentElement.classList.add('js');(function(){try{var ok={emerald:1,onyx:1,navy:1},q=new URLSearchParams(location.search).get('theme');if(q==='default')localStorage.removeItem('rh-theme');else if(ok[q])localStorage.setItem('rh-theme',q);var t=localStorage.getItem('rh-theme');if(ok[t])document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
     @vite('resources/css/site.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}
     {{ Modules::vite('account', 'resources/js/account.ts') }}
