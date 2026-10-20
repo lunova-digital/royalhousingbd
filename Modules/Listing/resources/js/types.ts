@@ -39,6 +39,7 @@ export interface Listing {
   price: string
   call_for_price: boolean
   price_amount: number | null
+  saved_by_count?: number
   land_area: string
   built_area: string
   size: string

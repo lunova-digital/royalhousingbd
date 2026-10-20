@@ -95,6 +95,7 @@ export function ListingListPage() {
               <TableHead>Type</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead title="Members who saved this listing">Saves</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-32 text-right">Actions</TableHead>
             </TableRow>
@@ -102,13 +103,13 @@ export function ListingListPage() {
           <TableBody>
             {rows === null ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-muted-foreground py-8 text-center">
+                <TableCell colSpan={8} className="text-muted-foreground py-8 text-center">
                   Loading…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-muted-foreground py-8 text-center">
+                <TableCell colSpan={8} className="text-muted-foreground py-8 text-center">
                   No listings yet.
                 </TableCell>
               </TableRow>
@@ -128,6 +129,7 @@ export function ListingListPage() {
                   <TableCell>{l.type_label}</TableCell>
                   <TableCell>{l.location}</TableCell>
                   <TableCell>{l.call_for_price || !l.price ? 'Call for Price' : l.price}</TableCell>
+                  <TableCell className="tabular-nums">{l.saved_by_count ?? 0}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       {l.published ? <Badge variant="success">Published</Badge> : <Badge variant="secondary">Draft</Badge>}

@@ -4,6 +4,7 @@ namespace Modules\Site;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
+use Modules\Account\Models\SavedListing;
 use Modules\Content\Services\Translations;
 use Modules\Content\Services\TranslationSources;
 use Modules\Listing\Models\Listing;
@@ -105,6 +106,7 @@ class Site
             'services' => Service::footer(),
             // `acct`, not `member`: a page's own @foreach ($team as $member) leaks into the layout's scope
             'acct' => Auth::guard('member')->user(),
+            'savedIds' => self::savedIds(),
             'nav_active' => $meta['nav'] ?? '',
             'whatsapp_float' => self::whatsapp($s, __('site::common.whatsapp_float_message', ['site' => $siteName])),
         ];
@@ -208,6 +210,17 @@ class Site
     public static function emphasis(?string $text): HtmlString
     {
         return new HtmlString(preg_replace('/\*([^*]+)\*/u', '<em class="font-medium italic">$1</em>', e((string) $text), 1));
+    }
+
+    /** The ids of the listings the signed-in member saved (empty for guests), read once per request. */
+    public static function savedIds(): array
+    {
+        $member = Auth::guard('member')->user();
+        if (! $member) {
+            return [];
+        }
+
+        return SavedListing::query()->where('member_id', $member->id)->pluck('listing_id')->map(fn ($id) => (int) $id)->all();
     }
 
     /** Turn a stored relative path ("uploads/…/x.jpg") into its URL. */

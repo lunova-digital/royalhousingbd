@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Account\Models\SavedListing;
 use Modules\Content\Models\Concerns\HasTranslations;
 use Modules\Masterplan\Models\Masterplan;
 
@@ -63,6 +64,12 @@ class Listing extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ListingImage::class)->orderBy('sort_order');
+    }
+
+    /** The members who saved this listing (a useful lead signal; the admin list shows the count). */
+    public function savedBy(): HasMany
+    {
+        return $this->hasMany(SavedListing::class);
     }
 
     public function features(): BelongsToMany

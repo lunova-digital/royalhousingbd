@@ -80,7 +80,8 @@
         <div class="flex-1">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'w-full', 'waHref' => $whatsapp, 'ctaLabel' => __('listing::show.ask_whatsapp')])</div>
         @if (\Modules\Consultation\Availability::enabled())<button type="button" data-consult-open data-consult-listing="{{ $l->id }}" class="btn-consult flex-1" aria-haspopup="dialog">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-5']) {{ __('site::layout.book_consultation') }}</button>@endif
       </div>
-      <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+      <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+        @include('account::partials.save-button', ['listing' => $l, 'variant' => 'detail'])
         @if ($planLive)<a href="{{ $plan->url() }}" class="link-arrow">{{ __('listing::show.view_on_map') }} @include('site::partials.icon', ['name' => 'arrow', 'class' => 'size-4'])</a>@endif
         @if ($l->hasBrochure())<a href="{{ $asset($l->brochure_path) }}" download="{{ $l->brochureFilename() }}" class="link-arrow">{{ __('listing::show.download_brochure') }} <span class="font-normal text-muted-fg">(PDF · {{ \Illuminate\Support\Number::fileSize((int) $l->brochure_size, 1) }})</span> @include('site::partials.icon', ['name' => 'download', 'class' => 'size-4'])</a>@endif
         @if ($settings['phone'] ?? '')<a href="tel:{{ $settings['phone'] }}" class="link-arrow">{{ __('site::common.call_now') }} @include('site::partials.icon', ['name' => 'phone', 'class' => 'size-4'])</a>@endif

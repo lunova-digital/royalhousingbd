@@ -22,6 +22,8 @@ class ListingController
             (int) $request->query('page', 1),
         );
 
+        $page->getCollection()->loadCount('savedBy');
+
         return response()->json(['listings' => $page->items(), 'total' => $page->total()]);
     }
 

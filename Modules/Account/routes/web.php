@@ -3,6 +3,8 @@
 use Illuminate\Routing\Router;
 use Modules\Account\Http\Controllers\AuthController;
 use Modules\Account\Http\Controllers\PasswordController;
+use Modules\Account\Http\Controllers\ProfileController;
+use Modules\Account\Http\Controllers\SavedController;
 use Modules\Account\Http\Controllers\SocialController;
 
 /** @var Router $router */
@@ -20,3 +22,16 @@ $router->post('/reset-password', [PasswordController::class, 'reset'])->middlewa
 
 $router->get('/auth/google', [SocialController::class, 'redirect']);
 $router->get('/auth/google/callback', [SocialController::class, 'callback']);
+$router->post('/account/pending-save', [SavedController::class, 'pending']);
+
+$router->middleware('auth:member')->prefix('account')->group(function (Router $router) {
+    $router->redirect('/', '/account/saved');
+    $router->get('saved', [SavedController::class, 'index'])->name('account.saved');
+    $router->put('saved/{listing}', [SavedController::class, 'save']);
+    $router->delete('saved/{listing}', [SavedController::class, 'remove']);
+    $router->get('profile', [ProfileController::class, 'show'])->name('account.profile');
+    $router->put('profile', [ProfileController::class, 'update']);
+    $router->post('profile/avatar', [ProfileController::class, 'avatar']);
+    $router->delete('profile/avatar', [ProfileController::class, 'removeAvatar']);
+    $router->put('profile/password', [ProfileController::class, 'password']);
+});
