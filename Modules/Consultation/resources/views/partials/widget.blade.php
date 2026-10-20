@@ -24,6 +24,7 @@
         <p data-consult-loading class="text-sm text-muted-fg">{{ __('consultation::widget.loading') }}</p>
       </div>
       <p data-consult-feed-error hidden class="mt-2 text-sm text-brand"></p>
+      @if ($wa)<a data-consult-wa-fallback href="{{ $wa }}" target="_blank" rel="noreferrer" hidden class="btn-wa btn-sm mt-3">@include('site::partials.icon', ['name' => 'whatsapp', 'class' => 'size-4']) {{ __('site::layout.chat_whatsapp') }}</a>@endif
     </section>
 
     {{-- 2. Time --}}

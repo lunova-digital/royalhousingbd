@@ -30,6 +30,8 @@ class Widget {
     if (this.loaded && !force) return
     const feedError = q(this.root, '[data-consult-feed-error]')!
     feedError.hidden = true
+    const fallback = q<HTMLElement>(this.root, '[data-consult-wa-fallback]')
+    if (fallback) fallback.hidden = true
     try {
       const response = await fetch(this.root.dataset.consultFeed ?? '/consultation/availability', { headers: { Accept: 'application/json' } })
       if (!response.ok) throw new Error(String(response.status))
@@ -38,10 +40,12 @@ class Widget {
     } catch {
       feedError.textContent = this.labels.load_failed
       feedError.hidden = false
+      if (fallback) fallback.hidden = false
       q(this.root, '[data-consult-loading]')?.remove()
       return
     }
     this.renderDays()
+    if (fallback) fallback.hidden = this.days.length > 0
     const keep = this.selected && this.days.find((d) => d.date === this.selected!.day.date)
     this.select(keep ?? this.days.find((d) => d.open > 0) ?? this.days[0] ?? null, keep && this.selected?.slot ? keep.slots.find((s) => s.time === this.selected!.slot!.time && !s.taken) : undefined)
   }

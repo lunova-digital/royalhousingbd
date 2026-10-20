@@ -123,16 +123,28 @@ class ConsultationTest extends TestCase
         $this->get('/consultation/RC-ZZZZZZ')->assertNotFound();
     }
 
+    public function test_behind_a_tls_proxy_the_visitor_ip_and_https_are_trusted(): void
+    {
+        // The slot feed is throttled per IP: every visitor behind the proxy must not share one bucket.
+        foreach (['203.0.113.1', '203.0.113.2'] as $visitor) {
+            for ($i = 0; $i < 60; $i++) {
+                $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.1'])->withHeaders(['X-Forwarded-For' => $visitor])->get('/consultation/availability')->assertOk();
+            }
+        }
+        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.1'])->withHeaders(['X-Forwarded-For' => '203.0.113.1'])->get('/consultation/availability')->assertStatus(429);
+        $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.1'])->withHeaders(['X-Forwarded-Proto' => 'https'])->get('/')->assertSee('https://', false)->assertDontSee('href="http://localhost/?lang=bn"', false);
+    }
+
     public function test_launcher_is_on_every_page_until_bookings_are_paused(): void
     {
-        $this->get('/')->assertOk()->assertSee('data-consult-open', false)->assertSee('Book a consultation');
+        $this->get('/')->assertOk()->assertSee('data-consult-open', false)->assertSee('Book free consultation');
         $this->get('/plot')->assertOk()->assertSee('data-consult-dialog', false);
         $this->get('/consultation')->assertOk()->assertSee('data-consult-inline', false)->assertDontSee('data-consult-open');
         $this->get('/consultation?lang=bn')->assertOk()->assertSee('ফ্রি পরামর্শ বুক করুন');
 
         Availability::save(['consult_enabled' => '0']);
         $this->get('/')->assertOk()->assertDontSee('data-consult-open');
-        $this->get('/consultation')->assertOk()->assertDontSee('data-consult-widget')->assertSee('No consultation slots are open');
+        $this->get('/consultation')->assertOk()->assertDontSee('data-consult-widget')->assertSee('No slots this week');
         $this->getJson('/consultation/availability')->assertOk()->assertJsonPath('days', []);
         $this->postJson('/consultation', $this->book())->assertNotFound();
     }

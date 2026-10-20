@@ -12,7 +12,7 @@ return [
     'bd_time' => 'Bangladesh time',
     'loading' => 'Loading available times…',
     'load_failed' => 'The calendar could not load. Please try again or message me on WhatsApp.',
-    'no_days' => 'No consultation slots are open right now. Message me on WhatsApp and I will find a time.',
+    'no_days' => 'No slots this week — chat with us on WhatsApp.',
     'no_slots' => 'No free times left on this day — pick another.',
     'choose_day_first' => 'Choose a day to see the free times.',
     'open_count' => ':count free|:count free',
