@@ -376,6 +376,11 @@ html:lang(bn) .legal-prose { line-height: 1.95; }
 .fab:hover .fab-wave, .fab:hover .fab-face, .fab:hover .fab-tap, .fab:hover .fab-face svg, .fab:hover .fab-aura { animation-play-state: paused; }
 .fab:focus-visible { outline: 3px solid var(--color-ink-950); outline-offset: 4px; }
 @keyframes fab-wave { 0% { transform: scale(1); opacity: 0.75; } 70% { opacity: 0.12; } 100% { transform: scale(2.3); opacity: 0; } }
+@keyframes fab-wave-sm { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.45); opacity: 0; } }
+@media (max-width: 1023px) {
+  .fab-wave { animation-name: fab-wave-sm; border-width: 1.5px; }
+  .fab-aura { inset: -6px; filter: blur(9px); }
+}
 @keyframes fab-breathe { 0%, 100% { transform: scale(0.9); opacity: 0.45; } 50% { transform: scale(1.15); opacity: 0.8; } }
 @keyframes fab-press { 0%, 66%, 100% { transform: scale(1); } 71% { transform: scale(0.9); } 78% { transform: scale(1.07); } 86% { transform: scale(1); } }
 @keyframes fab-tap { 0%, 69% { transform: scale(0); opacity: 0; } 71% { transform: scale(0.1); opacity: 0.7; } 88% { transform: scale(1.25); opacity: 0; } 100% { opacity: 0; } }
@@ -417,9 +422,10 @@ html.js .section-title:not(.rule-in)::after { transform: scaleX(0); }
 .btn-wa:active, .btn-consult:active { transform: scale(0.98); }
 
 /* Pages: slide in on load, fade out when an internal link is followed (no opacity change on enter, so LCP is not delayed) */
-html.js main { animation: page-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
-@keyframes page-in { from { transform: translateY(10px); } to { transform: none; } }
-html.is-leaving main { opacity: 0; transform: translateY(-6px); transition: opacity 0.18s ease-in, transform 0.18s ease-in; }
+/* opacity only: a transform on <main> would become the containing block of every position:fixed child (filter sheet, map) */
+html.js main { animation: page-in 0.3s ease-out; }
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+html.is-leaving main { opacity: 0; transition: opacity 0.18s ease-in; }
 dialog::backdrop { animation: backdrop-in 0.3s ease-out; }
 @keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { html.js main, .hwi, .hero-bg, dialog::backdrop { animation: none; } html.is-leaving main { transition: none; } .btn-wa::after, .btn-consult::after { display: none; } }
