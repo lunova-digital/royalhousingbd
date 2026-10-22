@@ -12,7 +12,7 @@
         </div>
       @endforeach
     </div>
-    <button type="button" data-ticker-dismiss aria-label="{{ __('site::layout.dismiss') }}" class="absolute top-1/2 right-3 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white sm:right-6">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-4'])</button>
+    <button type="button" data-ticker-dismiss aria-label="{{ __('site::layout.dismiss') }}" class="absolute top-1/2 right-3 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-white/70 hover:bg-surface/10 hover:text-white sm:right-6">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-4'])</button>
   </div>
 </div>
 @endsection
@@ -113,8 +113,8 @@
 <section class="container-x section reveal" data-tabs-listings>
   @include('site::partials.section-heading', ['title' => __('home::index.available_title'), 'text' => __('home::index.available_text'), 'action' => $cta])
   <div class="scroll-row mt-6 flex gap-2 overflow-x-auto pb-1" role="tablist">
-    <button type="button" role="tab" data-tab-chip="all" aria-selected="true" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ __('site::common.all') }}</button>
-    @foreach ($tabTypes as $t)<button type="button" role="tab" data-tab-chip="{{ $t['key'] }}" aria-selected="false" class="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950">{{ $t['label'] }}</button>@endforeach
+    <button type="button" role="tab" data-tab-chip="all" aria-selected="true" class="shrink-0 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-action">{{ __('site::common.all') }}</button>
+    @foreach ($tabTypes as $t)<button type="button" role="tab" data-tab-chip="{{ $t['key'] }}" aria-selected="false" class="shrink-0 rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-text transition-colors duration-150 hover:border-action">{{ $t['label'] }}</button>@endforeach
   </div>
   <div class="snap-row mt-6" data-tab-grid data-stagger>
     @foreach ($all->take(12) as $listing)<div data-tab-card="{{ $listing->type }}">@include('listing::card', ['listing' => $listing])</div>@endforeach
@@ -128,7 +128,7 @@
   @include('site::partials.section-heading', ['title' => __('home::index.maps_title'), 'text' => __('home::index.maps_text'), 'action' => [__('home::index.browse_all_maps'), '/map']])
   <ul class="mt-6 flex flex-wrap gap-2" aria-label="{{ __('home::index.chips_label') }}">
     @foreach ([['available', __('home::index.chip_open'), 'bg-status-available'], ['booked', __('site::common.booked'), 'bg-status-booked'], ['sold', __('site::common.sold'), 'bg-status-sold']] as [$key, $label, $dot])
-      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$key] }}</span> {{ $label }}</li>
+      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$key] }}</span> {{ $label }}</li>
     @endforeach
   </ul>
   <div data-stagger class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -173,13 +173,13 @@
   <div class="mt-8 {{ $single ? 'mx-auto max-w-[880px]' : 'snap-row sm:!grid sm:!grid-cols-2 lg:!grid-cols-3 lg:mx-auto lg:max-w-[1000px]' }}">
     @foreach ($videoIds as $video)
       <button type="button" data-video="{{ $video['id'] }}" class="group block w-full text-left" aria-label="{{ __('home::index.watch_video') }}: {{ $video['title'] }}">
-        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex {{ $single ? 'size-20' : 'size-14' }} items-center justify-center rounded-full bg-white text-ink-950 shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 {{ $single ? 'size-8' : 'size-6' }}" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
+        <span class="lift relative block aspect-video overflow-hidden rounded-[20px] border border-line bg-fill"><img src="https://i.ytimg.com/vi/{{ $video['id'] }}/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" class="size-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" /><span class="absolute inset-0 flex items-center justify-center"><span class="inline-flex {{ $single ? 'size-20' : 'size-14' }} items-center justify-center rounded-full bg-surface text-fg shadow-lift"><svg viewBox="0 0 24 24" class="ml-0.5 {{ $single ? 'size-8' : 'size-6' }}" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></span></span>
         @if ($video['title'])<span class="mt-3 block {{ $single ? 'text-center text-base' : 'text-[15px]' }} font-semibold text-fg">{{ $video['title'] }}</span>@endif
       </button>
     @endforeach
   </div>
   <dialog data-video-dialog class="video-dialog" aria-label="{{ __('home::index.watch_video') }}">
-    <button type="button" data-dialog-close aria-label="{{ __('home::index.close_video') }}" class="mb-2 ml-auto flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-white/10">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
+    <button type="button" data-dialog-close aria-label="{{ __('home::index.close_video') }}" class="mb-2 ml-auto flex size-9 items-center justify-center rounded-full text-white/80 hover:bg-surface/10">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
     <div data-video-slot class="aspect-video w-full overflow-hidden rounded-2xl bg-black"></div>
   </dialog>
 </section>
@@ -191,7 +191,7 @@
     <div>
       <h2 class="section-title">{{ __('home::index.faq') }}</h2>
       <p class="mt-2 text-base text-muted-fg">{{ __('home::index.faq_text') }}</p>
-      <div class="mt-8 rounded-[20px] border border-line bg-white p-5">
+      <div class="mt-8 rounded-[20px] border border-line bg-surface p-5">
         <p class="text-lg text-fg font-semibold">{{ __('home::index.faq_still') }}</p>
         <p class="mt-1 text-[15px] text-muted-fg">{{ __('home::index.faq_still_text') }}</p>
         <div class="mt-4">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'btn-sm'])</div>

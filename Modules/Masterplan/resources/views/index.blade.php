@@ -7,9 +7,9 @@
 
 <section class="container-x pt-6 pb-16 lg:pb-24">
   <ul class="flex flex-wrap gap-2" aria-label="{{ __('masterplan::show.plot_status') }}">
-    <li class="inline-flex items-center rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-fg">{{ trans_choice('site::common.project_count', $masterplans->count()) }}</li>
+    <li class="inline-flex items-center rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-fg">{{ trans_choice('site::common.project_count', $masterplans->count()) }}</li>
     @foreach ([['available', 'bg-status-available', __('site::common.available')], ['booked', 'bg-status-booked', __('site::common.booked')], ['sold', 'bg-status-sold', __('site::common.sold')]] as [$k, $dot, $text])
-      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$k] }}</span> {{ $text }}</li>
+      <li class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm text-text"><span class="size-2 rounded-full {{ $dot }}"></span><span class="font-semibold text-fg">{{ $totals[$k] }}</span> {{ $text }}</li>
     @endforeach
   </ul>
 
@@ -34,7 +34,7 @@
       @endforeach
     </div>
   @else
-    <p class="mt-8 rounded-[20px] border border-line bg-white p-12 text-center text-muted-fg">{{ __('masterplan::index.empty') }}</p>
+    <p class="mt-8 rounded-[20px] border border-line bg-surface p-12 text-center text-muted-fg">{{ __('masterplan::index.empty') }}</p>
   @endif
 </section>
 @endsection

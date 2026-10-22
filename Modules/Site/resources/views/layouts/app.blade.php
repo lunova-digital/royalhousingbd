@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{{ $title }}</title>
     @if ($description)<meta name="description" content="{{ $description }}" />@endif
@@ -39,7 +40,7 @@
     <link rel="preload" href="/fonts/manrope-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/cormorant-garamond-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
     @endif
-    <script>document.documentElement.classList.add('js');(function(){try{var ok={emerald:1,onyx:1,navy:1},q=new URLSearchParams(location.search).get('theme');if(q==='default')localStorage.removeItem('rh-theme');else if(ok[q])localStorage.setItem('rh-theme',q);var t=localStorage.getItem('rh-theme');if(ok[t])document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
+    <script>document.documentElement.classList.add('js');(function(){try{var m=localStorage.getItem('rh-mode');document.documentElement.setAttribute('data-mode',m==='dark'?'dark':'light')}catch(e){document.documentElement.setAttribute('data-mode','light')}try{var ok={emerald:1,onyx:1,navy:1},q=new URLSearchParams(location.search).get('theme');if(q==='default')localStorage.removeItem('rh-theme');else if(ok[q])localStorage.setItem('rh-theme',q);var t=localStorage.getItem('rh-theme');if(ok[t])document.documentElement.setAttribute('data-theme',t)}catch(e){}})()</script>
     @vite('resources/css/site.css')
     {{ Modules::vite('site', 'resources/js/site.ts') }}
     {{ Modules::vite('account', 'resources/js/account.ts') }}
@@ -59,7 +60,7 @@
 
     @yield('ticker')
 
-    <header class="sticky top-0 z-40 border-b border-line bg-white">
+    <header class="sticky top-0 z-40 border-b border-line bg-surface">
       <div class="container-x flex h-16 items-center gap-4 lg:h-[72px] lg:gap-4 xl:gap-8">
         @include('site::partials.brand', ['href' => '/'])
 
@@ -68,7 +69,7 @@
           <div class="group relative">
             <button type="button" class="nav-link" aria-haspopup="true" @if ($onType) aria-current="page" @endif>{{ __('site::layout.nav_listings') }} @include('site::partials.icon', ['name' => 'chevron-down', 'class' => 'size-3.5 text-muted-fg'])</button>
             <div class="invisible absolute top-full left-0 z-50 min-w-52 pt-2 opacity-0 transition duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-              <ul class="rounded-2xl border border-line bg-white p-2 shadow-lift">
+              <ul class="rounded-2xl border border-line bg-surface p-2 shadow-lift">
                 @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="block rounded-xl px-3 py-2 text-sm font-medium text-text hover:bg-fill hover:text-fg">{{ $t['label'] }}</a></li>@endforeach
               </ul>
             </div>
@@ -80,6 +81,7 @@
 
         <div class="ml-auto flex items-center gap-2 sm:gap-3">
           <button type="button" data-open-dialog="search-dialog" aria-label="{{ __('site::layout.search_open') }}" class="inline-flex size-10 items-center justify-center rounded-full text-fg transition-colors hover:bg-fill">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-5'])</button>
+          @include('site::partials.mode-toggle')
           {{-- Account: a guest gets the auth sheet; a member gets their menu (phones use the Menu sheet instead) --}}
           @if ($acct)
             @include('account::partials.user-menu')
@@ -89,7 +91,7 @@
           {{-- Language toggle: `?lang=` is remembered by the SetLocale middleware --}}
           <span class="flex items-center overflow-hidden rounded-full border border-line text-xs font-semibold leading-none" role="group" aria-label="{{ __('site::layout.language') }}">
             @foreach (\Modules\Site\Site::LOCALES as $code => $label)
-              <a href="{{ \Modules\Site\Site::localeUrl($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" rel="nofollow" class="px-3 py-2 transition-colors {{ $code === $locale ? 'bg-ink-950 text-white' : 'text-muted-fg hover:text-fg' }}" @if ($code === $locale) aria-current="true" @endif>{{ $label }}</a>
+              <a href="{{ \Modules\Site\Site::localeUrl($code) }}" hreflang="{{ $code }}" lang="{{ $code }}" rel="nofollow" class="px-3 py-2 transition-colors {{ $code === $locale ? 'bg-action text-action-fg' : 'text-muted-fg hover:text-fg' }}" @if ($code === $locale) aria-current="true" @endif>{{ $label }}</a>
             @endforeach
           </span>
           <span class="hidden lg:block">@include('site::partials.cta', ['kind' => 'consult', 'class' => 'btn-sm', 'fx' => 'glow', 'ctaShort' => __('site::layout.nav_consult')])</span>
@@ -108,7 +110,7 @@
           <div class="max-w-xl">
             <a href="/" class="inline-flex items-center">
               @if ($settings['logo'] ?? '')
-                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-white object-contain p-1" width="40" height="40" loading="lazy" /><span class="ml-2.5 text-lg font-semibold">{{ $site_name }}</span>
+                <img src="{{ \Modules\Site\Site::asset($settings['logo']) }}" alt="" class="size-10 rounded-xl bg-surface object-contain p-1" width="40" height="40" loading="lazy" /><span class="ml-2.5 text-lg font-semibold">{{ $site_name }}</span>
               @else
                 {!! \Modules\Site\Site::logo('logo-full-on-dark', 'h-10 w-auto') !!}
               @endif
@@ -165,7 +167,7 @@
             <div class="mt-4 flex flex-wrap gap-2">
               @foreach (['facebook_url' => 'facebook', 'instagram_url' => 'instagram', 'youtube_url' => 'youtube', 'tiktok_url' => 'tiktok'] as $key => $icon)
                 @if ($settings[$key] ?? '')
-                  <a href="{{ $settings[$key] }}" target="_blank" rel="noreferrer" aria-label="{{ ucfirst($icon) }}" class="flex size-10 items-center justify-center rounded-full border border-line bg-white text-fg transition-colors hover:bg-ink-950 hover:text-white">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-[18px]'])</a>
+                  <a href="{{ $settings[$key] }}" target="_blank" rel="noreferrer" aria-label="{{ ucfirst($icon) }}" class="flex size-10 items-center justify-center rounded-full border border-line bg-surface text-fg transition-colors hover:bg-action hover:text-action-fg">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-[18px]'])</a>
                 @endif
               @endforeach
             </div>
@@ -180,7 +182,7 @@
     </footer>
 
     {{-- Mobile: bottom tab bar with the raised Consult button in the middle --}}
-    <nav class="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t border-line bg-white lg:hidden" aria-label="{{ __('site::layout.quick_navigation') }}" style="padding-bottom: env(safe-area-inset-bottom, 0px)">
+    <nav class="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t border-line bg-surface lg:hidden" aria-label="{{ __('site::layout.quick_navigation') }}" style="padding-bottom: env(safe-area-inset-bottom, 0px)">
       <div class="grid h-16 grid-cols-5 items-end px-2">
         @php($tab = fn ($href, $icon, $label, $active) => compact('href', 'icon', 'label', 'active'))
         @foreach ([$tab('/', 'home', __('site::layout.nav_home'), $nav_active === 'home'), $tab('/projects', 'building', __('site::layout.nav_listings'), $nav_active === 'projects' || $onType)] as $t)
@@ -248,9 +250,10 @@
             <li><form method="post" action="/logout">@csrf<button type="submit" class="flex w-full items-center justify-between py-3.5 text-left">{{ __('account::auth.menu_logout') }} @include('site::partials.icon', ['name' => 'log-out', 'class' => 'size-5 text-muted-fg'])</button></form></li>
           </ul>
         @else
-          <div class="mt-4 grid grid-cols-2 gap-3"><button type="button" data-auth-open="login" class="btn-consult btn-sm">{{ __('account::auth.menu_login') }}</button><button type="button" data-auth-open="register" class="btn-wa btn-sm !bg-white !text-fg ring-1 ring-line hover:!bg-fill">{{ __('account::auth.menu_signup') }}</button></div>
+          <div class="mt-4 grid grid-cols-2 gap-3"><button type="button" data-auth-open="login" class="btn-consult btn-sm">{{ __('account::auth.menu_login') }}</button><button type="button" data-auth-open="register" class="btn-wa btn-sm !bg-surface !text-fg ring-1 ring-line hover:!bg-fill">{{ __('account::auth.menu_signup') }}</button></div>
         @endif
         <ul class="mt-2 divide-y divide-line text-[15px] font-medium text-fg">
+          <li>@include('site::partials.mode-toggle', ['row' => true])</li>
           <li><button type="button" data-open-dialog="search-dialog" class="flex w-full items-center justify-between py-3.5">{{ __('site::layout.search_title') }} @include('site::partials.icon', ['name' => 'search', 'class' => 'size-5 text-muted-fg'])</button></li>
           @foreach ($types as $t)<li><a href="{{ $t['href'] }}" class="flex items-center justify-between py-3.5">{{ $t['label'] }} @include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-4 text-muted-fg'])</a></li>@endforeach
           @foreach ([['/gallery', __('site::layout.nav_gallery')], ['/about', __('site::layout.nav_about')], ['/contact', __('site::layout.contact')], ['/privacy', __('site::layout.privacy_policy')], ['/terms', __('site::layout.terms_of_service')]] as [$href, $label])
@@ -274,9 +277,9 @@
 
     {{-- Lightbox for galleries: arrows, swipe, keyboard, backdrop --}}
     <div data-lightbox hidden class="fixed inset-0 z-[70] flex touch-pan-y items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="{{ __('site::layout.nav_gallery') }}">
-      <button type="button" data-lightbox-close aria-label="{{ __('site::common.close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
-      <button type="button" data-lightbox-prev aria-label="{{ __('site::layout.prev') }}" class="absolute top-1/2 left-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-left', 'class' => 'size-5'])</button>
-      <button type="button" data-lightbox-next aria-label="{{ __('site::layout.next') }}" class="absolute top-1/2 right-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-5'])</button>
+      <button type="button" data-lightbox-close aria-label="{{ __('site::common.close') }}" class="absolute top-4 right-4 inline-flex size-11 items-center justify-center rounded-full bg-surface/10 text-white hover:bg-surface/20">@include('site::partials.icon', ['name' => 'x', 'class' => 'size-5'])</button>
+      <button type="button" data-lightbox-prev aria-label="{{ __('site::layout.prev') }}" class="absolute top-1/2 left-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-surface/10 text-white hover:bg-surface/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-left', 'class' => 'size-5'])</button>
+      <button type="button" data-lightbox-next aria-label="{{ __('site::layout.next') }}" class="absolute top-1/2 right-3 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-surface/10 text-white hover:bg-surface/20 sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-5'])</button>
       <img data-lightbox-img src="" alt="" class="max-h-[84svh] max-w-full rounded-2xl object-contain select-none" draggable="false" />
       <p class="pointer-events-none absolute inset-x-0 bottom-4 px-16 text-center text-sm text-white/80"><span data-lightbox-caption></span> <span data-lightbox-counter class="text-white/60"></span></p>
     </div>

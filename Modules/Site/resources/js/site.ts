@@ -42,7 +42,7 @@ for (const gallery of document.querySelectorAll<HTMLElement>('[data-gallery]')) 
     const i = index()
     if (counter) counter.textContent = digits(`${i + 1} / ${count}`)
     thumbs.forEach((t, n) => {
-      t.classList.toggle('border-ink-950', n === i)
+      t.classList.toggle('border-action', n === i)
       t.classList.toggle('border-transparent', n !== i)
     })
   }
@@ -147,7 +147,7 @@ for (const tabs of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
       for (const other of buttons) {
         const active = other === button
         other.setAttribute('aria-selected', String(active))
-        other.classList.toggle('border-ink-950', active)
+        other.classList.toggle('border-action', active)
         other.classList.toggle('text-fg', active)
         other.classList.toggle('border-transparent', !active)
         other.classList.toggle('text-muted-fg', !active)
@@ -385,3 +385,27 @@ if (fab && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   }
   window.setTimeout(tick, 8000)
 }
+
+// Light / dark switch: the head script sets html[data-mode] before first paint; this flips it and remembers the choice.
+function syncModeButtons() {
+  const dark = document.documentElement.getAttribute('data-mode') === 'dark'
+  for (const b of document.querySelectorAll<HTMLElement>('[data-mode-toggle]')) {
+    const label = (dark ? b.dataset.labelLight : b.dataset.labelDark) ?? ''
+    b.setAttribute('aria-label', label)
+    b.setAttribute('aria-pressed', dark ? 'true' : 'false')
+    const t = b.querySelector('[data-mode-text]')
+    if (t) t.textContent = label
+  }
+}
+syncModeButtons()
+document.addEventListener('click', (e) => {
+  if (!(e.target as Element).closest('[data-mode-toggle]')) return
+  const next = document.documentElement.getAttribute('data-mode') === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-mode', next)
+  try {
+    localStorage.setItem('rh-mode', next)
+  } catch {
+    /* private mode: the choice just lasts for this page */
+  }
+  syncModeButtons()
+})

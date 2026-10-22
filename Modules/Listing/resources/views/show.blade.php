@@ -32,17 +32,17 @@
             <figure class="aspect-[4/3] w-full shrink-0">@if ($fallback)<img src="{{ $fallback }}" alt="" width="800" height="600" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'image', 'class' => 'size-10'])</span>@endif</figure>
           @endforelse
         </div>
-        <span class="absolute top-4 left-4 rounded-full bg-white px-3 py-1 text-xs font-semibold text-fg">{{ $l->typeLabel() }}</span>
+        <span class="absolute top-4 left-4 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-fg">{{ $l->typeLabel() }}</span>
         @if (count($slides) > 1)
           <span data-gallery-counter class="absolute right-4 bottom-4 rounded-full bg-ink-950/75 px-3 py-1 text-xs font-medium text-white"></span>
-          <button type="button" data-gallery-prev aria-label="{{ __('site::layout.prev') }}" class="absolute top-1/2 left-3 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-fg shadow-lift hover:bg-white sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-left', 'class' => 'size-5'])</button>
-          <button type="button" data-gallery-next aria-label="{{ __('site::layout.next') }}" class="absolute top-1/2 right-3 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-fg shadow-lift hover:bg-white sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-5'])</button>
+          <button type="button" data-gallery-prev aria-label="{{ __('site::layout.prev') }}" class="absolute top-1/2 left-3 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface/95 text-fg shadow-lift hover:bg-surface sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-left', 'class' => 'size-5'])</button>
+          <button type="button" data-gallery-next aria-label="{{ __('site::layout.next') }}" class="absolute top-1/2 right-3 hidden size-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface/95 text-fg shadow-lift hover:bg-surface sm:inline-flex">@include('site::partials.icon', ['name' => 'chevron-right', 'class' => 'size-5'])</button>
         @endif
       </div>
       @if (count($slides) > 1)
         <div class="scroll-row mt-3 hidden gap-3 overflow-x-auto sm:flex">
           @foreach ($slides as $i => $slide)
-            <button type="button" data-gallery-thumb class="size-[72px] shrink-0 overflow-hidden rounded-2xl border-2 bg-fill {{ $i === 0 ? 'border-ink-950' : 'border-transparent' }}" aria-label="{{ __('listing::show.photo_n', ['n' => $i + 1]) }}"><img src="{{ $slide['thumb'] }}" alt="" loading="lazy" class="size-full object-cover" /></button>
+            <button type="button" data-gallery-thumb class="size-[72px] shrink-0 overflow-hidden rounded-2xl border-2 bg-fill {{ $i === 0 ? 'border-action' : 'border-transparent' }}" aria-label="{{ __('listing::show.photo_n', ['n' => $i + 1]) }}"><img src="{{ $slide['thumb'] }}" alt="" loading="lazy" class="size-full object-cover" /></button>
           @endforeach
         </div>
       @endif
@@ -53,7 +53,7 @@
       <h1 class="mt-2 font-display text-[36px] leading-[1.1] text-fg lg:text-[46px]">{{ $l->title }}</h1>
 
       {{-- Price block --}}
-      <div class="mt-5 rounded-[20px] border border-line bg-white p-5">
+      <div class="mt-5 rounded-[20px] border border-line bg-surface p-5">
         <p class="text-sm text-muted-fg">{{ __('site::common.price') }}</p>
         <p class="mt-1 price-display text-[32px] text-fg leading-[1.1]">{!! $onRequest ? e(__('listing::show.price_on_request')) : \Modules\Site\Site::price($l->price) !!}</p>
         @if ($onRequest)<p class="mt-2 text-sm text-muted-fg">{{ __('listing::show.price_on_request_text') }}</p>@endif
@@ -70,7 +70,7 @@
       @if ($facts)
         <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           @foreach ($facts as [$icon, $label, $value])
-            <div class="rounded-2xl border border-line bg-white p-4"><dt class="text-xs text-muted-fg"><span class="mb-2 block text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span>{{ $label }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $value }}</dd></div>
+            <div class="rounded-2xl border border-line bg-surface p-4"><dt class="text-xs text-muted-fg"><span class="mb-2 block text-accent-text">@include('site::partials.icon', ['name' => $icon, 'class' => 'size-5'])</span>{{ $label }}</dt><dd class="mt-0.5 font-semibold text-fg">{{ $value }}</dd></div>
           @endforeach
         </dl>
       @endif
@@ -103,7 +103,7 @@
         <h2 class="section-title">{{ __('listing::show.amenities') }}</h2>
         <ul class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
           @foreach ($l->features as $feature)
-            <li><a href="/projects?features%5B%5D={{ $feature->slug }}" class="lift flex h-full items-center gap-3 rounded-2xl border border-line bg-white p-4 text-sm font-medium text-fg">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5 shrink-0 text-accent-text']) {{ $feature->name }}</a></li>
+            <li><a href="/projects?features%5B%5D={{ $feature->slug }}" class="lift flex h-full items-center gap-3 rounded-2xl border border-line bg-surface p-4 text-sm font-medium text-fg">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5 shrink-0 text-accent-text']) {{ $feature->name }}</a></li>
           @endforeach
         </ul>
       </div>
@@ -155,7 +155,7 @@
 @endif
 
 {{-- Phones: the two actions stay in reach, just above the tab bar --}}
-<div class="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 flex gap-3 border-t border-line bg-white/95 px-4 py-3 backdrop-blur sm:hidden">
+<div class="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 flex gap-3 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur sm:hidden">
   <div class="flex-1">@include('site::partials.cta', ['kind' => 'wa', 'class' => 'btn-sm w-full', 'waHref' => $whatsapp, 'ctaLabel' => __('listing::show.enquire_short')])</div>
   @if (\Modules\Consultation\Availability::enabled())<button type="button" data-consult-open data-consult-listing="{{ $l->id }}" class="btn-consult btn-sm flex-1" aria-haspopup="dialog">@include('site::partials.icon', ['name' => 'calendar', 'class' => 'size-4']) {{ __('listing::show.consult_short') }}</button>@endif
 </div>

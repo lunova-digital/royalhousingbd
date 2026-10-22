@@ -29,6 +29,8 @@ return [
     'nav_home' => 'হোম',
     'nav_consult' => 'পরামর্শ',
     'nav_menu' => 'মেনু',
+    'mode_to_dark' => 'ডার্ক মোডে যান',
+    'mode_to_light' => 'লাইট মোডে যান',
     'search_open' => 'খুঁজুন',
     'search_title' => 'লিস্টিং খুঁজুন',
     'close' => 'বন্ধ করুন',

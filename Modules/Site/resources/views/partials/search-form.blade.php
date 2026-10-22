@@ -1,8 +1,8 @@
 {{-- The type filter + keyword search that feeds /projects. @include('site::partials.search-form', ['pill' => bool, 'autofocus' => bool]) --}}
-<form action="/projects" method="get" role="search" class="flex items-center gap-1 rounded-full {{ ($pill ?? false) ? 'bg-white p-1.5 shadow-lift' : 'border border-line bg-fill p-1' }}">
+<form action="/projects" method="get" role="search" class="flex items-center gap-1 rounded-full {{ ($pill ?? false) ? 'bg-surface p-1.5 shadow-lift' : 'border border-line bg-fill p-1' }}">
   <label class="relative shrink-0 border-r border-line">
     <span class="sr-only">{{ __('site::common.type') }}</span>
-    <select name="type" class="h-11 w-[5.75rem] appearance-none rounded-full bg-transparent pr-6 pl-3 sm:w-auto sm:max-w-[9rem] sm:pr-7 sm:pl-4 text-sm font-medium text-fg outline-none focus-visible:ring-2 focus-visible:ring-ink-950">
+    <select name="type" class="h-11 w-[5.75rem] appearance-none rounded-full bg-transparent pr-6 pl-3 sm:w-auto sm:max-w-[9rem] sm:pr-7 sm:pl-4 text-sm font-medium text-fg outline-none focus-visible:ring-2 focus-visible:ring-action">
       <option value="">{{ __('site::common.all') }}</option>
       @foreach ($types as $t)<option value="{{ $t['key'] }}">{{ $t['label'] }}</option>@endforeach
     </select>

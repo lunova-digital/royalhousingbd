@@ -122,7 +122,7 @@ class Widget {
     for (const item of this.root.querySelectorAll<HTMLElement>('[data-progress-step]')) {
       const n = Number(item.dataset.progressStep)
       const bar = item.firstElementChild as HTMLElement
-      bar.className = `h-1 rounded-full transition-colors duration-200 ${n <= this.step ? 'bg-ink-950' : 'bg-line'}`
+      bar.className = `h-1 rounded-full transition-colors duration-200 ${n <= this.step ? 'bg-action' : 'bg-line'}`
       item.classList.toggle('text-fg', n <= this.step)
       if (n === this.step) item.setAttribute('aria-current', 'step')
       else item.removeAttribute('aria-current')
@@ -204,7 +204,7 @@ class Widget {
   private success(c: Summary) {
     this.form.hidden = true
     for (const item of this.root.querySelectorAll<HTMLElement>('[data-progress-step]')) {
-      ;(item.firstElementChild as HTMLElement).className = 'h-1 rounded-full bg-ink-950'
+      ;(item.firstElementChild as HTMLElement).className = 'h-1 rounded-full bg-action'
       item.classList.add('text-fg')
     }
     const panel = q(this.root, '[data-consult-success]')!

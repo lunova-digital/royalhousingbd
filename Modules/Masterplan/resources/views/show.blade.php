@@ -115,6 +115,6 @@
   {{ Modules::vite('masterplan', 'resources/js/plan.ts') }}
 @endpush
 @else
-<section class="container-x pt-8 pb-16"><p class="rounded-[20px] border border-line bg-white p-12 text-center text-muted-fg">{{ __('masterplan::show.no_layout') }}</p></section>
+<section class="container-x pt-8 pb-16"><p class="rounded-[20px] border border-line bg-surface p-12 text-center text-muted-fg">{{ __('masterplan::show.no_layout') }}</p></section>
 @endif
 @endsection

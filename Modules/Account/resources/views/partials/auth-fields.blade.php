@@ -3,7 +3,7 @@
 @php($google = \Modules\Account\Http\Controllers\SocialController::configured())
 @php($redirect = $redirect ?? '/')
 @if ($google)
-  <a href="/auth/google?redirect={{ urlencode($redirect) }}" data-google-link class="mb-4 flex h-12 items-center justify-center gap-3 rounded-full border border-line bg-white text-[15px] font-semibold text-fg transition-colors duration-150 hover:bg-fill">
+  <a href="/auth/google?redirect={{ urlencode($redirect) }}" data-google-link class="mb-4 flex h-12 items-center justify-center gap-3 rounded-full border border-line bg-surface text-[15px] font-semibold text-fg transition-colors duration-150 hover:bg-fill">
     <svg viewBox="0 0 24 24" class="size-5" aria-hidden="true"><path fill="#4285F4" d="M22.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h5.9a5.05 5.05 0 0 1-2.19 3.31v2.75h3.55c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.55-2.75c-.98.66-2.24 1.06-3.73 1.06-2.87 0-5.3-1.94-6.17-4.55H2.15v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.83 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.15a11 11 0 0 0 0 9.88z"/><path fill="#EA4335" d="M12 5.35c1.62 0 3.07.56 4.21 1.65l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.15 7.06l3.68 2.84C6.7 7.29 9.13 5.35 12 5.35z"/></svg>
     {{ __('account::auth.continue_google') }}
   </a>

@@ -29,6 +29,8 @@ return [
     'nav_home' => 'Home',
     'nav_consult' => 'Consult',
     'nav_menu' => 'Menu',
+    'mode_to_dark' => 'Switch to dark mode',
+    'mode_to_light' => 'Switch to light mode',
     'search_open' => 'Search',
     'search_title' => 'Search listings',
     'close' => 'Close',

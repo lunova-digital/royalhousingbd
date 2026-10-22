@@ -1,7 +1,7 @@
 @extends('site::layouts.app')
 @section('content')
 <section class="container-x flex justify-center pt-8 pb-16 lg:pt-14 lg:pb-24">
-  <div class="w-full max-w-[460px] rounded-[24px] border border-line bg-white p-6 sm:p-9">
+  <div class="w-full max-w-[460px] rounded-[24px] border border-line bg-surface p-6 sm:p-9">
     @if ($step === 'identifier')
       <h1 class="font-display text-[40px] leading-[1.1] text-fg">{{ __('account::auth.forgot_title') }}</h1>
       <p class="mt-2 text-[15px] text-muted-fg">{{ __('account::auth.send_code_hint') }}</p>

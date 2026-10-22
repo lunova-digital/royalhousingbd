@@ -8,7 +8,7 @@
     <summary class="flex cursor-pointer items-center justify-between text-sm font-semibold text-fg">{{ __('listing::index.chip_type') }} {!! $arrow() !!}</summary>
     <div class="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="{{ __('listing::index.chip_type') }}">
       @foreach (array_merge([[null, __('listing::index.all_types')]], $listingTypes->map(fn ($t) => [$t->slug, $t->name])->all()) as [$key, $name])
-        <label class="cursor-pointer"><input type="radio" name="type" value="{{ $key }}" @checked(($filter['type'] ?? null) === $key) class="peer sr-only" /><span class="inline-flex h-10 items-center rounded-full border border-line bg-white px-4 text-sm font-medium text-text transition-colors duration-150 hover:border-ink-950 peer-checked:border-ink-950 peer-checked:bg-ink-950 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-ink-950 peer-focus-visible:ring-offset-2">{{ $name }}</span></label>
+        <label class="cursor-pointer"><input type="radio" name="type" value="{{ $key }}" @checked(($filter['type'] ?? null) === $key) class="peer sr-only" /><span class="inline-flex h-10 items-center rounded-full border border-line bg-surface px-4 text-sm font-medium text-text transition-colors duration-150 hover:border-action peer-checked:border-action peer-checked:bg-action peer-checked:text-action-fg peer-focus-visible:ring-2 peer-focus-visible:ring-action peer-focus-visible:ring-offset-2">{{ $name }}</span></label>
       @endforeach
     </div>
   </details>

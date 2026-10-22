@@ -38,7 +38,7 @@
       <h2 class="section-title">{{ __('service::service.benefits') }}</h2>
       <ul class="mt-6 grid gap-4">
         @foreach ($benefits as $benefit)
-          <li class="flex gap-3 rounded-2xl border border-line bg-white p-4"><span class="mt-0.5 text-accent-text">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5'])</span><span class="font-medium text-fg">{{ $benefit }}</span></li>
+          <li class="flex gap-3 rounded-2xl border border-line bg-surface p-4"><span class="mt-0.5 text-accent-text">@include('site::partials.icon', ['name' => 'check', 'class' => 'size-5'])</span><span class="font-medium text-fg">{{ $benefit }}</span></li>
         @endforeach
       </ul>
     </div>

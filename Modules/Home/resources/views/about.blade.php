@@ -5,7 +5,7 @@
 
 @if ($stats)
 <section class="container-x pt-8">
-  <dl class="grid grid-cols-2 gap-y-6 divide-x divide-line rounded-[20px] border border-line bg-white py-6 sm:grid-cols-4">
+  <dl class="grid grid-cols-2 gap-y-6 divide-x divide-line rounded-[20px] border border-line bg-surface py-6 sm:grid-cols-4">
     @foreach ($stats as $stat)
       <div class="px-5 text-center sm:px-6"><dt data-count-up class="num text-[28px] leading-none text-fg sm:text-[34px]">{{ $stat['value'] ?? '' }}</dt><dd class="mt-2 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($stat['label'] ?? '') }}</dd></div>
     @endforeach
@@ -44,7 +44,7 @@
         <figure class="card overflow-hidden">
           <div class="relative aspect-[4/5] bg-fill">
             @if ($member['photo'] ?? '')<img src="{{ $asset($member['photo']) }}" alt="{{ \Modules\Site\Site::tr($member['name'] ?? '') }}" loading="lazy" class="size-full object-cover" />@else<span class="flex size-full items-center justify-center text-faint-fg">@include('site::partials.icon', ['name' => 'user', 'class' => 'size-12'])</span>@endif
-            <span class="absolute top-3 left-3 rounded-full bg-white px-3 py-1 text-xs font-semibold text-fg">{{ __('home::about.leadership') }}</span>
+            <span class="absolute top-3 left-3 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-fg">{{ __('home::about.leadership') }}</span>
           </div>
           <figcaption class="p-4"><p class="text-lg font-semibold">{{ \Modules\Site\Site::tr($member['name'] ?? '') }}</p><p class="mt-0.5 text-sm text-muted-fg">{{ \Modules\Site\Site::tr($member['role'] ?? '') }}</p></figcaption>
         </figure>

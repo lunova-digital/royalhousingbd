@@ -12,7 +12,7 @@
     </div>
   @else
     <div class="card card-in mt-4 flex flex-col items-center px-6 py-12 text-center sm:py-16">
-      <span class="inline-flex size-14 items-center justify-center rounded-full bg-fill text-ink-950">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-6'])</span>
+      <span class="inline-flex size-14 items-center justify-center rounded-full bg-fill text-fg">@include('site::partials.icon', ['name' => 'search', 'class' => 'size-6'])</span>
       <h2 class="mt-5 max-w-md text-xl text-fg font-semibold">{{ __('listing::index.empty_title') }}</h2>
       <p class="mt-2 max-w-md text-[15px] text-muted-fg">{{ __('listing::index.empty_text') }}</p>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row">@include('site::partials.cta', ['kind' => 'wa'])@include('site::partials.cta', ['kind' => 'consult'])</div>
@@ -24,7 +24,7 @@
     <nav class="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="{{ __('listing::index.pagination') }}" data-pagination>
       @for ($p = 1; $p <= $pages; $p++)
         <a href="{{ $query(['page' => $p > 1 ? $p : null]) }}" data-page-link="{{ $p }}"
-           class="inline-flex size-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors duration-150 {{ $p === $page ? 'border-ink-950 bg-ink-950 text-white' : 'border-line bg-white text-fg hover:bg-fill' }}"
+           class="inline-flex size-10 items-center justify-center rounded-full border text-sm font-semibold transition-colors duration-150 {{ $p === $page ? 'border-action bg-action text-action-fg' : 'border-line bg-surface text-fg hover:bg-fill' }}"
            @if ($p === $page) aria-current="page" @endif>{{ $p }}</a>
       @endfor
     </nav>
